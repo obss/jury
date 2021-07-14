@@ -1,0 +1,6 @@
+datasets>=1.8.0
+nltk
+rouge-score==0.0.4
+sacrebleu==1.5.1
+sentencepiece
+fire>=0.4.0
