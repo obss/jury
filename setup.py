@@ -28,7 +28,7 @@ setuptools.setup(
     version=get_version(),
     author="",
     license="MIT",
-    description="Evalution toolkit for neural language generation.",
+    description="Evaluation toolkit for neural language generation.",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
     url="https://github.com/obss/jury",

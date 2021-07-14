@@ -4,7 +4,7 @@ jury
 </h1>
 
 <h4>
-  Evalution for Neural Language Generation.
+  Evaluation for Neural Language Generation.
 </h4>
   
 Coming soon..
