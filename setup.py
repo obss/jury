@@ -31,7 +31,7 @@ setuptools.setup(
     description="Evalution toolkit for neural language generation.",
     long_description=get_long_description(),
     long_description_content_type="text/markdown",
-    url="https://github.com/obss/level",
+    url="https://github.com/obss/jury",
     packages=setuptools.find_packages(exclude=["tests"]),
     python_requires=">=3.7",
     install_requires=get_requirements(),
