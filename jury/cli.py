@@ -1,11 +1,11 @@
 import fire
 
-from level import __version__ as level_version
+from jury import __version__ as jury_version
 
 
 def app() -> None:
     """Cli app."""
-    fire.Fire({"version": level_version})
+    fire.Fire({"version": jury_version})
 
 
 if __name__ == "__main__":

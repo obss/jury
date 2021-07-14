@@ -81,11 +81,11 @@ jobs:
           pip install pytest
           python -m unittest
 
-      - name: Install level package from local setup.py
+      - name: Install jury package from local setup.py
         run: >
           pip install -e .
 
       - name: Test CLI for installed package
         run: |
           # version
-          level version
+          jury version
