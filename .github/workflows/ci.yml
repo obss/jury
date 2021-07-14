@@ -88,4 +88,4 @@ jobs:
       - name: Test CLI for installed package
         run: |
           # version
-          level version
+          jury version
