@@ -3,9 +3,8 @@ line-length = 119
 exclude = '''
 (
   /(
-      \.git
-    | \.venv
-    | data
+    | .git
+    | venv
   )/
 )
 '''

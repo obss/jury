@@ -6,9 +6,9 @@ import unittest
 
 class TestImport(unittest.TestCase):
     def test_import(self):
-        import level
+        import jury
 
-        print(level.__version__)
+        print(jury.__version__)
 
 
 if __name__ == "__main__":
