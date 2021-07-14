@@ -1,6 +1,6 @@
 <div align="center">
 <h1>
-  level
+jury
 </h1>
 
 <h4>
