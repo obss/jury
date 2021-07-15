@@ -1,12 +1,43 @@
 <div align="center">
 <h1>
-jury
+Jury
 </h1>
-
-<h4>
-  Evaluation for Neural Language Generation.
-</h4>
-  
-Coming soon..
-  
 </div>
+
+Simple tool/toolkit for evaluating NLG (Natural Language Generation) offering various automated metrics. Jury offers a smooth and easy-to-use interface. It uses huggingface/datasets package for underlying metric computation, and hence adding custom metric is easy as adopting `datasets.Metric`.
+
+## <div align="center"> Installation </div>
+
+Through pip,
+
+    pip install jury
+
+or build from source,
+
+    git clone https://github.com/obss/jury.git
+    cd jury
+    python setup.py install
+
+## <div align="center"> Usage </div>
+
+### API Usage
+
+It is only two lines of code to evaluate generated outputs.
+
+    from jury import Jury
+    
+    jury = Jury()
+    scores = jury.evaluate(predictions, references)
+
+Specify metrics you want to use on instantiation.
+
+    jury = Jury(metrics=["bleu", "meteor"])
+    scores = jury.evaluate(predictions, references)
+
+### CLI Usage
+
+Coming soon...
+
+## <div align="center"> License </div>
+
+Licensed under the [MIT](LICENSE) License.
