@@ -1,8 +1,12 @@
-# Jury
+<div align="center">
+<h1>
+Jury
+</h1>
+</div>
 
 Simple tool/toolkit for evaluating NLG (Natural Language Generation) offering various automated metrics. Jury offers a smooth and easy-to-use interface. It uses huggingface/datasets package for underlying metric computation, and hence adding custom metric is easy as adopting `datasets.Metric`.
 
-## Installation
+## <div align="center"> Installation </div>
 
 Through pip,
 
@@ -14,7 +18,7 @@ or build from source,
     cd jury
     python setup.py install
 
-## Basic Usage
+## <div align="center"> Usage </div>
 
 ### API Usage
 
@@ -25,7 +29,6 @@ It is only two lines of code to evaluate generated outputs.
     jury = Jury()
     scores = jury.evaluate(predictions, references)
 
-
 Specify metrics you want to use on instantiation.
 
     jury = Jury(metrics=["bleu", "meteor"])
@@ -35,7 +38,6 @@ Specify metrics you want to use on instantiation.
 
 Coming soon...
 
-
-## License
+## <div align="center"> License </div>
 
 Licensed under the [MIT](LICENSE) License.
