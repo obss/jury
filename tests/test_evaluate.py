@@ -2,7 +2,6 @@ import unittest
 
 
 class TestBasicEvaluation(unittest.TestCase):
-
     def test_basic_evaluate(self):
         from jury import Jury
 

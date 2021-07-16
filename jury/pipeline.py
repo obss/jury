@@ -109,7 +109,8 @@ class Jury:
 
         if len(predictions) != len(references):
             raise ValueError(
-                "Currently supporting 1 reference per candidate. Number of predictions and references should be same.")
+                "Currently supporting 1 reference per candidate. Number of predictions and references should be same."
+            )
 
         if metric_name == "bleu":
             predictions, references = _tokenize_for_bleu(predictions, references)

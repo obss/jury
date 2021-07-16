@@ -36,14 +36,8 @@ setuptools.setup(
     python_requires=">=3.7",
     install_requires=get_requirements(),
     include_package_data=True,
-    extras_require={
-        "dev": ["black==21.6b0", "flake==3.9.2", "isort==5.8.0", "jupyterlab==3.0.14"],
-    },
-    entry_points={
-        "console_scripts": [
-            "jury=jury.cli:app",
-        ],
-    },
+    extras_require={"dev": ["black==21.6b0", "flake==3.9.2", "isort==5.8.0", "jupyterlab==3.0.14"],},
+    entry_points={"console_scripts": ["jury=jury.cli:app",],},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Operating System :: OS Independent",
