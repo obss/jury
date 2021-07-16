@@ -32,9 +32,11 @@ class Jury:
                     {'bleu_1': 0.6111111111111112, ..., 'rougeL': 0.6470588235294118, ...}
     """
 
+    DEFAULT_METRICS = ["bleu_1", "bleu_2", "bleu_3", "bleu_4", "meteor", "rouge", "sacrebleu", "bertscore"]
+
     def __init__(self, metrics: Optional[List[str]] = None, preload_metrics=False):
         if metrics is None:
-            metrics = ["bleu_1", "bleu_2", "bleu_3", "bleu_4", "meteor", "rouge", "sacrebleu", "bertscore"]
+            metrics = Jury.DEFAULT_METRICS
         else:
             metrics = [metric.lower() for metric in metrics]
 
@@ -105,7 +107,9 @@ class Jury:
             references = [[remove_punctuations(ref).split()] for ref in references]
             return predictions, references
 
-        assert len(predictions) == len(references), "Currently supporting 1 reference per candidate"
+        if len(predictions) != len(references):
+            raise ValueError(
+                "Currently supporting 1 reference per candidate. Number of predictions and references should be same.")
 
         if metric_name == "bleu":
             predictions, references = _tokenize_for_bleu(predictions, references)
@@ -144,12 +148,12 @@ class Jury:
     ) -> Dict[str, float]:
         metrics = {}
 
-        empty_questions = 0
+        empty_predictions = 0
         for preds in tqdm(predictions):
             if not preds:  # Check if empty
-                empty_questions += 1
-        metrics["empty_questions"] = empty_questions
-        metrics["total_questions"] = len(references)
+                empty_predictions += 1
+        metrics["empty_predictions"] = empty_predictions
+        metrics["total_items"] = len(references)
 
         inputs_list = self._prepare_concurrent_inputs(predictions, references)
 
