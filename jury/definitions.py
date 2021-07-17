@@ -1,4 +1,4 @@
-METRIC_PARAMS = {
+METRIC_DEFINITIONS = {
     "squad": {"metric_name": "squad", "score_name": None},
     "bleu_1": {"metric_name": "bleu", "max_order": 1, "score_name": "bleu"},
     "bleu_2": {"metric_name": "bleu", "max_order": 2, "score_name": "bleu"},
