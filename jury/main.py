@@ -113,6 +113,7 @@ class Jury:
 
         metric = self.load_metric(metric_name)
         compute_fn = self._compute_metric_for_multiple_items
+        is_datasets_metric = False
         kwargs["metric"] = metric
 
         if metric_name == "bleu":
@@ -122,22 +123,32 @@ class Jury:
             predictions = InputList(predictions).reshape(-1)
             references = InputList(references).reshape(-1)
             compute_fn = metric.compute
+            is_datasets_metric = True
             remove_keys = ["metric", "score_name", "base_name"]
             kwargs = bulk_remove_keys(kwargs, remove_keys)
 
         result = compute_fn(predictions=predictions, references=references, **kwargs)
-        result = self._postprocess_result(result, metric_name=metric_name, score_name=score_name, base_name=base_name)
+        result = self._postprocess_result(result, metric_name=metric_name, score_name=score_name, base_name=base_name,
+                                          is_datasets_metric=is_datasets_metric)
 
         return result
 
     @staticmethod
-    def _postprocess_result(result, metric_name, score_name, base_name):
-        if metric_name == "rouge" and "rougeL" in result:
-            result = {metric_name: result[score_name].mid.fmeasure}
-        elif metric_name == "sacrebleu":
+    def _postprocess_result(
+            result,
+            metric_name,
+            score_name,
+            base_name,
+            is_datasets_metric: bool):
+        if is_datasets_metric:
+            if metric_name == "rouge":
+                result = {metric_name: result[score_name].mid.fmeasure}
+            elif metric_name == "bertscore":
+                result = {metric_name: result[score_name][0]}
+
+        if metric_name == "sacrebleu":
             result = {metric_name: result[base_name] / 100}
-        elif metric_name == "bertscore":
-            result = {metric_name: result[score_name][0]}
+
         return result
 
     def _compute_single_score(self, inputs) -> Mapping[str, float]:
@@ -183,3 +194,9 @@ class Jury:
                 metrics.update(score)
 
         return metrics
+
+
+if __name__ == "__main__":
+    from jury.tests.test_main import test_evaluate_multiple_items
+
+    test_evaluate_multiple_items()
