@@ -194,9 +194,3 @@ class Jury:
                 metrics.update(score)
 
         return metrics
-
-
-if __name__ == "__main__":
-    from jury.tests.test_main import test_evaluate_multiple_items
-
-    test_evaluate_multiple_items()

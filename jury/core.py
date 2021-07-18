@@ -53,14 +53,3 @@ class InputList(list):
 	@classmethod
 	def from_str(cls, seq: str):
 		return [seq]
-
-
-if __name__ == "__main__":
-	preds = [
-		["abc", "def"],
-		["ghi", "mno"],
-		["jkl", "prs"]
-	]
-	ilst = InputList(preds)
-	print(ilst)
-	print(ilst.can_collapse())
