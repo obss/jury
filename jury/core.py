@@ -18,7 +18,7 @@ class InputList(list):
 	def ndim(self):
 		return len(self.shape)
 
-	def flatten(self):
+	def collapse(self):
 		return InputList(np.ravel(self).tolist(), keep=True)
 
 	def nested(self):

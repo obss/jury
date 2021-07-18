@@ -1,7 +1,7 @@
 import re
 import string
 from copy import deepcopy
-from typing import List
+from typing import List, Dict
 
 
 class NestedSingleType:
@@ -40,3 +40,7 @@ def remove_punctuations(text: str) -> str:
     regex = re.compile("[%s]" % re.escape(string.punctuation))
     text = regex.sub(" ", text)
     return " ".join(text.split())
+
+
+def bulk_remove_keys(obj: Dict, keys: List[str]) -> Dict:
+    return {k: v for k, v in obj.items() if k not in keys}
