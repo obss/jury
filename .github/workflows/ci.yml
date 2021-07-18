@@ -66,8 +66,8 @@ jobs:
 
       - name: Test with unittest
         run: |
-          pip install pytest sacrebleu bert_score
-          python -m pytest jury/tests
+          pip install -r requirements-dev.txt
+          pytest jury/tests
 
       - name: Install jury package from local setup.py
         run: >
