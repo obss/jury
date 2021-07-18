@@ -55,18 +55,6 @@ jobs:
         run: >
           pip install -r requirements.txt
 
-      - name: Install PyTorch on Linux and Windows
-        if: >
-          matrix.operating-system == 'ubuntu-latest' ||
-          matrix.operating-system == 'windows-latest'
-        run: >
-          pip install torch==1.8.1+cpu torchvision==0.9.1+cpu
-          -f https://download.pytorch.org/whl/torch_stable.html
-
-      - name: Install PyTorch on MacOS
-        if: matrix.operating-system == 'macos-latest'
-        run: pip install torch==1.8.1 torchvision==0.9.1
-
       - name: Lint with flake8 and black
         run: |
           pip install flake8 "black==21.6b0"
@@ -78,7 +66,7 @@ jobs:
 
       - name: Test with unittest
         run: |
-          pip install pytest
+          pip install pytest sacrebleu bert_score
           python -m pytest jury/tests
 
       - name: Install jury package from local setup.py
