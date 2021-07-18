@@ -1,6 +1,6 @@
 from jury import Jury
 
-TEST_METRICS = ["bleu_1", "meteor", "rouge", "bertscore"]
+TEST_METRICS = ["bleu_1", "meteor", "rouge"]
 
 
 def test_evaluate_basic():
