@@ -1,4 +1,4 @@
-from typing import Union, List, Tuple
+from typing import Union, List
 
 import numpy as np
 
@@ -24,8 +24,9 @@ class InputList(list):
 	def nested(self):
 		return InputList(self.from_list_of_str(self))
 
-	def reshape(self, shape: Tuple[int, int]):
-		return InputList(np.reshape(self, newshape=shape).tolist(), keep=True)
+	def reshape(self, *args):
+		_seq = np.array(self, dtype=object)
+		return InputList(_seq.reshape(args).tolist(), keep=True)
 
 	def can_collapse(self):
 		if self.ndim != 2:

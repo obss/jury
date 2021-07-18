@@ -73,19 +73,26 @@ class Jury:
         return datasets.load_metric(name)
 
     @staticmethod
-    def _compute_metric_for_multiple_candidates(
-        metric: datasets.Metric, predictions: List[List[str]], references: List[str], reduce="mean", **kwargs
+    def _compute_metric_for_multiple_items(
+        metric: datasets.Metric, predictions: InputList, references: InputList, reduce="mean", **kwargs
     ) -> Dict[str, float]:
         scores = []
         reduce_fn = getattr(np, reduce)
         score_name = kwargs.pop("score_name")
         base_name = kwargs.pop("base_name")
 
-        for hyps, ref in tqdm(zip(predictions, references), total=len(references)):
+        for hyps, refs in tqdm(zip(predictions, references), total=len(references)):
             if len(hyps) == 0:
                 # scores.append(0)  # Penalize for not generating any question
                 continue
-            score = [metric.compute(predictions=[hyp], references=[ref], **kwargs)[score_name] for hyp in hyps]
+
+            if "bleu" in metric.name:
+                score = [metric.compute(predictions=[hyp], references=[refs], **kwargs)[score_name] for hyp in hyps]
+            else:
+                score = []
+                for hyp, ref in zip(hyps, refs):
+                    _score = metric.compute(predictions=[hyp], references=[ref], **kwargs)[score_name]
+                    score.append(_score)
             scores.append(reduce_fn(score))
 
         return {base_name: float(np.mean(scores))}
@@ -99,7 +106,7 @@ class Jury:
     ) -> Dict[str, float]:
         metric = self.load_metric(metric_name)
         if isinstance(predictions[0], list):
-            compute_fn = self._compute_metric_for_multiple_candidates
+            compute_fn = self._compute_metric_for_multiple_items
             kwargs["metric"] = metric
         else:
             compute_fn = metric.compute
@@ -108,14 +115,14 @@ class Jury:
 
         if metric_name == "bleu":
             predictions, references = self.bleu_tokenizer.tokenize(predictions, references)
-        elif metric_name == "sacrebleu" and not isinstance(references[0], list):
-            references = [[ref] for ref in references]
+
+        if predictions.can_collapse() and references.can_collapse():
+            predictions = InputList(predictions).reshape(-1)
+            references = InputList(references).reshape(-1)
 
         result = compute_fn(predictions=predictions, references=references, **kwargs)
 
-        if metric_name == "rouge":
-            result = {"rougeL": result["rougeL"].mid.fmeasure}
-        elif metric_name == "sacrebleu":
+        if metric_name == "sacrebleu":
             result = {metric_name: result["score"] / 100}
         return result
 
@@ -168,7 +175,13 @@ if __name__ == "__main__":
 
     jury = Jury()
 
-    preds = ["abc def"]
-    refs = ["abc def"]
+    preds = [
+        ["the cat is on the mat"],
+        ["Look! a wonderful day."]
+    ]
+    refs = [
+        ["the cat is playing on the mat.", "The cat plays on the mat."],
+        ["Today is a wonderful day", "The weather outside is wonderful."]
+    ]
     scores = jury.evaluate(preds, refs)
     print(json.dumps(scores, indent=4))
