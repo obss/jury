@@ -41,16 +41,24 @@ class Jury:
     """
     _DEFAULT_METRICS = ["bleu_1", "bleu_2", "bleu_3", "bleu_4", "meteor", "rouge", "sacrebleu", "bertscore"]
 
-    def __init__(self, metrics: Optional[List[str]] = None, preload_metrics: bool = False, run_concurrent=False,
-                 bleu_tokenizer=None):
+    def __init__(
+        self,
+        metrics: Optional[List[str]] = None,
+        preload_metrics: bool = False,
+        run_concurrent=False,
+        bleu_tokenizer=None,
+    ):
         if metrics is None:
             metrics = self._DEFAULT_METRICS
         else:
             metrics = [metric.lower() for metric in metrics]
 
         self.metrics = metrics
-        self.bleu_tokenizer = TokenizerWrapper(bleu_tokenizer) if bleu_tokenizer is not None \
+        self.bleu_tokenizer = (
+            TokenizerWrapper(bleu_tokenizer)
+            if bleu_tokenizer is not None
             else TokenizerWrapper(BLEUDefaultTokenizer())
+        )
         self._concurrent = run_concurrent
         self._preloaded_metrics = None
         self.preload_metrics = preload_metrics
@@ -128,18 +136,18 @@ class Jury:
             kwargs = bulk_remove_keys(kwargs, remove_keys)
 
         result = compute_fn(predictions=predictions, references=references, **kwargs)
-        result = self._postprocess_result(result, metric_name=metric_name, score_name=score_name, base_name=base_name,
-                                          is_datasets_metric=is_datasets_metric)
+        result = self._postprocess_result(
+            result,
+            metric_name=metric_name,
+            score_name=score_name,
+            base_name=base_name,
+            is_datasets_metric=is_datasets_metric,
+        )
 
         return result
 
     @staticmethod
-    def _postprocess_result(
-            result,
-            metric_name,
-            score_name,
-            base_name,
-            is_datasets_metric: bool):
+    def _postprocess_result(result, metric_name, score_name, base_name, is_datasets_metric: bool):
         if is_datasets_metric:
             if metric_name == "rouge":
                 result = {metric_name: result[score_name].mid.fmeasure}
@@ -164,9 +172,9 @@ class Jury:
         return inputs
 
     def evaluate(
-            self,
-            predictions: Union[str, List[str], List[List[str]], List[Dict]],
-            references: Union[str, List[str], List[List[str]], List[Dict]]
+        self,
+        predictions: Union[str, List[str], List[List[str]], List[Dict]],
+        references: Union[str, List[str], List[List[str]], List[Dict]],
     ) -> Dict[str, float]:
         if len(predictions) != len(references):
             raise ValueError("Lengths of predictions and references must be equal.")

@@ -5,7 +5,6 @@ from typing import List, Dict
 
 
 class NestedSingleType:
-
     @staticmethod
     def is_iterable(obj):
         if isinstance(obj, str) or isinstance(obj, dict):

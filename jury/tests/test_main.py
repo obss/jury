@@ -1,8 +1,6 @@
 from jury import Jury
 
-TEST_METRICS = [
-    "bleu_1", "meteor", "rouge", "bertscore"
-]
+TEST_METRICS = ["bleu_1", "meteor", "rouge", "bertscore"]
 
 
 def test_evaluate_basic():
@@ -17,13 +15,10 @@ def test_evaluate_basic():
 
 
 def test_evaluate_corpus():
-    predictions = [
-        ["the cat is on the mat"],
-        ["Look! a wonderful day."]
-    ]
+    predictions = [["the cat is on the mat"], ["Look! a wonderful day."]]
     references = [
         ["the cat is playing on the mat.", "The cat plays on the mat."],
-        ["Today is a wonderful day", "The weather outside is wonderful."]
+        ["Today is a wonderful day", "The weather outside is wonderful."],
     ]
 
     jury = Jury(metrics=TEST_METRICS)
@@ -34,13 +29,10 @@ def test_evaluate_corpus():
 
 
 def test_evaluate_multiple_items():
-    predictions = [
-        ["the cat is on the mat", "There is cat playing on the mat"],
-        ["Look! a wonderful day."]
-    ]
+    predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
     references = [
         ["the cat is playing on the mat.", "The cat plays on the mat."],
-        ["Today is a wonderful day", "The weather outside is wonderful."]
+        ["Today is a wonderful day", "The weather outside is wonderful."],
     ]
     jury = Jury(metrics=TEST_METRICS)
     scores = jury.evaluate(predictions=predictions, references=references)

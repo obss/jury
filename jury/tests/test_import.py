@@ -1,4 +1,4 @@
 def test_import():
-	import jury
+    import jury
 
-	print(jury.__version__)
+    print(jury.__version__)
