@@ -10,8 +10,7 @@ def test_evaluate_basic():
 
     scores = jury.evaluate(predictions, references)
 
-    _check_all = [scores[metric] is not None for metric in TEST_METRICS]
-    assert all(_check_all)
+    assert all([scores[metric] is not None for metric in TEST_METRICS])
 
 
 def test_evaluate_corpus():
@@ -24,8 +23,7 @@ def test_evaluate_corpus():
     jury = Jury(metrics=TEST_METRICS)
     scores = jury.evaluate(predictions, references)
 
-    _check_all = [scores[metric] is not None for metric in TEST_METRICS]
-    assert all(_check_all)
+    assert all([scores[metric] is not None for metric in TEST_METRICS])
 
 
 def test_evaluate_multiple_items():
@@ -37,8 +35,7 @@ def test_evaluate_multiple_items():
     jury = Jury(metrics=TEST_METRICS)
     scores = jury.evaluate(predictions=predictions, references=references)
 
-    _check_all = [scores[metric] is not None for metric in TEST_METRICS]
-    assert all(_check_all)
+    assert all([scores[metric] is not None for metric in TEST_METRICS])
 
 
 def test_evaluate_preload():
@@ -48,8 +45,7 @@ def test_evaluate_preload():
 
     scores = jury.evaluate(predictions, references)
 
-    _check_all = [scores[metric] is not None for metric in TEST_METRICS]
-    assert all(_check_all)
+    assert all([scores[metric] is not None for metric in TEST_METRICS])
 
 
 def test_evaluate_concurrent():
@@ -59,5 +55,4 @@ def test_evaluate_concurrent():
 
     scores = jury.evaluate(predictions, references)
 
-    _check_all = [scores[metric] is not None for metric in TEST_METRICS]
-    assert all(_check_all)
+    assert all([scores[metric] is not None for metric in TEST_METRICS])
