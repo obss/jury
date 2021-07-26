@@ -78,8 +78,8 @@ jobs:
 
       - name: Test with unittest
         run: |
-          pip install pytest
-          python -m unittest
+          pip install -r requirements-dev.txt
+          pytest jury/tests
 
       - name: Install jury package from local setup.py
         run: >

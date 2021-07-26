@@ -27,6 +27,9 @@ It is only two lines of code to evaluate generated outputs.
     from jury import Jury
     
     jury = Jury()
+    # Microsoft translator translition for "Yurtta sulh, cihanda sulh." (16.07.2021)
+    predictions = ["Peace in the dormitory, peace in the world."]
+    references = ["Peace at home, peace in the world."]
     scores = jury.evaluate(predictions, references)
 
 Specify metrics you want to use on instantiation.

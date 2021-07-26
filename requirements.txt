@@ -3,6 +3,5 @@ fire>=0.4.0
 nltk
 numpy>=1.21.0
 rouge-score==0.0.4
-sacrebleu==1.5.1
 sentencepiece
 tqdm==4.61.2
