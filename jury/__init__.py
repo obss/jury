@@ -10,7 +10,7 @@ from jury.definitions import METRIC_DEFINITIONS
 from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
 from jury.utils import bulk_remove_keys
 
-__version__ = "0.0.4"
+__version__ = "0.0.5"
 
 
 class Jury:
