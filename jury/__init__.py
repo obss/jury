@@ -1,5 +1,5 @@
 from concurrent.futures import ProcessPoolExecutor
-from typing import List, Optional, Dict, Union, Mapping
+from typing import List, Optional, Dict, Union, Mapping, Callable
 
 import datasets
 import numpy as np
@@ -8,7 +8,7 @@ from tqdm import tqdm
 from jury.core import InputList
 from jury.definitions import METRIC_DEFINITIONS
 from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
-from jury.utils import bulk_remove_keys
+from jury.utils import bulk_remove_keys, is_reduce_fn
 
 __version__ = "0.0.5"
 
@@ -92,10 +92,9 @@ class Jury:
 
     @staticmethod
     def _compute_metric_for_multiple_items(
-        metric: datasets.Metric, predictions: InputList, references: InputList, reduce="mean", **kwargs
+        metric: datasets.Metric, predictions: InputList, references: InputList, reduce_fn, **kwargs
     ) -> Dict[str, float]:
         scores = []
-        reduce_fn = getattr(np, reduce)
         score_name = kwargs.pop("score_name")
         base_name = kwargs.pop("base_name")
 
@@ -116,7 +115,7 @@ class Jury:
         return {base_name: float(np.mean(scores))}
 
     def compute_metric(
-        self, metric_name: str, predictions: InputList, references: InputList, **kwargs
+        self, metric_name: str, predictions: InputList, references: InputList, reduce_fn: Callable, **kwargs
     ) -> Dict[str, float]:
         base_name = kwargs.get("base_name")
         score_name = kwargs.get("score_name")
@@ -136,6 +135,8 @@ class Jury:
             is_datasets_metric = True
             remove_keys = ["metric", "score_name", "base_name"]
             kwargs = bulk_remove_keys(kwargs, remove_keys)
+        else:
+            kwargs["reduce_fn"] = reduce_fn
 
         result = compute_fn(predictions=predictions, references=references, **kwargs)
         result = self._postprocess_result(
@@ -162,25 +163,29 @@ class Jury:
         return result
 
     def _compute_single_score(self, inputs) -> Mapping[str, float]:
-        metric_name, predictions, references = inputs
+        metric_name, predictions, references, reduce_fn = inputs
         params = self._get_metric_definition(metric_name)
-        score = self.compute_metric(predictions=predictions, references=references, **params)
+        score = self.compute_metric(predictions=predictions, references=references, reduce_fn=reduce_fn, **params)
         return score
 
-    def _prepare_concurrent_inputs(self, predictions, references):
+    def _prepare_concurrent_inputs(self, predictions, references, reduce_fn):
         inputs = []
         for metric in self.metrics:
-            inputs.append([metric, predictions, references])
+            inputs.append([metric, predictions, references, reduce_fn])
         return inputs
 
     def evaluate(
         self,
         predictions: Union[str, List[str], List[List[str]], List[Dict]],
         references: Union[str, List[str], List[List[str]], List[Dict]],
+        reduce_fn: Union[str, Callable] = "max"
     ) -> Dict[str, float]:
         if len(predictions) != len(references):
             raise ValueError("Lengths of predictions and references must be equal.")
 
+        reduce_fn = getattr(np, reduce_fn) if isinstance(reduce_fn, str) else reduce_fn
+        if not is_reduce_fn(reduce_fn):
+            raise ValueError("'reduce_fn' must be an aggregation function.")
         predictions = InputList(predictions)
         references = InputList(references)
         metrics = {}
@@ -192,7 +197,7 @@ class Jury:
         metrics["empty_predictions"] = empty_predictions
         metrics["total_items"] = len(references)
 
-        inputs_list = self._prepare_concurrent_inputs(predictions, references)
+        inputs_list = self._prepare_concurrent_inputs(predictions, references, reduce_fn)
 
         if self._concurrent:
             with ProcessPoolExecutor() as executor:

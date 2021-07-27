@@ -27,6 +27,7 @@ It is only two lines of code to evaluate generated outputs.
     from jury import Jury
     
     jury = Jury()
+
     # Microsoft translator translition for "Yurtta sulh, cihanda sulh." (16.07.2021)
     predictions = ["Peace in the dormitory, peace in the world."]
     references = ["Peace at home, peace in the world."]
@@ -40,6 +41,28 @@ Specify metrics you want to use on instantiation.
 ### CLI Usage
 
 Coming soon...
+
+## <div align="center"> Contributing </div>
+
+PRs are welcomed as always :)
+
+### Installation
+
+    git clone https://github.com/obss/pigeons.git
+    cd pigeons
+    python setup.py develop
+    pip install -r requirements-dev.txt
+
+### Tests
+
+To tests simply run.
+
+### Code Style
+
+Jury uses black package for code style check.
+
+    black . --config pyproject.toml
+
 
 ## <div align="center"> License </div>
 

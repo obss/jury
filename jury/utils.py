@@ -1,7 +1,9 @@
 import re
 import string
 from copy import deepcopy
-from typing import List, Dict
+from typing import List, Dict, Callable
+
+import numpy as np
 
 
 class NestedSingleType:
@@ -43,3 +45,8 @@ def remove_punctuations(text: str) -> str:
 
 def bulk_remove_keys(obj: Dict, keys: List[str]) -> Dict:
     return {k: v for k, v in obj.items() if k not in keys}
+
+
+def is_reduce_fn(fun: Callable) -> bool:
+    result = np.array(fun([1, 2]))
+    return result.size == 1
