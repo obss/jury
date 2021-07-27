@@ -1,3 +1,4 @@
+black
 pytest>=6.2.4
 sacrebleu
 bert_score
