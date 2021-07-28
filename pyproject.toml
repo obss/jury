@@ -1,5 +1,5 @@
 [tool.black]
-line-length = 119
+line-length = 120
 exclude = '''
 (
   /(
