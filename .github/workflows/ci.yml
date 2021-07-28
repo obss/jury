@@ -60,9 +60,9 @@ jobs:
           bash tests/run_code_style.sh install
           bash tests/run_code_style.sh check
 
-      - name: Test with unittest
+      - name: Run tests.
         run: |
-          pytest jury/tests
+          bash tests/run_tests.sh
 
       - name: Install jury package from local setup.py
         run: >
