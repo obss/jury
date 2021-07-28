@@ -38,9 +38,18 @@ Specify metrics you want to use on instantiation.
     jury = Jury(metrics=["bleu", "meteor"])
     scores = jury.evaluate(predictions, references)
 
-### CLI Usage
+### Custom Metrics
 
-Coming soon...
+You can use custom metrics with inheriting `datasets.Metric`, you can see current metrics on [datasets/metrics](https://github.com/huggingface/datasets/tree/master/metrics). The code snippet below gives a brief explanation.
+
+    import datasets
+
+    CustomMetric(datasets.Metric):
+        def _info(self):
+            pass
+        
+        def _compute(self, predictions, references, *args, **kwargs):
+            pass
 
 ## <div align="center"> Contributing </div>
 
@@ -57,11 +66,17 @@ PRs are welcomed as always :)
 
 To tests simply run.
 
+    bash tests/run_tests.sh
+
 ### Code Style
 
-Jury uses black package for code style check.
+To check code style,
 
-    black . --config pyproject.toml
+    bash tests/run_code_style.sh check
+
+To format codebase,
+
+    bash tests/run_code_style.sh format
 
 
 ## <div align="center"> License </div>

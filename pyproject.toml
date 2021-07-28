@@ -5,6 +5,7 @@ exclude = '''
   /(
     | .git
     | venv
+    | .venv
   )/
 )
 '''
