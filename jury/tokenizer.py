@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from jury.core import InputList
+from jury.collator import Collator
 from jury.utils import remove_punctuations
 
 
@@ -24,7 +24,7 @@ class TokenizerWrapper:
         self.tokenizer = tokenizer
 
     def tokenize(
-        self, predictions: InputList, references: InputList
+        self, predictions: Collator, references: Collator
     ) -> Tuple[List[List[List[str]]], List[List[List[str]]]]:
         _predictions = []
         _references = []
@@ -32,4 +32,4 @@ class TokenizerWrapper:
             _predictions.append([self.tokenizer.tokenize(pred) for pred in preds])
         for refs in references:
             _references.append([self.tokenizer.tokenize(ref) for ref in refs])
-        return InputList(_predictions, keep=True), InputList(_references, keep=True)
+        return Collator(_predictions, keep=True), Collator(_references, keep=True)

@@ -53,33 +53,15 @@ jobs:
 
       - name: Install dependencies
         run: >
-          pip install -r requirements.txt
-
-      - name: Install PyTorch on Linux and Windows
-        if: >
-          matrix.operating-system == 'ubuntu-latest' ||
-          matrix.operating-system == 'windows-latest'
-        run: >
-          pip install torch==1.8.1+cpu torchvision==0.9.1+cpu
-          -f https://download.pytorch.org/whl/torch_stable.html
-
-      - name: Install PyTorch on MacOS
-        if: matrix.operating-system == 'macos-latest'
-        run: pip install torch==1.8.1 torchvision==0.9.1
+          pip install -r requirements-dev.txt
 
       - name: Lint with flake8 and black
         run: |
-          pip install flake8 "black==21.6b0"
-          # stop the build if there are Python syntax errors or undefined names
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          black . --check --config pyproject.toml
-          # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          python tests/run_code_style.py check
 
-      - name: Test with unittest
+      - name: Run tests.
         run: |
-          pip install -r requirements-dev.txt
-          pytest jury/tests
+          python tests/run_tests.py
 
       - name: Install jury package from local setup.py
         run: >
