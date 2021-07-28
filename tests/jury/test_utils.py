@@ -1,6 +1,6 @@
 import numpy as np
 
-from jury.utils import remove_punctuations, bulk_remove_keys, is_reduce_fn
+from jury.utils import bulk_remove_keys, is_reduce_fn, remove_punctuations
 
 
 def test_remove_punctuations():
