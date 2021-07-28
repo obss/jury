@@ -1,6 +1,6 @@
 from typing import List, Tuple
 
-from jury.core import InputList
+from jury.collator import InputList
 from jury.utils import remove_punctuations
 
 
