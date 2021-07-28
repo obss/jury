@@ -5,7 +5,7 @@ import datasets
 import numpy as np
 from tqdm import tqdm
 
-from jury.collator import InputList
+from jury.collator import Collator
 from jury.definitions import METRIC_DEFINITIONS
 from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
 from jury.utils import bulk_remove_keys, is_reduce_fn
@@ -88,7 +88,7 @@ class Jury:
 
     @staticmethod
     def _compute_metric_for_multiple_items(
-        metric: datasets.Metric, predictions: InputList, references: InputList, reduce_fn, **kwargs
+        metric: datasets.Metric, predictions: Collator, references: Collator, reduce_fn, **kwargs
     ) -> Dict[str, float]:
         scores = []
         score_name = kwargs.pop("score_name")
@@ -111,7 +111,7 @@ class Jury:
         return {base_name: float(np.mean(scores))}
 
     def compute_metric(
-        self, metric_name: str, predictions: InputList, references: InputList, reduce_fn: Callable, **kwargs
+        self, metric_name: str, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs
     ) -> Dict[str, float]:
         base_name = kwargs.get("base_name")
         score_name = kwargs.get("score_name")
@@ -125,8 +125,8 @@ class Jury:
             predictions, references = self.bleu_tokenizer.tokenize(predictions, references)
 
         if predictions.can_collapse() and references.can_collapse() and "bleu" not in metric_name:
-            predictions = InputList(predictions).reshape(-1)
-            references = InputList(references).reshape(-1)
+            predictions = Collator(predictions).reshape(-1)
+            references = Collator(references).reshape(-1)
             compute_fn = metric.compute
             is_datasets_metric = True
             remove_keys = ["metric", "score_name", "base_name"]
@@ -182,8 +182,8 @@ class Jury:
         reduce_fn = getattr(np, reduce_fn) if isinstance(reduce_fn, str) else reduce_fn
         if not is_reduce_fn(reduce_fn):
             raise ValueError("'reduce_fn' must be an aggregation function.")
-        predictions = InputList(predictions)
-        references = InputList(references)
+        predictions = Collator(predictions)
+        references = Collator(references)
         metrics = {}
 
         empty_predictions = 0
