@@ -55,9 +55,7 @@ class Jury:
 
         self.metrics = metrics
         self.bleu_tokenizer = (
-            TokenizerWrapper(bleu_tokenizer)
-            if bleu_tokenizer is not None
-            else TokenizerWrapper(BLEUDefaultTokenizer())
+            TokenizerWrapper(bleu_tokenizer) if bleu_tokenizer is not None else TokenizerWrapper(BLEUDefaultTokenizer())
         )
         self._concurrent = run_concurrent
         self._preloaded_metrics = None

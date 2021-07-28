@@ -1,8 +1,10 @@
-<div align="center">
-<h1>
-Jury
-</h1>
-</div>
+<h1 align="center">Jury</h1>
+
+<p align="center">
+<a href="https://github.com/obss/jury/actions"><img alt="Build status" src="https://github.com/obss/jury/actions/workflows/ci.yml/badge.svg"></a>
+<a href="https://badge.fury.io/py/jury"><img src="https://badge.fury.io/py/jury.svg" alt="PyPI version" height="20"></a>
+<a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
+</p>
 
 Simple tool/toolkit for evaluating NLG (Natural Language Generation) offering various automated metrics. Jury offers a smooth and easy-to-use interface. It uses huggingface/datasets package for underlying metric computation, and hence adding custom metric is easy as adopting `datasets.Metric`.
 
@@ -66,17 +68,17 @@ PRs are welcomed as always :)
 
 To tests simply run.
 
-    bash tests/run_tests.sh
+    python tests/run_tests.py
 
 ### Code Style
 
 To check code style,
 
-    bash tests/run_code_style.sh check
+    python tests/run_code_style.py check
 
 To format codebase,
 
-    bash tests/run_code_style.sh format
+    python tests/run_code_style.py format
 
 
 ## <div align="center"> License </div>

@@ -57,12 +57,11 @@ jobs:
 
       - name: Lint with flake8 and black
         run: |
-          bash tests/run_code_style.sh install
-          bash tests/run_code_style.sh check
+          python tests/run_code_style.py check
 
       - name: Run tests.
         run: |
-          bash tests/run_tests.sh
+          python tests/run_tests.py
 
       - name: Install jury package from local setup.py
         run: >
