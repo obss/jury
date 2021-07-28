@@ -5,7 +5,7 @@ import numpy as np
 from jury.utils import NestedSingleType
 
 
-class InputList(list):
+class Collator(list):
     def __init__(self, sequence, keep=False):
         sequence = self._construct(sequence, keep=keep)
         super().__init__(sequence)
@@ -19,14 +19,14 @@ class InputList(list):
         return len(self.shape)
 
     def collapse(self):
-        return InputList(np.ravel(self).tolist(), keep=True)
+        return Collator(np.ravel(self).tolist(), keep=True)
 
     def nested(self):
-        return InputList(self.from_list_of_str(self))
+        return Collator(self.from_list_of_str(self))
 
     def reshape(self, *args):
         _seq = np.array(self, dtype=object)
-        return InputList(_seq.reshape(args).tolist(), keep=True)
+        return Collator(_seq.reshape(args).tolist(), keep=True)
 
     def can_collapse(self):
         if self.ndim != 2:
