@@ -57,7 +57,7 @@ PRs are welcomed as always :)
 
 ### Installation
 
-    git clone https://github.com/obss/pigeons.git
+    git clone https://github.com/obss/jury.git
     cd pigeons
     python setup.py develop
     pip install -r requirements-dev.txt
