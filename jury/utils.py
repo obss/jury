@@ -1,7 +1,7 @@
 import re
 import string
 from copy import deepcopy
-from typing import List, Dict, Callable
+from typing import Callable, Dict, List
 
 import numpy as np
 

@@ -1,5 +1,5 @@
 from concurrent.futures import ProcessPoolExecutor
-from typing import List, Optional, Dict, Union, Mapping, Callable
+from typing import Callable, Dict, List, Mapping, Optional, Union
 
 import datasets
 import numpy as np
