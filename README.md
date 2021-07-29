@@ -3,7 +3,7 @@
 <p align="center">
 <a href="https://github.com/obss/jury/actions"><img alt="Build status" src="https://github.com/obss/jury/actions/workflows/ci.yml/badge.svg"></a>
 <a href="https://badge.fury.io/py/jury"><img src="https://badge.fury.io/py/jury.svg" alt="PyPI version" height="20"></a>
-<a href="https://github.com/obss/jury/releases"><img alt="License: MIT" src="https://img.shields.io/github/release-date/obss/jury"></a>
+<a href="https://github.com/obss/jury/releases/latest"><img alt="License: MIT" src="https://img.shields.io/github/release-date/obss/jury"></a>
 <br>
 <a href="https://pypi.org/project/jury"><img src="https://img.shields.io/pypi/pyversions/jury" alt="downloads"></a>
 <a href="https://pepy.tech/project/jury"><img src="https://pepy.tech/badge/jury" alt="downloads"></a>
