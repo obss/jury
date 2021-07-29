@@ -11,7 +11,7 @@
 <a href="https://github.com/obss/jury/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/pypi/l/jury"></a>
 </p>
 
-Simple tool/toolkit for evaluating NLG (Natural Language Generation) offering various automated metrics. Jury offers a smooth and easy-to-use interface. It uses huggingface/datasets package for underlying metric computation, and hence adding custom metric is easy as adopting `datasets.Metric`. 
+Simple tool/toolkit for evaluating NLG (Natural Language Generation) offering various automated metrics. Jury offers a smooth and easy-to-use interface. It uses [datasets](https://github.com/huggingface/datasets/) for underlying metric computation, and hence adding custom metric is easy as adopting `datasets.Metric`. 
 
 Main advantages that Jury offers are:
 
