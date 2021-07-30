@@ -14,7 +14,7 @@ from jury.utils import bulk_remove_keys, is_reduce_fn
 class Jury:
     r"""
     Simple evaluation pipeline for text based metrics. By default it computes BLEU(n),
-    METEOR, ROUGE-L and SacreBLEU metrics.
+    METEOR, ROUGE-L metrics.
 
     Note:
 
