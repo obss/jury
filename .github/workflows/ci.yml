@@ -53,7 +53,7 @@ jobs:
 
       - name: Install dependencies
         run: >
-          pip install -r requirements-dev.txt
+          pip install .[develop]
 
       - name: Lint with flake8 and black
         run: |
@@ -62,10 +62,6 @@ jobs:
       - name: Run tests.
         run: |
           python tests/run_tests.py
-
-      - name: Install jury package from local setup.py
-        run: >
-          pip install -e .
 
       - name: Test CLI for installed package
         run: |

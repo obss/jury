@@ -23,6 +23,13 @@ def get_version():
         return re.search(r'^__version__ = [\'"]([^\'"]*)[\'"]', f.read(), re.M).group(1)
 
 
+_DEV_REQUIREMENTS = ["black==21.7b0", "flake8==3.9.2", "isort==5.9.2", "pytest>=6.2.4", "pytest-cov>=2.12.1"]
+
+_METRIC_REQUIREMENTS = ["sacrebleu", "bert_score"]
+
+extras = {"develop": _DEV_REQUIREMENTS, "metrics": _METRIC_REQUIREMENTS}
+
+
 setuptools.setup(
     name="jury",
     version=get_version(),
@@ -35,6 +42,7 @@ setuptools.setup(
     packages=setuptools.find_packages(exclude=["tests"]),
     python_requires=">=3.7",
     install_requires=get_requirements(),
+    extras_require=extras,
     include_package_data=True,
     entry_points={
         "console_scripts": [

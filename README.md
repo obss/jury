@@ -75,8 +75,7 @@ PRs are welcomed as always :)
 
     git clone https://github.com/obss/jury.git
     cd jury
-    python setup.py develop
-    pip install -r requirements-dev.txt
+    pip install -e .[develop]
 
 ### Tests
 
