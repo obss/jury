@@ -5,10 +5,10 @@ import datasets
 import numpy as np
 from tqdm import tqdm
 
-from jury.collator import Collator
-from jury.definitions import METRIC_DEFINITIONS
+from jury.collator import Collator, MetricCollator
+from jury.definitions import DEFAULT_METRICS
 from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
-from jury.utils import bulk_remove_keys, is_reduce_fn
+from jury.utils import is_reduce_fn, NestedSingleType
 
 
 class Jury:
@@ -39,109 +39,64 @@ class Jury:
         >>> print(results)
         {'bleu_1': 0.6111111111111112, ..., 'rougeL': 0.6470588235294118, ...}
     """
-    _DEFAULT_METRICS = ["bleu_1", "bleu_2", "bleu_3", "bleu_4", "meteor", "rouge"]
-
     def __init__(
         self,
         metrics: Optional[List[str]] = None,
-        preload_metrics: bool = False,
         run_concurrent=False,
         bleu_tokenizer=None,
     ):
         if metrics is None:
-            metrics = self._DEFAULT_METRICS
-        else:
+            metrics = DEFAULT_METRICS
+        elif NestedSingleType.get_type(metrics) == "list<str>":
             metrics = [metric.lower() for metric in metrics]
 
-        self.metrics = metrics
+        self.metrics = MetricCollator(metrics)
         self.bleu_tokenizer = (
             TokenizerWrapper(bleu_tokenizer) if bleu_tokenizer is not None else TokenizerWrapper(BLEUDefaultTokenizer())
         )
         self._concurrent = run_concurrent
-        self._preloaded_metrics = None
-        self.preload_metrics = preload_metrics
-
-        if preload_metrics:
-            self._preload_metrics()
-
-    @staticmethod
-    def _get_metric_definition(metric_name: str):
-        try:
-            definition = METRIC_DEFINITIONS[metric_name]
-            definition["base_name"] = metric_name
-        except KeyError:
-            raise ValueError(f"Unknown metric {metric_name}.")
-
-        return definition
-
-    def _preload_metrics(self) -> None:
-        preloaded_metrics = {}
-        for metric in self.metrics:
-            params = self._get_metric_definition(metric)
-            preloaded_metrics[metric] = datasets.load_metric(params["metric_name"])
-        setattr(self, "_preloaded_metrics", preloaded_metrics)
-
-    def load_metric(self, name) -> datasets.Metric:
-        if self.preload_metrics and name in self._preloaded_metrics:
-            return self._preloaded_metrics[name]
-        return datasets.load_metric(name)
 
     @staticmethod
     def _compute_metric_for_multiple_items(
-        metric: datasets.Metric, predictions: Collator, references: Collator, reduce_fn, **kwargs
+        metric: datasets.Metric, predictions: Collator, references: Collator, reduce_fn
     ) -> Dict[str, float]:
         scores = []
-        score_name = kwargs.pop("score_name")
-        base_name = kwargs.pop("base_name")
 
         for hyps, refs in tqdm(zip(predictions, references), total=len(references)):
             if len(hyps) == 0:
                 # scores.append(0)  # Penalize for not generating any question
                 continue
 
-            if "bleu" in metric.name:
-                score = [metric.compute(predictions=[hyp], references=[refs], **kwargs)[score_name] for hyp in hyps]
+            if "bleu" in metric.metric_name:
+                score = [metric.compute(predictions=[hyp], references=[refs], return_dict=False) for hyp in hyps]
             else:
                 score = []
                 for hyp, ref in zip(hyps, refs):
-                    _score = metric.compute(predictions=[hyp], references=[ref], **kwargs)[score_name]
+                    _score = metric.compute(predictions=[hyp], references=[ref], return_dict=False)
                     score.append(_score)
             scores.append(reduce_fn(score))
 
-        return {base_name: float(np.mean(scores))}
+        return {metric.resulting_name: float(np.mean(scores))}
 
     def compute_metric(
-        self, metric_name: str, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs
+        self, metric, predictions: Collator, references: Collator, reduce_fn: Callable
     ) -> Dict[str, float]:
-        base_name = kwargs.get("base_name")
-        score_name = kwargs.get("score_name")
-
-        metric = self.load_metric(metric_name)
-        compute_fn = self._compute_metric_for_multiple_items
-        is_datasets_metric = False
-        kwargs["metric"] = metric
-
-        if metric_name == "bleu":
+        if metric.metric_name == "bleu":
             predictions, references = self.bleu_tokenizer.tokenize(predictions, references)
 
-        if predictions.can_collapse() and references.can_collapse() and "bleu" not in metric_name:
+        if predictions.can_collapse() and references.can_collapse() and "bleu" not in metric.metric_name:
             predictions = Collator(predictions).reshape(-1)
             references = Collator(references).reshape(-1)
-            compute_fn = metric.compute
-            is_datasets_metric = True
-            remove_keys = ["metric", "score_name", "base_name"]
-            kwargs = bulk_remove_keys(kwargs, remove_keys)
+            result = metric.compute(predictions=predictions, references=references)
         else:
-            kwargs["reduce_fn"] = reduce_fn
-
-        result = compute_fn(predictions=predictions, references=references, **kwargs)
-        result = self._postprocess_result(
-            result,
-            metric_name=metric_name,
-            score_name=score_name,
-            base_name=base_name,
-            is_datasets_metric=is_datasets_metric,
-        )
+            result = self._compute_metric_for_multiple_items(metric, predictions=predictions, references=references, reduce_fn=reduce_fn)
+        # result = self._postprocess_result(
+        #     result,
+        #     metric_name=metric_name,
+        #     score_name=score_name,
+        #     base_name=base_name,
+        #     is_datasets_metric=is_datasets_metric,
+        # )
 
         return result
 
@@ -159,9 +114,8 @@ class Jury:
         return result
 
     def _compute_single_score(self, inputs) -> Mapping[str, float]:
-        metric_name, predictions, references, reduce_fn = inputs
-        params = self._get_metric_definition(metric_name)
-        score = self.compute_metric(predictions=predictions, references=references, reduce_fn=reduce_fn, **params)
+        metric, predictions, references, reduce_fn = inputs
+        score = self.compute_metric(metric=metric, predictions=predictions, references=references, reduce_fn=reduce_fn)
         return score
 
     def _prepare_concurrent_inputs(self, predictions, references, reduce_fn):
