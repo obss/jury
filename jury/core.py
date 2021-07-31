@@ -7,6 +7,7 @@ from tqdm import tqdm
 
 from jury.collator import Collator, MetricCollator
 from jury.definitions import DEFAULT_METRICS
+from jury.metrics import Metric
 from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
 from jury.utils import is_reduce_fn, NestedSingleType
 
@@ -41,9 +42,8 @@ class Jury:
     """
     def __init__(
         self,
-        metrics: Optional[List[str]] = None,
+        metrics: Optional[Union[List[str], List[Metric]]] = None,
         run_concurrent=False,
-        bleu_tokenizer=None,
     ):
         if metrics is None:
             metrics = DEFAULT_METRICS
@@ -51,9 +51,6 @@ class Jury:
             metrics = [metric.lower() for metric in metrics]
 
         self.metrics = MetricCollator(metrics)
-        self.bleu_tokenizer = (
-            TokenizerWrapper(bleu_tokenizer) if bleu_tokenizer is not None else TokenizerWrapper(BLEUDefaultTokenizer())
-        )
         self._concurrent = run_concurrent
 
     @staticmethod
@@ -68,7 +65,7 @@ class Jury:
                 continue
 
             if "bleu" in metric.metric_name:
-                score = [metric.compute(predictions=[hyp], references=[refs], return_dict=False) for hyp in hyps]
+                score = [metric.compute(predictions=Collator([hyp]), references=Collator(refs), return_dict=False) for hyp in hyps]
             else:
                 score = []
                 for hyp, ref in zip(hyps, refs):
@@ -81,9 +78,6 @@ class Jury:
     def compute_metric(
         self, metric, predictions: Collator, references: Collator, reduce_fn: Callable
     ) -> Dict[str, float]:
-        if metric.metric_name == "bleu":
-            predictions, references = self.bleu_tokenizer.tokenize(predictions, references)
-
         if predictions.can_collapse() and references.can_collapse() and "bleu" not in metric.metric_name:
             predictions = Collator(predictions).reshape(-1)
             references = Collator(references).reshape(-1)

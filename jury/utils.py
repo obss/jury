@@ -1,6 +1,5 @@
 import re
 import string
-from copy import deepcopy
 from typing import Callable, Dict, List
 
 import numpy as np
@@ -32,7 +31,7 @@ class NestedSingleType:
         types = []
         while cls.is_iterable(_obj):
             types.append(type(_obj).__name__)
-            _obj = deepcopy(_obj[0])
+            _obj = _obj[0]
         types.append(type(_obj).__name__)
         return cls.join(types)
 
