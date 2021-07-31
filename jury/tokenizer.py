@@ -14,18 +14,12 @@ class BLEUDefaultTokenizer:
 
 
 class TokenizerWrapper:
-    _selected_metrics = ["bleu"]
-
     def __init__(self, tokenizer):
-        if tokenizer.__class__.__name__ == "BLEUDefaultTokenizer":
-            self.is_default_tokenizer = True
-        else:
-            self.is_default_tokenizer = False
         self.tokenizer = tokenizer
 
     def tokenize(
         self, predictions: Collator, references: Collator
-    ) -> Tuple[List[List[List[str]]], List[List[List[str]]]]:
+    ) -> Tuple[Collator, Collator]:
         _predictions = []
         _references = []
         for preds in predictions:
