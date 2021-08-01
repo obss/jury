@@ -17,9 +17,7 @@ class TokenizerWrapper:
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
 
-    def tokenize(
-        self, predictions: Collator, references: Collator
-    ) -> Tuple[Collator, Collator]:
+    def tokenize(self, predictions: Collator, references: Collator) -> Tuple[Collator, Collator]:
         _predictions = []
         _references = []
         for preds in predictions:

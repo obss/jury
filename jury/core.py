@@ -8,8 +8,7 @@ from tqdm import tqdm
 from jury.collator import Collator, MetricCollator
 from jury.definitions import DEFAULT_METRICS
 from jury.metrics import Metric
-from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
-from jury.utils import is_reduce_fn, NestedSingleType
+from jury.utils import NestedSingleType, is_reduce_fn
 
 
 class Jury:
@@ -40,6 +39,7 @@ class Jury:
         >>> print(results)
         {'bleu_1': 0.6111111111111112, ..., 'rougeL': 0.6470588235294118, ...}
     """
+
     def __init__(
         self,
         metrics: Optional[Union[List[str], List[Metric]]] = None,
@@ -65,11 +65,14 @@ class Jury:
                 continue
 
             if "bleu" in metric.metric_name:
-                score = [metric.compute(predictions=Collator([hyp]), references=Collator(refs), return_dict=False) for hyp in hyps]
+                score = [
+                    metric.compute(predictions=Collator([hyp]), references=Collator(refs), return_dict=False)
+                    for hyp in hyps
+                ]
             else:
                 score = []
                 for hyp, ref in zip(hyps, refs):
-                    _score = metric.compute(predictions=[hyp], references=[ref], return_dict=False)
+                    _score = metric.compute(predictions=Collator([hyp]), references=Collator([ref]), return_dict=False)
                     score.append(_score)
             scores.append(reduce_fn(score))
 
@@ -83,28 +86,9 @@ class Jury:
             references = Collator(references).reshape(-1)
             result = metric.compute(predictions=predictions, references=references)
         else:
-            result = self._compute_metric_for_multiple_items(metric, predictions=predictions, references=references, reduce_fn=reduce_fn)
-        # result = self._postprocess_result(
-        #     result,
-        #     metric_name=metric_name,
-        #     score_name=score_name,
-        #     base_name=base_name,
-        #     is_datasets_metric=is_datasets_metric,
-        # )
-
-        return result
-
-    @staticmethod
-    def _postprocess_result(result, metric_name, score_name, base_name, is_datasets_metric: bool):
-        if is_datasets_metric:
-            if metric_name == "rouge":
-                result = {metric_name: result[score_name].mid.fmeasure}
-            elif metric_name == "bertscore":
-                result = {metric_name: result[score_name][0]}
-
-        if metric_name == "sacrebleu":
-            result = {metric_name: result[base_name] / 100}
-
+            result = self._compute_metric_for_multiple_items(
+                metric, predictions=predictions, references=references, reduce_fn=reduce_fn
+            )
         return result
 
     def _compute_single_score(self, inputs) -> Mapping[str, float]:

@@ -1,4 +1,4 @@
-from typing import List, Union, Dict
+from typing import Dict, List, Union
 
 import numpy as np
 
@@ -38,6 +38,11 @@ class Collator(list):
             return False
 
         return self.shape[1] == 1
+
+    def to_list(self, collapse=True):
+        if collapse:
+            return list(self.collapse())
+        return list(self)
 
     def _construct(self, sequence: Union[str, List[str], List[List[str]]], keep: bool) -> List[List[str]]:
         if keep:
