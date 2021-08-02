@@ -9,12 +9,11 @@ class Metric(ABC):
         self.metric_name = metric_name.lower()
         self.resulting_name = resulting_name if resulting_name is not None else metric_name
         self.params = params if params is not None else {}
-        self._metric = datasets.load_metric(self.metric_name)
 
     def compute(self, predictions, references, return_dict: bool = True):
         predictions, references = self._preprocess(predictions, references)
-        # metric = datasets.load_metric(self.metric_name)
-        result = self._metric.compute(predictions=predictions, references=references, **self.params)
+        metric = datasets.load_metric(self.metric_name)
+        result = metric.compute(predictions=predictions, references=references, **self.params)
         return self._postprocess(result, return_dict=return_dict)
 
     def _preprocess(self, predictions, references):

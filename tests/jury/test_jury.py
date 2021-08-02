@@ -11,11 +11,19 @@ from jury.metrics.squad import SQUAD
 
 _TEST_METRICS = [
     Bleu(),
-    # Meteor(),
-    # Rouge(),
-    # SacreBLEU(),
-    # BERTScore(params={"model_type": "albert-base-v1"}),
-    # SQUAD(),
+    Meteor(),
+    Rouge(),
+    SacreBLEU(),
+    BERTScore(params={"model_type": "albert-base-v1"}),
+    SQUAD(),
+]
+_CONCURRENT_TEST_METRICS = [
+    Bleu(),
+    Meteor(),
+    Rouge(),
+    # SacreBLEU(),  # Broken in concurrency, cannot find package 'sacrebleu'.
+    BERTScore(params={"model_type": "albert-base-v1"}),
+    SQUAD(),
 ]
 _STR_TEST_METRICS = ["bleu", "meteor", "rouge", "sacrebleu", "bertscore", "squad"]
 
@@ -63,7 +71,7 @@ def test_evaluate_multiple_predictions():
 
 
 def test_evaluate_concurrent():
-    jury = Jury(metrics=_TEST_METRICS, run_concurrent=True)
+    jury = Jury(metrics=_CONCURRENT_TEST_METRICS, run_concurrent=True)
     scores = jury.evaluate(_DEFAULT_PREDICTIONS, _DEFAULT_REFERENCES)
 
     assert all([scores[metric.resulting_name] is not None for metric in jury.metrics])
