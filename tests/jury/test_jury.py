@@ -1,5 +1,3 @@
-import platform
-
 import numpy as np
 import pytest
 
@@ -15,7 +13,7 @@ _TEST_METRICS = [
     Bleu(),
     # Meteor(),
     # Rouge(),
-    SacreBLEU(),
+    # SacreBLEU(),
     # BERTScore(params={"model_type": "albert-base-v1"}),
     # SQUAD(),
 ]

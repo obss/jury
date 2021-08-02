@@ -30,7 +30,7 @@ _METRIC_REQUIREMENTS = ["sacrebleu", "bert_score"]
 extras = {
     "tests": _DEV_REQUIREMENTS,
     "metrics": _METRIC_REQUIREMENTS,
-    "develop": _DEV_REQUIREMENTS + _METRIC_REQUIREMENTS
+    "develop": _DEV_REQUIREMENTS + _METRIC_REQUIREMENTS,
 }
 
 

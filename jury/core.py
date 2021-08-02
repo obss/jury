@@ -1,7 +1,6 @@
 from concurrent.futures import ProcessPoolExecutor
 from typing import Callable, Dict, List, Mapping, Optional, Union
 
-import datasets
 import numpy as np
 from tqdm import tqdm
 
@@ -55,7 +54,7 @@ class Jury:
 
     @staticmethod
     def _compute_metric_for_multiple_items(
-        metric: datasets.Metric, predictions: Collator, references: Collator, reduce_fn
+        metric: Metric, predictions: Collator, references: Collator, reduce_fn
     ) -> Dict[str, float]:
         scores = []
 
@@ -72,7 +71,9 @@ class Jury:
             else:
                 score = []
                 for hyp, ref in zip(hyps, refs):
-                    _score = metric.compute(predictions=Collator([hyp]), references=Collator([ref]), return_dict=False)
+                    _score = metric.compute(
+                        predictions=Collator([hyp], keep=True), references=Collator([ref], keep=True), return_dict=False
+                    )
                     score.append(_score)
             scores.append(reduce_fn(score))
 
