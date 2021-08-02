@@ -22,7 +22,7 @@ _CONCURRENT_TEST_METRICS = [
     Meteor(),
     Rouge(),
     # SacreBLEU(),  # Broken in concurrency, cannot find package 'sacrebleu'.
-    BERTScore(params={"model_type": "albert-base-v1"}),
+    BERTScore(),
     SQUAD(),
 ]
 _STR_TEST_METRICS = ["bleu", "meteor", "rouge", "sacrebleu", "bertscore", "squad"]
