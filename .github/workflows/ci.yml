@@ -53,7 +53,7 @@ jobs:
 
       - name: Install dependencies
         run: >
-          pip install .[ci]
+          pip install .[develop]
 
       - name: Lint with flake8 and black
         run: |

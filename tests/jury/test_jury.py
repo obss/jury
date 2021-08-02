@@ -12,14 +12,14 @@ from jury.metrics.sacrebleu import SacreBLEU
 from jury.metrics.squad import SQUAD
 
 _TEST_METRICS = [
-    # Bleu(),
+    Bleu(),
     # Meteor(),
     # Rouge(),
-    # SacreBLEU(),
+    SacreBLEU(),
     # BERTScore(params={"model_type": "albert-base-v1"}),
-    SQUAD(),
+    # SQUAD(),
 ]
-_STR_TEST_METRICS = ["bleu", "meteor", "rouge", "sacrebleu", "bertscore"]
+_STR_TEST_METRICS = ["bleu", "meteor", "rouge", "sacrebleu", "bertscore", "squad"]
 
 _DEFAULT_PREDICTIONS = ["Peace in the dormitory, peace in the world."]
 _DEFAULT_REFERENCES = ["Peace at home, peace in the world."]
@@ -65,12 +65,10 @@ def test_evaluate_multiple_predictions():
 
 
 def test_evaluate_concurrent():
+    jury = Jury(metrics=_TEST_METRICS, run_concurrent=True)
+    scores = jury.evaluate(_DEFAULT_PREDICTIONS, _DEFAULT_REFERENCES)
 
-    if platform.system() != "Windows":
-        jury = Jury(metrics=_TEST_METRICS, run_concurrent=True)
-        scores = jury.evaluate(_DEFAULT_PREDICTIONS, _DEFAULT_REFERENCES)
-
-        assert all([scores[metric.resulting_name] is not None for metric in jury.metrics])
+    assert all([scores[metric.resulting_name] is not None for metric in jury.metrics])
 
 
 def test_reduce_fn():

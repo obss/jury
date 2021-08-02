@@ -1,4 +1,4 @@
-import os
+from tests.utils import assert_shell
 
 if __name__ == "__main__":
-    os.system("pytest --cov jury --cov-report term-missing --cov-report xml -vvv tests")
+    assert_shell("pytest --cov jury --cov-report term-missing --cov-report xml -vvv tests")

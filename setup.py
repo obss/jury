@@ -28,9 +28,9 @@ _DEV_REQUIREMENTS = ["black==21.7b0", "flake8==3.9.2", "isort==5.9.2", "pytest>=
 _METRIC_REQUIREMENTS = ["sacrebleu", "bert_score"]
 
 extras = {
-    "develop": _DEV_REQUIREMENTS,
+    "tests": _DEV_REQUIREMENTS,
     "metrics": _METRIC_REQUIREMENTS,
-    "ci": _DEV_REQUIREMENTS + _METRIC_REQUIREMENTS
+    "develop": _DEV_REQUIREMENTS + _METRIC_REQUIREMENTS
 }
 
 
