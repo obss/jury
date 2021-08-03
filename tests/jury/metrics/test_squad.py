@@ -17,7 +17,7 @@ def test_basic_str_input():
     jury = Jury(metrics=METRICS)
     scores = jury.evaluate(predictions, references)
 
-    assert scores == _EXPECTED_RESULT
+    assert_almost_equal_dict(_EXPECTED_RESULT, scores)
 
 
 def test_basic_dict_input():
@@ -31,7 +31,7 @@ def test_basic_dict_input():
     assert_almost_equal_dict(_EXPECTED_RESULT, scores)
 
 
-def test_squad_str_multiple_ref():
+def test_multiple_ref():
     _EXPECTED_RESULT = {"empty_predictions": 0, "total_items": 2, "SQUAD": 1.0}
     predictions = ["1917", "Albert Einstein"]
     references = ["1917", ["Einstein", "Albert Einstein"]]

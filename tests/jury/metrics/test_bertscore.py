@@ -14,7 +14,7 @@ def test_basic():
     jury = Jury(metrics=METRICS)
     scores = jury.evaluate(predictions, references)
 
-    assert assert_almost_equal_dict(_EXPECTED_RESULT, scores)
+    assert_almost_equal_dict(_EXPECTED_RESULT, scores)
 
 
 def test_multiple_ref():
@@ -25,7 +25,7 @@ def test_multiple_ref():
     jury = Jury(metrics=METRICS)
     scores = jury.evaluate(predictions, references)
 
-    assert assert_almost_equal_dict(_EXPECTED_RESULT, scores)
+    assert_almost_equal_dict(_EXPECTED_RESULT, scores)
 
 
 def test_multiple_pred_multiple_ref():
@@ -36,4 +36,4 @@ def test_multiple_pred_multiple_ref():
     jury = Jury(metrics=METRICS)
     scores = jury.evaluate(predictions, references)
 
-    assert assert_almost_equal_dict(_EXPECTED_RESULT, scores)
+    assert_almost_equal_dict(_EXPECTED_RESULT, scores)
