@@ -1,6 +1,6 @@
 import re
 import string
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Optional
 
 import numpy as np
 
@@ -25,7 +25,7 @@ class NestedSingleType:
         return nested_types.lower()
 
     @classmethod
-    def get_type(cls, obj):
+    def get_type(cls, obj, order: Optional[int] = None):
         _obj = obj
 
         types = []
@@ -33,6 +33,9 @@ class NestedSingleType:
             types.append(type(_obj).__name__)
             _obj = _obj[0]
         types.append(type(_obj).__name__)
+        if order is not None:
+            return types[order]
+
         return cls.join(types)
 
 

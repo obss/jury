@@ -2,12 +2,12 @@ from typing import Dict
 
 from jury.metrics import Metric
 
-__class_name__ = "Bleu"
+__class_name__ = "BLEU"
 
 from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
 
 
-class Bleu(Metric):
+class BLEU(Metric):
     def __init__(self, resulting_name: str = None, params: Dict = None):
         metric_name = self.__class__.__name__
         params = {} if params is None else params
