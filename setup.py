@@ -26,12 +26,10 @@ def get_version():
 _DEV_REQUIREMENTS = ["black==21.7b0", "flake8==3.9.2", "isort==5.9.2", "pytest>=6.2.4", "pytest-cov>=2.12.1"]
 
 _METRIC_REQUIREMENTS = ["sacrebleu", "bert_score"]
-_NOTEBOOK_REQUIREMENTS = ["notebook>=6.4.0"]
 
 extras = {
     "tests": _DEV_REQUIREMENTS,
     "metrics": _METRIC_REQUIREMENTS,
-    "notebook": _NOTEBOOK_REQUIREMENTS + _METRIC_REQUIREMENTS,
     "develop": _DEV_REQUIREMENTS + _METRIC_REQUIREMENTS,
 }
 

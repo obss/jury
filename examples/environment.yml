@@ -1,9 +1,11 @@
 name: jury-notebook
-#prefix: /your/custom/path/envs/turkish-qa-qg
 channels:
   - anaconda
 dependencies:
   - pip
   - python=3.8
   - pip:
-    - jury[metric]
+    - jury @ git+git://github.com/obss/jury.git@metrics
+    - notebook>=6.4.0
+    - sacrebleu
+    - bert-score
