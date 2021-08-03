@@ -1,6 +1,7 @@
 from jury import Jury
 from jury.metrics.bertscore import BERTScore
 from tests.jury import _DEFAULT_PREDICTIONS, _DEFAULT_PREDICTIONS_MR, _DEFAULT_REFERENCES, _DEFAULT_REFERENCES_MR
+from tests.utils import assert_almost_equal_dict
 
 METRICS = [BERTScore(params={"model_type": "albert-base-v1"})]
 
@@ -13,7 +14,7 @@ def test_basic():
     jury = Jury(metrics=METRICS)
     scores = jury.evaluate(predictions, references)
 
-    assert scores == _EXPECTED_RESULT
+    assert assert_almost_equal_dict(_EXPECTED_RESULT, scores)
 
 
 def test_multiple_ref():
@@ -24,7 +25,7 @@ def test_multiple_ref():
     jury = Jury(metrics=METRICS)
     scores = jury.evaluate(predictions, references)
 
-    assert scores == _EXPECTED_RESULT
+    assert assert_almost_equal_dict(_EXPECTED_RESULT, scores)
 
 
 def test_multiple_pred_multiple_ref():
@@ -35,4 +36,4 @@ def test_multiple_pred_multiple_ref():
     jury = Jury(metrics=METRICS)
     scores = jury.evaluate(predictions, references)
 
-    assert scores == _EXPECTED_RESULT
+    assert assert_almost_equal_dict(_EXPECTED_RESULT, scores)

@@ -1,5 +1,6 @@
 from jury import Jury
 from jury.metrics.squad import SQUAD
+from tests.utils import assert_almost_equal_dict
 
 METRICS = [SQUAD()]
 
@@ -27,7 +28,7 @@ def test_basic_dict_input():
     jury = Jury(metrics=METRICS)
     scores = jury.evaluate(predictions, references)
 
-    assert scores == _EXPECTED_RESULT
+    assert_almost_equal_dict(_EXPECTED_RESULT, scores)
 
 
 def test_squad_str_multiple_ref():
@@ -38,7 +39,7 @@ def test_squad_str_multiple_ref():
     jury = Jury(metrics=METRICS)
     scores = jury.evaluate(predictions, references)
 
-    assert scores == _EXPECTED_RESULT
+    assert_almost_equal_dict(_EXPECTED_RESULT, scores)
 
 
 def test_multiple_pred_multiple_ref():
@@ -49,4 +50,4 @@ def test_multiple_pred_multiple_ref():
     jury = Jury(metrics=METRICS)
     scores = jury.evaluate(predictions, references)
 
-    assert scores == _EXPECTED_RESULT
+    assert_almost_equal_dict(_EXPECTED_RESULT, scores)
