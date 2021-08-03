@@ -29,9 +29,9 @@ _METRIC_REQUIREMENTS = ["sacrebleu", "bert_score"]
 _NOTEBOOK_REQUIREMENTS = ["notebook>=6.4.0"]
 
 extras = {
-    "notebook": _NOTEBOOK_REQUIREMENTS,
     "tests": _DEV_REQUIREMENTS,
     "metrics": _METRIC_REQUIREMENTS,
+    "notebook": _NOTEBOOK_REQUIREMENTS + _METRIC_REQUIREMENTS,
     "develop": _DEV_REQUIREMENTS + _METRIC_REQUIREMENTS,
 }
 
