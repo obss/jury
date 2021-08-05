@@ -25,7 +25,8 @@ def get_version():
 
 _DEV_REQUIREMENTS = ["black==21.7b0", "flake8==3.9.2", "isort==5.9.2", "pytest>=6.2.4", "pytest-cov>=2.12.1"]
 
-_METRIC_REQUIREMENTS = ["sacrebleu", "bert_score"]
+_METRIC_REQUIREMENTS = ["sacrebleu==1.5.1",
+                        "bert_score==0.3.9"]
 
 extras = {
     "tests": _DEV_REQUIREMENTS,
