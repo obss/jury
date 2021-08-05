@@ -8,8 +8,8 @@ from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
 
 
 class BLEU(Metric):
-    def __init__(self, resulting_name: str = None, params: Dict = None):
-        metric_name = self.__class__.__name__
+    def __init__(self, metric_name: str = None, resulting_name: str = None, params: Dict = None):
+        metric_name = self.__class__.__name__ if metric_name is None else metric_name
         params = {} if params is None else params
         tokenizer = params.get("tokenizer", None)
         self.tokenizer = BLEUDefaultTokenizer() if tokenizer is None else tokenizer
