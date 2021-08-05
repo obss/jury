@@ -20,9 +20,11 @@ class BLEU(Metric):
         predictions, references = tokenizer_wrapper.tokenize(predictions, references)
         if predictions.ndim > 2:
             predictions = predictions.reshape_len(-1)
-        if references.ndim != 3:
-            references = references.reshape(1, -1)
+
         if references.ndim == 3:
             ref_count = references.shape[0]
             references = references.reshape(1, ref_count, -1)
+        else:
+            references = references.reshape(1, -1)
+
         return predictions, references
