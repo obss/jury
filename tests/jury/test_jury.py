@@ -3,14 +3,15 @@ import pytest
 
 from jury import Jury
 from jury.metrics.bertscore import BERTScore
-from jury.metrics.bleu import Bleu
+from jury.metrics.bleu import BLEU
 from jury.metrics.meteor import Meteor
 from jury.metrics.rouge import Rouge
 from jury.metrics.sacrebleu import SacreBLEU
 from jury.metrics.squad import SQUAD
+from tests.jury import _DEFAULT_PREDICTIONS, _DEFAULT_REFERENCES
 
 _TEST_METRICS = [
-    Bleu(),
+    BLEU(),
     Meteor(),
     Rouge(),
     SacreBLEU(),
@@ -18,7 +19,7 @@ _TEST_METRICS = [
     SQUAD(),
 ]
 _CONCURRENT_TEST_METRICS = [
-    Bleu(),
+    BLEU(),
     Meteor(),
     Rouge(),
     # SacreBLEU(),  # Broken in concurrency, cannot find package 'sacrebleu'.
@@ -26,9 +27,6 @@ _CONCURRENT_TEST_METRICS = [
     SQUAD(),
 ]
 _STR_TEST_METRICS = ["bleu", "meteor", "rouge", "sacrebleu", "bertscore", "squad"]
-
-_DEFAULT_PREDICTIONS = ["Peace in the dormitory, peace in the world."]
-_DEFAULT_REFERENCES = ["Peace at home, peace in the world."]
 
 
 def test_evaluate_basic():

@@ -2,14 +2,14 @@ from typing import Dict
 
 from jury.metrics import Metric
 
-__class_name__ = "Bleu"
+__class_name__ = "BLEU"
 
 from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
 
 
-class Bleu(Metric):
-    def __init__(self, resulting_name: str = None, params: Dict = None):
-        metric_name = self.__class__.__name__
+class BLEU(Metric):
+    def __init__(self, metric_name: str = None, resulting_name: str = None, params: Dict = None):
+        metric_name = self.__class__.__name__ if metric_name is None else metric_name
         params = {} if params is None else params
         tokenizer = params.get("tokenizer", None)
         self.tokenizer = BLEUDefaultTokenizer() if tokenizer is None else tokenizer
@@ -20,9 +20,11 @@ class Bleu(Metric):
         predictions, references = tokenizer_wrapper.tokenize(predictions, references)
         if predictions.ndim > 2:
             predictions = predictions.reshape_len(-1)
-        if references.ndim != 3:
-            references = references.reshape(1, -1)
+
         if references.ndim == 3:
             ref_count = references.shape[0]
             references = references.reshape(1, ref_count, -1)
+        else:
+            references = references.reshape(1, -1)
+
         return predictions, references
