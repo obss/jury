@@ -1,0 +1,13 @@
+name: jury-notebook
+channels:
+  - anaconda
+dependencies:
+  - pip
+  - python=3.8
+  - pip:
+    - ipywidgets==7.6.3
+    - jury @ git+git://github.com/obss/jury.git@metrics
+    - jupyter==1.0.0
+    - notebook>=6.4.0
+    - sacrebleu==1.5.1
+    - bert-score==0.3.9
