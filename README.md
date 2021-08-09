@@ -57,15 +57,12 @@ Specify metrics you want to use on instantiation.
 
 ### Custom Metrics
 
-You can use custom metrics with inheriting `datasets.Metric`, you can see current metrics on [datasets/metrics](https://github.com/huggingface/datasets/tree/master/metrics). The code snippet below gives a brief explanation.
+You can use custom metrics with inheriting `jury.metrics.Metric`, you can see current metrics on [datasets/metrics](https://github.com/huggingface/datasets/tree/master/metrics). The code snippet below gives a brief explanation.
 
-    import datasets
+    from jury.metrics import Metric
 
-    CustomMetric(datasets.Metric):
-        def _info(self):
-            pass
-        
-        def _compute(self, predictions, references, *args, **kwargs):
+    CustomMetric(Metric):
+        def compute(self, predictions, references):
             pass
 
 ## <div align="center"> Contributing </div>
