@@ -1,3 +1,4 @@
+import os
 import re
 import string
 from typing import Callable, Dict, List, Optional
@@ -52,3 +53,9 @@ def bulk_remove_keys(obj: Dict, keys: List[str]) -> Dict:
 def is_reduce_fn(fun: Callable) -> bool:
     result = np.array(fun([1, 2]))
     return result.size == 1
+
+
+def set_env(name: str, value: str):
+    if not isinstance(value, str):
+        raise ValueError(f"Expected type str for 'value', got {type(value)}.")
+    os.environ[name] = value

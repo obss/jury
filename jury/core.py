@@ -7,7 +7,7 @@ from tqdm import tqdm
 from jury.collator import Collator, MetricCollator
 from jury.definitions import DEFAULT_METRICS
 from jury.metrics import Metric
-from jury.utils import NestedSingleType, is_reduce_fn
+from jury.utils import NestedSingleType, is_reduce_fn, set_env
 
 
 class Jury:
@@ -117,18 +117,15 @@ class Jury:
             raise ValueError("'reduce_fn' must be an aggregation function.")
         predictions = Collator(predictions)
         references = Collator(references)
-        metrics = {}
 
-        empty_predictions = 0
-        for preds in tqdm(predictions):
-            if not preds:  # Check if empty
-                empty_predictions += 1
-        metrics["empty_predictions"] = empty_predictions
+        metrics = dict()
+        metrics["empty_predictions"] = len([1 for p in predictions if not p])
         metrics["total_items"] = len(references)
 
         inputs_list = self._prepare_concurrent_inputs(predictions, references, reduce_fn)
 
         if self._concurrent:
+            set_env("TOKENIZERS_PARALLELISM", "true")
             with ProcessPoolExecutor() as executor:
                 for score in executor.map(self._compute_single_score, inputs_list):
                     metrics.update(score)
