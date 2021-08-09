@@ -11,7 +11,7 @@ _TEST_METRICS = [
     load_metric("rouge"),
     load_metric("sacrebleu"),
     load_metric("bertscore", params={"model_type": "albert-base-v1", "device": "cpu"}),
-    load_metric("squad")
+    load_metric("squad"),
 ]
 
 _CONCURRENT_TEST_METRICS = [
@@ -20,7 +20,7 @@ _CONCURRENT_TEST_METRICS = [
     load_metric("rouge"),
     load_metric("sacrebleu"),
     # load_metric("bertscore", params={"model_type": "albert-base-v1", "device": "cpu"}),  # Memory allocation
-    load_metric("squad")
+    load_metric("squad"),
 ]
 
 _STR_TEST_METRICS = ["bleu", "meteor", "rouge", "sacrebleu", "squad"]
