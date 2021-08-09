@@ -1,7 +1,7 @@
+import os
 import re
 import string
-from copy import deepcopy
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Optional
 
 import numpy as np
 
@@ -26,14 +26,17 @@ class NestedSingleType:
         return nested_types.lower()
 
     @classmethod
-    def get_type(cls, obj):
+    def get_type(cls, obj, order: Optional[int] = None):
         _obj = obj
 
         types = []
         while cls.is_iterable(_obj):
             types.append(type(_obj).__name__)
-            _obj = deepcopy(_obj[0])
+            _obj = _obj[0]
         types.append(type(_obj).__name__)
+        if order is not None:
+            return types[order]
+
         return cls.join(types)
 
 
@@ -50,3 +53,15 @@ def bulk_remove_keys(obj: Dict, keys: List[str]) -> Dict:
 def is_reduce_fn(fun: Callable) -> bool:
     result = np.array(fun([1, 2]))
     return result.size == 1
+
+
+def set_env(name: str, value: str):
+    if not isinstance(value, str):
+        raise ValueError(f"Expected type str for 'value', got {type(value)}.")
+    os.environ[name] = value
+
+
+def replace(a: List, obj: object, index=-1):
+    del a[index]
+    a.insert(index, obj)
+    return a
