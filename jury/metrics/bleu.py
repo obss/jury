@@ -1,10 +1,9 @@
 from typing import Dict
 
 from jury.metrics import Metric
-
-__class_name__ = "BLEU"
-
 from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
+
+__class_names__ = {"bleu": "BLEU"}
 
 
 class BLEU(Metric):

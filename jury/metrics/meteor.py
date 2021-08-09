@@ -2,7 +2,7 @@ from typing import Dict
 
 from jury.metrics import Metric
 
-__class_name__ = "Meteor"
+__class_names__ = {"meteor": "Meteor"}
 
 
 class Meteor(Metric):

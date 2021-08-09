@@ -2,31 +2,28 @@ import numpy as np
 import pytest
 
 from jury import Jury
-from jury.metrics.bertscore import BERTScore
-from jury.metrics.bleu import BLEU
-from jury.metrics.meteor import Meteor
-from jury.metrics.rouge import Rouge
-from jury.metrics.sacrebleu import SacreBLEU
-from jury.metrics.squad import SQUAD
+from jury.metrics import load_metric
 from tests.jury import _DEFAULT_PREDICTIONS, _DEFAULT_REFERENCES
 
 _TEST_METRICS = [
-    BLEU(),
-    Meteor(),
-    Rouge(),
-    SacreBLEU(),
-    BERTScore(params={"model_type": "albert-base-v1"}),
-    SQUAD(),
+    load_metric("bleu"),
+    load_metric("meteor"),
+    load_metric("rouge"),
+    load_metric("sacrebleu"),
+    load_metric("bertscore", params={"model_type": "albert-base-v1", "device": "cpu"}),
+    load_metric("squad")
 ]
+
 _CONCURRENT_TEST_METRICS = [
-    BLEU(),
-    Meteor(),
-    Rouge(),
-    # SacreBLEU(),  # Broken in concurrency, cannot find package 'sacrebleu'.
-    # BERTScore(params={"model_type": "albert-base-v1"}),  # There is an issue (probably) on downloading the model on concurrent run.
-    SQUAD(),
+    load_metric("bleu"),
+    load_metric("meteor"),
+    load_metric("rouge"),
+    load_metric("sacrebleu"),
+    # load_metric("bertscore", params={"model_type": "albert-base-v1", "device": "cpu"}),  # Memory allocation
+    load_metric("squad")
 ]
-_STR_TEST_METRICS = ["bleu", "meteor", "rouge", "sacrebleu", "bertscore", "squad"]
+
+_STR_TEST_METRICS = ["bleu", "meteor", "rouge", "sacrebleu", "squad"]
 
 
 def test_evaluate_basic():

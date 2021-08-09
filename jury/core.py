@@ -6,8 +6,8 @@ from tqdm import tqdm
 
 from jury.collator import Collator, MetricCollator
 from jury.definitions import DEFAULT_METRICS
-from jury.metrics import Metric
-from jury.utils import NestedSingleType, is_reduce_fn, set_env
+from jury.metrics import Metric, load_metric
+from jury.utils import is_reduce_fn, set_env, replace
 
 
 class Jury:
@@ -46,8 +46,10 @@ class Jury:
     ):
         if metrics is None:
             metrics = DEFAULT_METRICS
-        elif NestedSingleType.get_type(metrics) == "list<str>":
-            metrics = [metric.lower() for metric in metrics]
+        else:
+            for i, m in enumerate(metrics):
+                if isinstance(m, str):
+                    metrics = replace(metrics, load_metric(m.lower()), i)
 
         self.metrics = MetricCollator(metrics)
         self._concurrent = run_concurrent
