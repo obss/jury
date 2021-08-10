@@ -1,4 +1,4 @@
-name: jury-notebook
+name: jury
 channels:
   - anaconda
 dependencies:
@@ -6,7 +6,7 @@ dependencies:
   - python=3.8
   - pip:
     - ipywidgets==7.6.3
-    - jury @ git+git://github.com/obss/jury.git@metrics
+    - jury==1.0.0
     - jupyter==1.0.0
     - notebook>=6.4.0
     - sacrebleu==1.5.1
