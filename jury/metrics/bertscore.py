@@ -12,7 +12,7 @@ class BERTScore(Metric):
         params = {"lang": "en"} if params is None else params
         super().__init__(metric_name=metric_name, resulting_name=resulting_name, params=params)
 
-    def _preprocess(self, predictions, references):
+    def _preprocess(self, predictions, references, fn_multiple):
         predictions = predictions.to_list()
         references = references.to_list()
         return predictions, references

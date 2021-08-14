@@ -14,7 +14,7 @@ class SQUAD(Metric):
         resulting_name = metric_name if resulting_name is None else resulting_name
         super().__init__(metric_name=metric_name, resulting_name=resulting_name, params=params)
 
-    def _preprocess(self, predictions, references):
+    def _preprocess(self, predictions, references, fn_multiple):
         if NestedSingleType.get_type(predictions, order=-1) == "str":
             predictions = [{"prediction_text": pred, "id": str(i)} for i, pred in enumerate(predictions.collapse())]
         if NestedSingleType.get_type(references, order=-1) == "str":

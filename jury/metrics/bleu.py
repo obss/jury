@@ -14,16 +14,19 @@ class BLEU(Metric):
         self.tokenizer = BLEUDefaultTokenizer() if tokenizer is None else tokenizer
         super().__init__(metric_name=metric_name, resulting_name=resulting_name, params=params)
 
-    def _preprocess(self, predictions, references):
+    def _preprocess(self, predictions, references, fn_multiple):
         tokenizer_wrapper = TokenizerWrapper(self.tokenizer)
         predictions, references = tokenizer_wrapper.tokenize(predictions, references)
-        if predictions.ndim > 2:
-            predictions = predictions.reshape_len(-1)
-
-        if references.ndim == 3:
-            ref_count = references.shape[0]
-            references = references.reshape(1, ref_count, -1)
+        if not fn_multiple:
+            predictions = predictions.collapse()
         else:
-            references = references.reshape(1, -1)
+            if predictions.ndim > 2:
+                predictions = predictions.reshape_len(-1)
+
+            if references.ndim == 3:
+                ref_count = references.shape[0]
+                references = references.reshape(1, ref_count, -1)
+            else:
+                references = references.reshape(1, -1)
 
         return predictions, references
