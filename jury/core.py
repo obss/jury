@@ -67,14 +67,19 @@ class Jury:
 
             if "bleu" in metric.metric_name:
                 score = [
-                    metric.compute(predictions=Collator([hyp]), references=Collator(refs), return_dict=False)
+                    metric.compute(
+                        predictions=Collator([hyp]), references=Collator(refs), return_dict=False, fn_multiple=True
+                    )
                     for hyp in hyps
                 ]
             else:
                 score = []
                 for hyp, ref in zip(hyps, refs):
                     _score = metric.compute(
-                        predictions=Collator([hyp], keep=True), references=Collator([ref], keep=True), return_dict=False
+                        predictions=Collator([hyp], keep=True),
+                        references=Collator([ref], keep=True),
+                        return_dict=False,
+                        fn_multiple=True,
                     )
                     score.append(_score)
             scores.append(reduce_fn(score))
@@ -87,6 +92,9 @@ class Jury:
         if predictions.can_collapse() and references.can_collapse() and "bleu" not in metric.metric_name:
             predictions = Collator(predictions).reshape(-1)
             references = Collator(references).reshape(-1)
+            result = metric.compute(predictions=predictions, references=references)
+        elif predictions.can_collapse() and "bleu" in metric.metric_name:
+            predictions = predictions.reshape_len(-1)
             result = metric.compute(predictions=predictions, references=references)
         else:
             result = self._compute_metric_for_multiple_items(
@@ -124,16 +132,17 @@ class Jury:
         metrics["empty_predictions"] = len([1 for p in predictions if not p])
         metrics["total_items"] = len(references)
 
-        inputs_list = self._prepare_concurrent_inputs(predictions, references, reduce_fn)
-
         if self._concurrent:
+            inputs_list = self._prepare_concurrent_inputs(predictions, references, reduce_fn)
             set_env("TOKENIZERS_PARALLELISM", "true")
             with ProcessPoolExecutor() as executor:
                 for score in executor.map(self._compute_single_score, inputs_list):
                     metrics.update(score)
         else:
-            for inputs in inputs_list:
-                score = self._compute_single_score(inputs)
+            for metric in self.metrics:
+                score = self.compute_metric(
+                    metric=metric, predictions=predictions, references=references, reduce_fn=reduce_fn
+                )
                 metrics.update(score)
 
         return metrics

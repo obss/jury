@@ -15,7 +15,10 @@ class SacreBLEU(Metric):
         result = {self.metric_name: result["score"] / 100}
         return super()._postprocess(result, return_dict)
 
-    def _preprocess(self, predictions, references):
-        predictions = predictions.reshape(-1)
-        references = references.reshape(1, -1)
+    def _preprocess(self, predictions, references, fn_multiple):
+        if not fn_multiple:
+            predictions = predictions.collapse()
+        else:
+            predictions = predictions.reshape(-1)
+            references = references.reshape(1, -1)
         return predictions, references

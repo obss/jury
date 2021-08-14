@@ -7,7 +7,7 @@ METRICS = [BLEU()]
 
 
 def test_basic():
-    _EXPECTED_RESULT = {"empty_predictions": 0, "total_items": 2, "BLEU": 0.18277761142725615}
+    _EXPECTED_RESULT = {"BLEU": 0.29689669509442307, "empty_predictions": 0, "total_items": 2}
     predictions = _DEFAULT_PREDICTIONS
     references = _DEFAULT_REFERENCES
 
@@ -18,7 +18,7 @@ def test_basic():
 
 
 def test_multiple_ref():
-    _EXPECTED_RESULT = {"empty_predictions": 0, "total_items": 2, "BLEU": 0.18277761142725615}
+    _EXPECTED_RESULT = {"BLEU": 0.29689669509442307, "empty_predictions": 0, "total_items": 2}
     predictions = _DEFAULT_PREDICTIONS
     references = _DEFAULT_REFERENCES_MR
 
