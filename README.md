@@ -73,7 +73,7 @@ If you want to specify metrics, and do not want to use default, specify it in co
   "metrics": [
     "bleu",
     "meteor"
-  ],
+  ]
 }
 ```
 
