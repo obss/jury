@@ -1,4 +1,6 @@
+import json
 import os
+import re
 from typing import Dict
 
 from numpy.testing import assert_almost_equal
@@ -23,4 +25,12 @@ def assert_shell(command, exit_status=0):
 
 def assert_almost_equal_dict(actual: Dict, desired: Dict, decimal=5):
     for key in actual.keys():
-        assert_almost_equal(actual[key], desired[key], decimal=decimal)
+        assert_almost_equal(desired[key], actual[key], decimal=decimal)
+
+
+def shell_capture(command, out_json=True):
+    out = os.popen(command).read()
+    if out_json:
+        out = re.findall(r"{\s+.*\}", out, flags=re.MULTILINE | re.DOTALL)[0].replace("\n", "")
+        return json.loads(out)
+    return out
