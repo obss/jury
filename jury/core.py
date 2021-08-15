@@ -117,10 +117,13 @@ class Jury:
         self,
         predictions: Union[str, List[str], List[List[str]], List[Dict]],
         references: Union[str, List[str], List[List[str]], List[Dict]],
-        reduce_fn: Union[str, Callable] = "max",
+        reduce_fn: Optional[Union[str, Callable]] = None,
     ) -> Dict[str, float]:
         if len(predictions) != len(references):
             raise ValueError("Lengths of predictions and references must be equal.")
+
+        if reduce_fn is None:
+            reduce_fn = "max"
 
         reduce_fn = getattr(np, reduce_fn) if isinstance(reduce_fn, str) else reduce_fn
         if not is_reduce_fn(reduce_fn):

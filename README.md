@@ -57,6 +57,30 @@ Specify metrics you want to use on instantiation.
     jury = Jury(metrics=["bleu", "meteor"])
     scores = jury.evaluate(predictions, references)
 
+### CLI Usage
+
+You can specify predictions file and references file paths and get the resulting scores. Each line should be paired in both files.
+
+    jury eval --predictions /path/to/predictions.txt --references /path/to/references.txt --reduce_fn max
+
+If you want to specify metrics, and do not want to use default, specify it in config file (json) in `metrics` key.
+
+```json
+{
+  "predictions": "/path/to/predictions.txt",
+  "references": "/path/to/references.txt",
+  "reduce_fn": "max",
+  "metrics": [
+    "bleu",
+    "meteor"
+  ]
+}
+```
+
+Then, you can call jury eval with `config` argument.
+
+    jury eval --config path/to/config.json
+
 ### Custom Metrics
 
 You can use custom metrics with inheriting `jury.metrics.Metric`, you can see current metrics on [datasets/metrics](https://github.com/huggingface/datasets/tree/master/metrics). The code snippet below gives a brief explanation.
