@@ -1,6 +1,6 @@
 import os
 
-from .core import Jury
+from jury.core import Jury
 
 SOURCE_DIR = os.path.abspath(os.path.dirname(__file__))
 PROJECT_ROOT = os.path.dirname(SOURCE_DIR)
