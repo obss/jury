@@ -24,6 +24,8 @@ def assert_shell(command, exit_status=0):
 
 
 def assert_almost_equal_dict(actual: Dict, desired: Dict, decimal=5):
+    assert len(actual) == len(desired)
+
     for key in actual.keys():
         assert_almost_equal(desired[key], actual[key], decimal=decimal)
 

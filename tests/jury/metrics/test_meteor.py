@@ -1,39 +1,31 @@
+import pytest
+
 from jury import Jury
 from jury.metrics.meteor import Meteor
-from tests.jury import _DEFAULT_PREDICTIONS, _DEFAULT_PREDICTIONS_MR, _DEFAULT_REFERENCES, _DEFAULT_REFERENCES_MR
 from tests.utils import assert_almost_equal_dict
 
-METRICS = [Meteor()]
+
+@pytest.fixture(scope="module")
+def jury():
+    return Jury(metrics=[Meteor()])
 
 
-def test_basic():
-    _EXPECTED_RESULT = {"empty_predictions": 0, "total_items": 2, "Meteor": 0.6594164989939638}
-    predictions = _DEFAULT_PREDICTIONS
-    references = _DEFAULT_REFERENCES
+def test_basic(predictions, references, jury):
+    _EXPECTED_RESULT = {"empty_predictions": 0, "total_items": 2, "Meteor": 0.5098979591836734}
 
-    jury = Jury(metrics=METRICS)
     scores = jury.evaluate(predictions, references)
-
     assert_almost_equal_dict(_EXPECTED_RESULT, scores)
 
 
-def test_multiple_ref():
-    _EXPECTED_RESULT = {"empty_predictions": 0, "total_items": 2, "Meteor": 0.6594164989939638}
-    predictions = _DEFAULT_PREDICTIONS
-    references = _DEFAULT_REFERENCES_MR
+def test_multiple_ref(predictions, multiple_references, jury):
+    _EXPECTED_RESULT = {"empty_predictions": 0, "total_items": 2, "Meteor": 0.5098979591836734}
 
-    jury = Jury(metrics=METRICS)
-    scores = jury.evaluate(predictions, references)
-
+    scores = jury.evaluate(predictions, multiple_references)
     assert_almost_equal_dict(_EXPECTED_RESULT, scores)
 
 
-def test_multiple_pred_multiple_ref():
-    _EXPECTED_RESULT = {"empty_predictions": 0, "total_items": 2, "Meteor": 0.6915697081036947}
-    predictions = _DEFAULT_PREDICTIONS_MR
-    references = _DEFAULT_REFERENCES_MR
+def test_multiple_pred_multiple_ref(multiple_predictions, multiple_references, jury):
+    _EXPECTED_RESULT = {"empty_predictions": 0, "total_items": 2, "Meteor": 0.5420511682934044}
 
-    jury = Jury(metrics=METRICS)
-    scores = jury.evaluate(predictions, references)
-
+    scores = jury.evaluate(multiple_predictions, multiple_references)
     assert_almost_equal_dict(_EXPECTED_RESULT, scores)

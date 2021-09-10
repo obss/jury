@@ -24,27 +24,27 @@ _CONCURRENT_TEST_METRICS = [
 _STR_TEST_METRICS = ["bleu", "meteor", "rouge", "sacrebleu", "squad"]
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def predictions():
-    return ["Peace in the dormitory, peace in the world.", "There is a cat on the mat."]
+    return ["There is a cat on the mat.", "Look! a wonderful day."]
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def references():
-    return ["Peace at home, peace in the world.", "The cat is playing on the mat."]
+    return ["The cat is playing on the mat.", "Today is a wonderful day"]
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def single_prediction_array():
     return [["the cat is on the mat"], ["Look! a wonderful day."]]
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def multiple_predictions():
     return [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def multiple_references():
     return [
         ["the cat is playing on the mat.", "The cat plays on the mat."],
@@ -52,16 +52,16 @@ def multiple_references():
     ]
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="package")
 def jury():
     return Jury(metrics=_TEST_METRICS)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="package")
 def jury_str():
     return Jury(metrics=_STR_TEST_METRICS)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="package")
 def jury_concurrent():
     return Jury(metrics=_CONCURRENT_TEST_METRICS, run_concurrent=True)
