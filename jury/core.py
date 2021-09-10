@@ -89,11 +89,11 @@ class Jury:
     def compute_metric(
         self, metric, predictions: Collator, references: Collator, reduce_fn: Callable
     ) -> Dict[str, float]:
-        if predictions.can_collapse() and references.can_collapse() and "bleu" not in metric.metric_name:
+        if predictions.can_collapse() and references.can_collapse() and metric.metric_name not in ["bleu", "sacrebleu"]:
             predictions = Collator(predictions).reshape(-1)
             references = Collator(references).reshape(-1)
             result = metric.compute(predictions=predictions, references=references)
-        elif predictions.can_collapse() and "bleu" in metric.metric_name:
+        elif predictions.can_collapse() and metric.metric_name in ["bleu", "sacrebleu", "squad"]:
             predictions = predictions.reshape_len(-1)
             result = metric.compute(predictions=predictions, references=references)
         else:
