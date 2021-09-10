@@ -93,7 +93,7 @@ class Jury:
             predictions = Collator(predictions).reshape(-1)
             references = Collator(references).reshape(-1)
             result = metric.compute(predictions=predictions, references=references)
-        elif predictions.can_collapse() and "bleu" in metric.metric_name:
+        elif predictions.can_collapse() and metric.metric_name in ["bleu", "squad"]:
             predictions = predictions.reshape_len(-1)
             result = metric.compute(predictions=predictions, references=references)
         else:
