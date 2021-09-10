@@ -11,7 +11,7 @@ def raw_text():
 
 @pytest.fixture
 def preprocessed_text():
-    return 'This a test text Testing 123 alpha123 Multiple spaces uneven sizes and also this'
+    return "This a test text Testing 123 alpha123 Multiple spaces uneven sizes and also this"
 
 
 def test_remove_punctuations(raw_text, preprocessed_text):
