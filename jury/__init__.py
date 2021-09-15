@@ -7,4 +7,4 @@ PROJECT_ROOT = os.path.dirname(SOURCE_DIR)
 TEST_DIR = os.path.join(PROJECT_ROOT, "tests")
 TEST_DATA_DIR = os.path.join(TEST_DIR, "test_data")
 
-__version__ = "1.1.1"
+__version__ = "1.1.2"
