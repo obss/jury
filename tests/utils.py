@@ -3,7 +3,7 @@ import os
 import re
 from typing import Dict
 
-from numpy.testing import assert_almost_equal
+from deepdiff import DeepDiff
 
 
 def assert_shell(command, exit_status=0):
@@ -23,11 +23,8 @@ def assert_shell(command, exit_status=0):
     return actual_exit_status
 
 
-def assert_almost_equal_dict(actual: Dict, desired: Dict, decimal=5):
-    assert len(actual) == len(desired)
-
-    for key in actual.keys():
-        assert_almost_equal(desired[key], actual[key], decimal=decimal)
+def assert_almost_equal_dict(actual: Dict, desired: Dict, decimal=7):
+    assert DeepDiff(actual, desired, significant_digits=decimal) == {}
 
 
 def shell_capture(command, out_json=True):

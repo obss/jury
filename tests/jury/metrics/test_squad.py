@@ -55,18 +55,18 @@ def test_basic_dict_input(squad_style_predictions, squad_style_references, jury)
     _EXPECTED_RESULT = {"empty_predictions": 0, "total_items": 1, "squad_f1": 1.0}
 
     scores = jury.evaluate(squad_style_predictions, squad_style_references)
-    assert_almost_equal_dict(_EXPECTED_RESULT, scores)
+    assert_almost_equal_dict(actual=scores, desired=_EXPECTED_RESULT)
 
 
 def test_multiple_ref(predictions, multiple_references, jury):
     _EXPECTED_RESULT = {"empty_predictions": 0, "total_items": 2, "squad_f1": 1.0}
 
     scores = jury.evaluate(predictions, multiple_references)
-    assert_almost_equal_dict(_EXPECTED_RESULT, scores)
+    assert_almost_equal_dict(actual=scores, desired=_EXPECTED_RESULT)
 
 
 def test_multiple_pred_multiple_ref(multiple_predictions, multiple_references, jury):
     _EXPECTED_RESULT = {"empty_predictions": 0, "total_items": 2, "squad_f1": 0.5}
 
     scores = jury.evaluate(multiple_predictions, multiple_references)
-    assert_almost_equal_dict(_EXPECTED_RESULT, scores)
+    assert_almost_equal_dict(actual=scores, desired=_EXPECTED_RESULT)
