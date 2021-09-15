@@ -16,7 +16,6 @@ def assert_shell(command, exit_status=0):
         exit_status: (int) Expected exit status of given command run.
 
     Returns: actual_exit_status
-
     """
     actual_exit_status = os.system(command)
     assert exit_status == actual_exit_status, f"Unexpected exit code {str(actual_exit_status)}"
