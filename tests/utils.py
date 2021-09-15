@@ -3,7 +3,7 @@ import os
 import re
 from typing import Dict
 
-from numpy.testing import assert_almost_equal
+from deepdiff import DeepDiff
 
 
 def assert_shell(command, exit_status=0):
@@ -16,7 +16,6 @@ def assert_shell(command, exit_status=0):
         exit_status: (int) Expected exit status of given command run.
 
     Returns: actual_exit_status
-
     """
     actual_exit_status = os.system(command)
     assert exit_status == actual_exit_status, f"Unexpected exit code {str(actual_exit_status)}"
@@ -24,8 +23,7 @@ def assert_shell(command, exit_status=0):
 
 
 def assert_almost_equal_dict(actual: Dict, desired: Dict, decimal=5):
-    for key in actual.keys():
-        assert_almost_equal(desired[key], actual[key], decimal=decimal)
+    assert DeepDiff(actual, desired, significant_digits=decimal) == {}
 
 
 def shell_capture(command, out_json=True):

@@ -1,39 +1,31 @@
+import pytest
+
 from jury import Jury
 from jury.metrics.bleu import BLEU
-from tests.jury import _DEFAULT_PREDICTIONS, _DEFAULT_PREDICTIONS_MR, _DEFAULT_REFERENCES, _DEFAULT_REFERENCES_MR
 from tests.utils import assert_almost_equal_dict
 
-METRICS = [BLEU()]
+
+@pytest.fixture(scope="module")
+def jury():
+    return Jury(metrics=[BLEU()])
 
 
-def test_basic():
-    _EXPECTED_RESULT = {"BLEU": 0.29689669509442307, "empty_predictions": 0, "total_items": 2}
-    predictions = _DEFAULT_PREDICTIONS
-    references = _DEFAULT_REFERENCES
+def test_basic(predictions, references, jury):
+    _EXPECTED_RESULT = {"BLEU": 0.0, "empty_predictions": 0, "total_items": 2}
 
-    jury = Jury(metrics=METRICS)
     scores = jury.evaluate(predictions, references)
-
-    assert_almost_equal_dict(_EXPECTED_RESULT, scores)
-
-
-def test_multiple_ref():
-    _EXPECTED_RESULT = {"BLEU": 0.29689669509442307, "empty_predictions": 0, "total_items": 2}
-    predictions = _DEFAULT_PREDICTIONS
-    references = _DEFAULT_REFERENCES_MR
-
-    jury = Jury(metrics=METRICS)
-    scores = jury.evaluate(predictions, references)
-
-    assert_almost_equal_dict(_EXPECTED_RESULT, scores)
+    assert_almost_equal_dict(actual=scores, desired=_EXPECTED_RESULT)
 
 
-def test_multiple_pred_multiple_ref():
-    _EXPECTED_RESULT = {"empty_predictions": 0, "total_items": 2, "BLEU": 0.410274681629658}
-    predictions = _DEFAULT_PREDICTIONS_MR
-    references = _DEFAULT_REFERENCES_MR
+def test_multiple_ref(predictions, multiple_references, jury):
+    _EXPECTED_RESULT = {"BLEU": 0.0, "empty_predictions": 0, "total_items": 2}
 
-    jury = Jury(metrics=METRICS)
-    scores = jury.evaluate(predictions, references)
+    scores = jury.evaluate(predictions, multiple_references)
+    assert_almost_equal_dict(actual=scores, desired=_EXPECTED_RESULT)
 
-    assert_almost_equal_dict(_EXPECTED_RESULT, scores)
+
+def test_multiple_pred_multiple_ref(multiple_predictions, multiple_references, jury):
+    _EXPECTED_RESULT = {"empty_predictions": 0, "total_items": 2, "BLEU": 0.22749707020240187}
+
+    scores = jury.evaluate(multiple_predictions, multiple_references)
+    assert_almost_equal_dict(actual=scores, desired=_EXPECTED_RESULT)

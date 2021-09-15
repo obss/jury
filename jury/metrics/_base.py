@@ -1,5 +1,5 @@
 from abc import ABC
-from typing import Dict
+from typing import Dict, Union
 
 import datasets
 
@@ -19,8 +19,8 @@ class Metric(ABC):
     def _preprocess(self, predictions, references, fn_multiple):
         return predictions, references
 
-    def _postprocess(self, result, return_dict: bool):
+    def _postprocess(self, result, return_dict: bool) -> Union[Dict[str, float], float]:
         score = result[self.metric_name]
         if not return_dict:
             return score
-        return {self.resulting_name: score}
+        return {self.resulting_name: float(score)}

@@ -41,8 +41,8 @@ class NestedSingleType:
 
 
 def remove_punctuations(text: str) -> str:
-    regex = re.compile("[%s]" % re.escape(string.punctuation))
-    text = regex.sub(" ", text)
+    pattern = r"[%s]" % re.escape(string.punctuation)
+    text = re.sub(pattern, " ", text)
     return " ".join(text.split())
 
 

@@ -23,7 +23,14 @@ def get_version():
         return re.search(r'^__version__ = [\'"]([^\'"]*)[\'"]', f.read(), re.M).group(1)
 
 
-_DEV_REQUIREMENTS = ["black==21.7b0", "flake8==3.9.2", "isort==5.9.2", "pytest>=6.2.4", "pytest-cov>=2.12.1"]
+_DEV_REQUIREMENTS = [
+    "black==21.7b0",
+    "deepdiff==5.5.0",
+    "flake8==3.9.2",
+    "isort==5.9.2",
+    "pytest>=6.2.4",
+    "pytest-cov>=2.12.1",
+]
 
 _METRIC_REQUIREMENTS = ["sacrebleu==1.5.1", "bert_score==0.3.9"]
 
