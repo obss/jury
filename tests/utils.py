@@ -23,7 +23,7 @@ def assert_shell(command, exit_status=0):
 
 
 def assert_almost_equal_dict(actual: Dict, desired: Dict, decimal=5):
-    assert DeepDiff(actual, desired, significant_digits=decimal + 1) == {}
+    assert DeepDiff(actual, desired, significant_digits=decimal) == {}
 
 
 def shell_capture(command, out_json=True):
