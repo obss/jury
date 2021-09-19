@@ -1,15 +1,5 @@
-from typing import Dict, Optional, List, Union
-
-import pandas as pd
-
-from jury.collator import Collator
-from jury.metrics._base import Metric
-
-__class_names__ = {"rouge": "Rouge"}
-
-
 # coding=utf-8
-# Copyright 2020 The HuggingFace Datasets Authors.
+# Copyright 2020 Open Business Software Solutions, The HuggingFace Datasets Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,10 +12,19 @@ __class_names__ = {"rouge": "Rouge"}
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" ROUGE metric from Google Research github repo. """
-from rouge_score import rouge_scorer, scoring
+""" ROUGE metric. The part of this file is adapted from HuggingFace's
+datasets package implementation of ROUGE metric."""
+
+from typing import Dict, Optional, List, Union
 
 import datasets
+import pandas as pd
+from rouge_score import rouge_scorer, scoring
+
+from jury.collator import Collator
+from jury.metrics._base import Metric
+
+__class_names__ = {"rouge": "Rouge"}
 
 
 _CITATION = """\
@@ -209,30 +208,3 @@ class Rouge(Metric):
             score = self._select_mid_from_aggregation(self._aggregate(multi_aggregator))
             aggregator = self._add_score(aggregator, score)
         return aggregator
-
-
-if __name__ == "__main__":
-    predictions = [[
-        "It is a guide to action which ensures that the military always obeys the commands of the party"
-    ]]
-    references = [[
-        "It is a guide to action that ensures that the military will forever heed Party commands"
-    ]]
-
-    # references = [[
-    #     "It is a guide to action that ensures that the military will forever heed Party commands",
-    #     "It is a guide to action which ensures that the military will forever heed Party commands"
-    # ]]
-
-    # Multi pred multi ref
-    # predictions = [[
-    #     "It is a guide to action which ensures that the military always obeys the commands of the party",
-    #     "It is a guide to action that will ensure that the military always obeys the commands of the party"
-    # ]]
-    # references = [[
-    #     "It is a guide to action that ensures that the military will forever heed Party commands",
-    #     "It is a guide to action which ensures that the military will forever heed Party commands"
-    # ]]
-    rouge = Rouge()
-    score = rouge.compute(predictions=predictions, references=references, use_aggregator=False)
-    print(score)

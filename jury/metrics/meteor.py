@@ -18,10 +18,9 @@ https://github.com/huggingface/datasets/blob/master/metrics/meteor/meteor.py
 """
 from typing import Dict, Optional
 
+import datasets
 import numpy as np
 from nltk.translate import meteor_score
-
-import datasets
 
 from jury.metrics._base import Metric
 
@@ -140,4 +139,30 @@ class Meteor(Metric):
             scores.append(reduce_fn(score_reduced))
         return {self.resulting_name: np.mean(scores)}
 
+
+if __name__ == "__main__":
+    predictions = [[
+        "It is a guide to action which ensures that the military always obeys the commands of the party"
+    ]]
+    references = [[
+        "It is a guide to action that ensures that the military will forever heed Party commands"
+    ]]
+
+    # references = [[
+    #     "It is a guide to action that ensures that the military will forever heed Party commands",
+    #     "It is a guide to action which ensures that the military will forever heed Party commands"
+    # ]]
+
+    # Multi pred multi ref
+    # predictions = [[
+    #     "It is a guide to action which ensures that the military always obeys the commands of the party",
+    #     "It is a guide to action that will ensure that the military always obeys the commands of the party"
+    # ]]
+    # references = [[
+    #     "It is a guide to action that ensures that the military will forever heed Party commands",
+    #     "It is a guide to action which ensures that the military will forever heed Party commands"
+    # ]]
+    bleu = Meteor()
+    score = bleu.compute(predictions=predictions, references=references)
+    print(score)
 

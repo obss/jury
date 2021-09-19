@@ -1,7 +1,4 @@
-from jury.metrics.bleu import BLEU
 from jury.metrics.meteor import Meteor
-from jury.metrics.rouge import Rouge
-from jury.metrics.sacrebleu import SacreBLEU
 
 DEFAULT_METRICS = [
     # BLEU(resulting_name="bleu_1", params={"max_order": 1}),
