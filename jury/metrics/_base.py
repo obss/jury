@@ -26,6 +26,7 @@ class Metric(datasets.Metric):
     def __init__(self, resulting_name: Optional[str] = None, params: Optional[Dict] = None):
         self.resulting_name = resulting_name if resulting_name is not None else self.name
         self.params = params if params is not None else {"reduce_fn": "mean"}
+        self.download_and_prepare()
         super().__init__()
 
     def evaluate(self, predictions: Collator, references: Collator, reduce_fn: callable, **kwargs) -> Dict[str, float]:
