@@ -23,8 +23,7 @@ from nltk.translate import meteor_score
 
 import datasets
 
-from jury.collator import Collator
-from jury.metrics import Metric
+from jury.metrics._base import Metric
 
 __class_names__ = {"meteor": "Meteor"}
 
@@ -113,38 +112,32 @@ class Meteor(Metric):
 
         nltk.download("wordnet")
 
-    def evaluate(self, predictions: Collator, references: Collator, reduce_fn, alpha=0.9, beta=3, gamma=0.5):
-        if predictions.can_collapse() and references.can_collapse():
-            scores = [
-                meteor_score.single_meteor_score(ref, pred, alpha=alpha, beta=beta, gamma=gamma)
-                for ref, pred in zip(references, predictions)
-            ]
-        elif predictions.can_collapse() and not references.can_collapse():
-            scores = [
-                meteor_score.meteor_score(hypothesis=pred, references=ref,
-                                          alpha=alpha,
-                                          beta=beta,
-                                          gamma=gamma)
-                for ref, pred in zip(references, predictions)
-            ]
-        else:
-            scores = []
-            for pred, ref in zip(predictions, references):
-                pred_scores = []
-                for p in pred:
-                    score_p = [
-                        meteor_score.meteor_score(ref, pred, alpha=alpha, beta=beta, gamma=gamma)
-                        for ref, pred in zip(references, predictions)
-                    ]
-                    pred_scores.append(score_p)
-                scores.append(reduce_fn(pred_scores))
+    def _compute_single_pred_single_ref(self, predictions, references, reduce_fn=None, alpha=0.9, beta=3, gamma=0.5):
+        scores = [
+            meteor_score.single_meteor_score(ref, pred, alpha=alpha, beta=beta, gamma=gamma)
+            for ref, pred in zip(references, predictions)
+        ]
+        return {self.resulting_name: np.mean(scores)}
 
+    def _compute_single_pred_multi_ref(self, predictions, references, reduce_fn=None, alpha=0.9, beta=3, gamma=0.5):
+        scores = [
+            meteor_score.meteor_score(references=ref,
+                                      hypothesis=pred,
+                                      alpha=alpha,
+                                      beta=beta,
+                                      gamma=gamma)
+            for ref, pred in zip(references, predictions)
+        ]
+        return {self.resulting_name: np.mean(scores)}
+
+    def _compute_multi_pred_multi_ref(self, predictions, references, reduce_fn, alpha=0.9, beta=3, gamma=0.5):
+        scores = []
+        for pred, ref in zip(predictions, references):
+            score_reduced = [
+                meteor_score.meteor_score(references=ref, hypothesis=p, alpha=alpha, beta=beta, gamma=gamma)
+                for p in pred
+            ]
+            scores.append(reduce_fn(score_reduced))
         return {self.resulting_name: np.mean(scores)}
 
 
-if __name__ == "__main__":
-    predictions = [["It is a guide to action which ensures that the military always obeys the commands of the party"]]
-    references = [["It is a guide to action that ensures that the military will forever heed Party commands"]]
-    meteor = Meteor()
-    score = meteor.compute(predictions=predictions, references=references)
-    print(score)

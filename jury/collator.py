@@ -1,8 +1,7 @@
-from typing import Dict, List, Union
+from typing import List, Union
 
 import numpy as np
 
-from jury.metrics import Metric, load_metric
 from jury.utils import NestedSingleType
 
 
@@ -63,29 +62,3 @@ class Collator(list):
     @classmethod
     def from_str(cls, seq: str):
         return [seq]
-
-
-class MetricCollator(list):
-    def __init__(self, metrics: Union[List[str], List[Metric]]):
-        metrics = self._constructor(metrics)
-        super(MetricCollator, self).__init__(metrics)
-
-    def _constructor(self, metrics):
-        _type = NestedSingleType.get_type(metrics)
-        if _type == "list<str>":
-            _metrics = []
-            for metric in metrics:
-                _metrics.append(load_metric(metric))
-            metrics = _metrics
-        return metrics
-
-    def add_metric(self, metric_name: str, resulting_name: str = None, params: Dict = None):
-        metric = load_metric(metric_name, resulting_name=resulting_name, params=params)
-        self.append(metric)
-
-    def remove_metric(self, resulting_name: str):
-        for i, metric in enumerate(self):
-            if metric.resulting_name == resulting_name:
-                self.pop(i)
-                break
-        raise ValueError(f"Metric with resulting name {resulting_name} does not exists.")

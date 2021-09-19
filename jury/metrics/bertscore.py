@@ -1,6 +1,6 @@
 from typing import Dict
 
-from jury.metrics import Metric
+from jury.metrics._base import Metric
 
 __class_names__ = {"bertscore": "BERTScore"}
 

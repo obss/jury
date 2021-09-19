@@ -1,17 +1,238 @@
-from typing import Dict
+from typing import Dict, Optional, List, Union
 
-from jury.metrics import Metric
+import pandas as pd
+
+from jury.collator import Collator
+from jury.metrics._base import Metric
 
 __class_names__ = {"rouge": "Rouge"}
 
 
-class Rouge(Metric):
-    def __init__(self, metric_name: str = None, resulting_name: str = None, params: Dict = None):
-        metric_name = self.__class__.__name__ if metric_name is None else metric_name
-        resulting_name = "rougeL" if resulting_name is None else resulting_name
-        params = {"rouge_types": ["rougeL"]} if params is None else params
-        super().__init__(metric_name=metric_name, resulting_name=resulting_name, params=params)
+# coding=utf-8
+# Copyright 2020 The HuggingFace Datasets Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+""" ROUGE metric from Google Research github repo. """
+from rouge_score import rouge_scorer, scoring
 
-    def _postprocess(self, result, return_dict: bool):
-        result = {self.metric_name: result["rougeL"].mid.fmeasure}
-        return super()._postprocess(result, return_dict)
+import datasets
+
+
+_CITATION = """\
+@inproceedings{lin-2004-rouge,
+    title = "{ROUGE}: A Package for Automatic Evaluation of Summaries",
+    author = "Lin, Chin-Yew",
+    booktitle = "Text Summarization Branches Out",
+    month = jul,
+    year = "2004",
+    address = "Barcelona, Spain",
+    publisher = "Association for Computational Linguistics",
+    url = "https://www.aclweb.org/anthology/W04-1013",
+    pages = "74--81",
+}
+"""
+
+_DESCRIPTION = """\
+ROUGE, or Recall-Oriented Understudy for Gisting Evaluation, is a set of metrics and a software package used for
+evaluating automatic summarization and machine translation software in natural language processing.
+The metrics compare an automatically produced summary or translation against a reference or a set of references (human-produced) summary or translation.
+
+Note that ROUGE is case insensitive, meaning that upper case letters are treated the same way as lower case letters.
+
+This metrics is a wrapper around Google Research reimplementation of ROUGE:
+https://github.com/google-research/google-research/tree/master/rouge
+"""
+
+_KWARGS_DESCRIPTION = """
+Calculates average rouge scores for a list of hypotheses and references
+Args:
+    predictions: list of predictions to score. Each predictions
+        should be a string with tokens separated by spaces.
+    references: list of reference for each prediction. Each
+        reference should be a string with tokens separated by spaces.
+    rouge_types: A list of rouge types to calculate.
+        Valid names:
+        `"rouge{n}"` (e.g. `"rouge1"`, `"rouge2"`) where: {n} is the n-gram based scoring,
+        `"rougeL"`: Longest common subsequence based scoring.
+        `"rougeLSum"`: rougeLsum splits text using `"\n"`.
+        See details in https://github.com/huggingface/datasets/issues/617
+    use_stemmer: Bool indicating whether Porter stemmer should be used to strip word suffixes.
+    use_agregator: Return aggregates if this is set to True
+Returns:
+    rouge1: rouge_1 (precision, recall, f1),
+    rouge2: rouge_2 (precision, recall, f1),
+    rougeL: rouge_l (precision, recall, f1),
+    rougeLsum: rouge_lsum (precision, recall, f1)
+Examples:
+
+    >>> rouge = datasets.load_metric('rouge')
+    >>> predictions = ["hello there", "general kenobi"]
+    >>> references = ["hello there", "general kenobi"]
+    >>> results = rouge.compute(predictions=predictions, references=references)
+    >>> print(list(results.keys()))
+    ['rouge1', 'rouge2', 'rougeL', 'rougeLsum']
+    >>> print(results["rouge1"])
+    AggregateScore(low=Score(precision=1.0, recall=1.0, fmeasure=1.0), mid=Score(precision=1.0, recall=1.0, fmeasure=1.0), high=Score(precision=1.0, recall=1.0, fmeasure=1.0))
+    >>> print(results["rouge1"].mid.fmeasure)
+    1.0
+"""
+
+
+@datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
+class Rouge(Metric):
+    def __init__(self, resulting_name: str = None, params: Optional[Dict] = None):
+        resulting_name = "Rouge" if resulting_name is None else resulting_name
+        super(Rouge, self).__init__(resulting_name=resulting_name, params=params)
+
+    def _info(self):
+        return datasets.MetricInfo(
+            description=_DESCRIPTION,
+            citation=_CITATION,
+            inputs_description=_KWARGS_DESCRIPTION,
+            features=datasets.Features(
+                {
+                    "predictions": datasets.Sequence(datasets.Value("string", id="sequence")),
+                    "references": datasets.Sequence(datasets.Value("string", id="sequence")),
+                }
+            ),
+            codebase_urls=["https://github.com/google-research/google-research/tree/master/rouge"],
+            reference_urls=[
+                "https://en.wikipedia.org/wiki/ROUGE_(metric)",
+                "https://github.com/google-research/google-research/tree/master/rouge",
+            ],
+        )
+
+    @staticmethod
+    def _get_aggregator(use_aggregator: bool) -> Union[List, scoring.BootstrapAggregator]:
+        if use_aggregator:
+            aggregator = scoring.BootstrapAggregator()
+        else:
+            aggregator = []
+        return aggregator
+
+    @staticmethod
+    def _add_score(aggregator: Union[List, scoring.BootstrapAggregator], score: Union[Dict[str, float], Dict[str, scoring.BootstrapAggregator]]) -> Union[List, scoring.BootstrapAggregator]:
+        if isinstance(aggregator, scoring.BootstrapAggregator):
+            aggregator.add_scores(score)
+        else:
+            aggregator.append(score)
+        return aggregator
+
+    @staticmethod
+    def _aggregate(aggregator) -> Union[Dict[str, float], Dict[str, scoring.AggregateScore]]:
+        if isinstance(aggregator, scoring.BootstrapAggregator):
+            result = aggregator.aggregate()
+        else:
+            result = {}
+            for key in aggregator[0]:
+                result[key] = list(score[key] for score in aggregator)
+        return result
+
+    @staticmethod
+    def _normalize_score_list(score_list: List[Dict[str, scoring.BootstrapAggregator]], metric_to_select: str) -> List[Dict[str, scoring.BootstrapAggregator]]:
+        for score_dict in score_list:
+            for metric, score in score_dict.items():
+                score_dict[metric] = getattr(score, metric_to_select)
+        return score_list
+
+    @staticmethod
+    def _reduce_dict(score_list: List[Dict[str, scoring.BootstrapAggregator]], reduce_fn: callable) -> Dict[str, float]:
+        return pd.DataFrame(score_list).apply(reduce_fn, axis=0).to_dict()
+
+    @staticmethod
+    def _select_mid_from_aggregation(aggregated_scores: Dict[str, scoring.AggregateScore]) -> Dict[str, float]:
+        return {metric: score.mid for metric, score in aggregated_scores.items()}
+
+    def evaluate(self, predictions: Collator, references: Collator, reduce_fn: callable, rouge_types=None, use_aggregator=True, use_stemmer=False, metric_to_select: Optional[str] = "fmeasure"):
+        if rouge_types is None:
+            rouge_types = ["rouge1", "rouge2", "rougeL", "rougeLsum"]
+
+        scorer = rouge_scorer.RougeScorer(rouge_types=rouge_types, use_stemmer=use_stemmer)
+
+        if predictions.can_collapse() and references.can_collapse():
+            aggregator = self._get_aggregator(use_aggregator)
+            predictions = predictions.collapse()
+            references = references.collapse()
+            aggregator = self._compute_single_pred_single_ref(predictions, references, reduce_fn, scorer, aggregator, metric_to_select)
+        elif predictions.can_collapse() and not references.can_collapse():
+            # Force to use BootstrapAggregator
+            aggregator = self._get_aggregator(use_aggregator=True)
+            predictions = predictions.collapse()
+            aggregator = self._compute_single_pred_multi_ref(predictions, references, reduce_fn, scorer, aggregator, metric_to_select)
+        else:
+            # Force to use BootstrapAggregator
+            aggregator = self._get_aggregator(use_aggregator=True)
+            aggregator = self._compute_multi_pred_multi_ref(predictions, references, reduce_fn, scorer, aggregator, metric_to_select)
+
+        result = self._aggregate(aggregator)
+
+        if metric_to_select and use_aggregator:
+            result = self._select_mid_from_aggregation(result)
+        elif metric_to_select and not use_aggregator:
+            result = {k: v[0] for k, v in result.items()}
+
+        return result
+
+    def _compute_single_pred_single_ref(self, predictions, references, reduce_fn=None, scorer=None, aggregator=None, metric_to_select=None):
+        for ref, pred in zip(references, predictions):
+            score = scorer.score(target=ref, prediction=pred)
+            if metric_to_select is not None:
+                score = self._normalize_score_list(score_list=[score], metric_to_select=metric_to_select)[0]
+            aggregator = self._add_score(aggregator, score)
+        return aggregator
+
+    def _compute_single_pred_multi_ref(self, predictions, references, reduce_fn, scorer=None, aggregator=None, metric_to_select=None):
+        for pred, refs in zip(predictions, references):
+            pred_scores = [scorer.score(target=ref, prediction=pred) for ref in refs]
+            pred_scores = self._normalize_score_list(pred_scores, metric_to_select)
+            score = self._reduce_dict(pred_scores, reduce_fn)
+            aggregator = self._add_score(aggregator, score)
+        return aggregator
+
+    def _compute_multi_pred_multi_ref(self, predictions, references, reduce_fn, scorer=None, aggregator=None, metric_to_select=None):
+        for preds, refs in zip(predictions, references):
+            multi_aggregator = self._get_aggregator(use_aggregator=True)
+            for pred in preds:
+                pred_score = self._normalize_score_list([scorer.score(target=ref, prediction=pred) for ref in refs], metric_to_select)
+                pred_score = self._reduce_dict(pred_score, reduce_fn)
+                multi_aggregator = self._add_score(multi_aggregator, pred_score)
+            score = self._select_mid_from_aggregation(self._aggregate(multi_aggregator))
+            aggregator = self._add_score(aggregator, score)
+        return aggregator
+
+
+if __name__ == "__main__":
+    predictions = [[
+        "It is a guide to action which ensures that the military always obeys the commands of the party"
+    ]]
+    references = [[
+        "It is a guide to action that ensures that the military will forever heed Party commands"
+    ]]
+
+    # references = [[
+    #     "It is a guide to action that ensures that the military will forever heed Party commands",
+    #     "It is a guide to action which ensures that the military will forever heed Party commands"
+    # ]]
+
+    # Multi pred multi ref
+    # predictions = [[
+    #     "It is a guide to action which ensures that the military always obeys the commands of the party",
+    #     "It is a guide to action that will ensure that the military always obeys the commands of the party"
+    # ]]
+    # references = [[
+    #     "It is a guide to action that ensures that the military will forever heed Party commands",
+    #     "It is a guide to action which ensures that the military will forever heed Party commands"
+    # ]]
+    rouge = Rouge()
+    score = rouge.compute(predictions=predictions, references=references, use_aggregator=False)
+    print(score)
