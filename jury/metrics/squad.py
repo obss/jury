@@ -1,7 +1,7 @@
 from typing import Dict
 
 from jury.collator import Collator
-from jury.metrics import Metric
+from jury.metrics._base import Metric
 
 __class_names__ = {"squad": "SQUAD_F1", "squad_f1": "SQUAD_F1", "squad_em": "SQUAD_EM"}
 
