@@ -18,13 +18,13 @@ of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/sacrebleu/sacrebleu.py
 """
 
-from __future__ import absolute_import
 from typing import Dict
 
 import datasets
 import sacrebleu as scb
 from packaging import version
 
+from jury.collator import Collator
 from jury.metrics._base import Metric
 
 __class_names__ = {"sacrebleu": "Sacrebleu"}
@@ -119,10 +119,18 @@ class Sacrebleu(Metric):
             ],
         )
 
-    def _compute(
+    def validate_references(self, references: Collator) -> Collator:
+        references_per_prediction = len(references[0])
+        if any(len(refs) != references_per_prediction for refs in references):
+            raise ValueError("Sacrebleu requires the same number of references for each prediction")
+        transformed_referenes = [[refs[i] for refs in references] for i in range(references_per_prediction)]
+        return Collator(transformed_referenes, keep=True)
+
+    def _compute_single_pred_single_ref(
         self,
-        predictions,
-        references,
+        predictions: Collator,
+        references: Collator,
+        reduce_fn=None,
         smooth_method="exp",
         smooth_value=None,
         force=False,
@@ -130,13 +138,9 @@ class Sacrebleu(Metric):
         tokenize=None,
         use_effective_order=False,
     ):
-        references_per_prediction = len(references[0])
-        if any(len(refs) != references_per_prediction for refs in references):
-            raise ValueError("Sacrebleu requires the same number of references for each prediction")
-        transformed_references = [[refs[i] for refs in references] for i in range(references_per_prediction)]
         output = scb.corpus_bleu(
             predictions,
-            transformed_references,
+            references,
             smooth_method=smooth_method,
             smooth_value=smooth_value,
             force=force,
@@ -145,35 +149,75 @@ class Sacrebleu(Metric):
             **(dict(tokenize=tokenize) if tokenize else {}),
         )
         output_dict = {
-            "score": output.score,
+            "score": output.score / 100,
             "counts": output.counts,
             "totals": output.totals,
-            "precisions": output.precisions,
+            "precisions": [p / 100 for p in output.precisions],
             "bp": output.bp,
             "sys_len": output.sys_len,
             "ref_len": output.ref_len,
         }
         return output_dict
 
+    def _compute_single_pred_multi_ref(
+        self,
+        predictions: Collator,
+        references: Collator,
+        reduce_fn: callable,
+        smooth_method="exp",
+        smooth_value=None,
+        force=False,
+        lowercase=False,
+        tokenize=None,
+        use_effective_order=False,
+    ):
+        return self._compute_single_pred_single_ref(
+            predictions=predictions,
+            references=references,
+            reduce_fn=reduce_fn,
+            smooth_method=smooth_method,
+            smooth_value=smooth_value,
+            force=force,
+            lowercase=lowercase,
+            tokenize=tokenize,
+            use_effective_order=use_effective_order,
+        )
+
+    def _compute_multi_pred_multi_ref(
+        self,
+        predictions: Collator,
+        references: Collator,
+        reduce_fn: callable,
+        smooth_method="exp",
+        smooth_value=None,
+        force=False,
+        lowercase=False,
+        tokenize=None,
+        use_effective_order=False,
+    ):
+        pass
+
+    def evaluate(self, predictions: Collator, references: Collator, reduce_fn: callable, **kwargs) -> Dict[str, float]:
+        if predictions.can_collapse() and references.can_collapse():
+            predictions = predictions.collapse()
+            eval_fn = self._compute_single_pred_single_ref
+        elif predictions.can_collapse() and not references.can_collapse():
+            predictions = predictions.collapse()
+            eval_fn = self._compute_single_pred_multi_ref
+        else:
+            eval_fn = self._compute_multi_pred_multi_ref
+        references = self.validate_references(references)
+        return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)
+
 
 if __name__ == "__main__":
-    from jury.metrics.sacrebleu import Sacrebleu
-
     predictions = [
-        [
-            "It is a guide to action which ensures that the military always obeys the commands of the party"
-        ],
-        [
-            "bar foo foobar"
-        ]
+        ["It is a guide to action which ensures that the military always obeys the commands of the party"],
+        ["bar foo foobar"],
     ]
     references = [
-        [
-            "It is a guide to action that ensures that the military will forever heed Party commands"
-        ],
-        [
-            "foo bar foobar"
-        ]
+        ["It is a guide to action that ensures that the military will forever heed Party commands"],
+        ["foo bar foobar"],
     ]
 
     # Multi pred multi ref

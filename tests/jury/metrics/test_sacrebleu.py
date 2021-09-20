@@ -1,7 +1,7 @@
 import pytest
 
 from jury import Jury
-from jury.metrics.sacrebleu import SacreBLEU
+from jury.metrics.sacre_bleu import SacreBLEU
 from tests.utils import assert_almost_equal_dict
 
 

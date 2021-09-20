@@ -1,6 +1,6 @@
 import importlib
 from abc import ABC
-from typing import Dict, List, Optional, Tuple, Union
+from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import datasets
 import numpy
@@ -43,18 +43,20 @@ class Metric(datasets.Metric, ABC):
     def _preprocess(self, predictions: List[List[str]], references: List[List[str]]) -> Tuple[Collator, Collator]:
         return Collator(predictions), Collator(references)
 
-    def _compute_single_pred_single_ref(self, predictions: Collator, references: Collator, **kwargs):
-        raise NotImplementedError
-
-    def _compute_single_pred_multi_ref(
-        self, predictions: Collator, references: Collator, reduce_fn: callable, **kwargs
+    def _compute_single_pred_single_ref(
+        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
     ):
         raise NotImplementedError
 
-    def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: callable, **kwargs):
+    def _compute_single_pred_multi_ref(
+        self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs
+    ):
         raise NotImplementedError
 
-    def evaluate(self, predictions: Collator, references: Collator, reduce_fn: callable, **kwargs) -> Dict[str, float]:
+    def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs):
+        raise NotImplementedError
+
+    def evaluate(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs) -> Dict[str, float]:
         if predictions.can_collapse() and references.can_collapse():
             predictions = predictions.collapse()
             references = references.collapse()
