@@ -18,10 +18,9 @@
 import importlib.util
 import math
 import os
+from typing import Callable, Dict, Iterable, List, Tuple, Union
 
 import datasets
-from typing import Dict, Tuple, Iterable, Union, List, Callable
-
 import numpy as np
 
 from jury.collator import Collator
@@ -167,15 +166,25 @@ class Bleu(Metric):
             "reference_length": reference_length,
         }
 
-    def _compute_single_pred_single_ref(self, predictions: Collator, references: Collator, reduce_fn=None, max_order=4, smooth=False):
-        predictions = predictions.reshape(len(predictions),)
+    def _compute_single_pred_single_ref(
+        self, predictions: Collator, references: Collator, reduce_fn=None, max_order=4, smooth=False
+    ):
+        predictions = predictions.reshape(
+            len(predictions),
+        )
         return self._compute_bleu_score(predictions=predictions, references=references)
 
-    def _compute_single_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn=None, max_order=4, smooth=False):
+    def _compute_single_pred_multi_ref(
+        self, predictions: Collator, references: Collator, reduce_fn=None, max_order=4, smooth=False
+    ):
         # Bleu score implementation can natively handle multiple references.
-        return self._compute_single_pred_single_ref(predictions=predictions, references=references, reduce_fn=reduce_fn, max_order=max_order, smooth=smooth)
+        return self._compute_single_pred_single_ref(
+            predictions=predictions, references=references, reduce_fn=reduce_fn, max_order=max_order, smooth=smooth
+        )
 
-    def _compute_multi_pred_multi_ref2(self, predictions: Collator, references: Collator, reduce_fn=None, max_order=4, smooth=False):
+    def _compute_multi_pred_multi_ref2(
+        self, predictions: Collator, references: Collator, reduce_fn=None, max_order=4, smooth=False
+    ):
         scores = []
         for preds, refs in zip(predictions, references):
             pred_scores = []
@@ -187,11 +196,11 @@ class Bleu(Metric):
             reduced_score = reduce_fn(pred_scores)
             scores.append(reduced_score)
 
-        return {
-            "bleu": float(np.mean(scores))
-        }
+        return {"bleu": float(np.mean(scores))}
 
-    def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn=None, max_order=4, smooth=False):
+    def _compute_multi_pred_multi_ref(
+        self, predictions: Collator, references: Collator, reduce_fn=None, max_order=4, smooth=False
+    ):
         flattened_predictions = []
         matched_references = []
         reference_length = prediction_length = adjusted_reference_length = adjusted_prediction_length = 0
@@ -211,12 +220,12 @@ class Bleu(Metric):
         ratio = prediction_length / reference_length
         adjusted_ratio = adjusted_prediction_length / adjusted_reference_length
         if ratio > 1.0:
-            adjusted_bp = 1.
+            adjusted_bp = 1.0
             bleu_score = score["bleu"]
         else:
-            bp = math.exp(1 - 1. / ratio)
-            adjusted_bp = math.exp(1 - 1. / adjusted_ratio)
-            bleu_score = score["bleu"] * (adjusted_bp/bp)
+            bp = math.exp(1 - 1.0 / ratio)
+            adjusted_bp = math.exp(1 - 1.0 / adjusted_ratio)
+            bleu_score = score["bleu"] * (adjusted_bp / bp)
 
         return {
             "bleu": bleu_score,

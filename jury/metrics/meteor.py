@@ -120,11 +120,7 @@ class Meteor(Metric):
 
     def _compute_single_pred_multi_ref(self, predictions, references, reduce_fn=None, alpha=0.9, beta=3, gamma=0.5):
         scores = [
-            meteor_score.meteor_score(references=ref,
-                                      hypothesis=pred,
-                                      alpha=alpha,
-                                      beta=beta,
-                                      gamma=gamma)
+            meteor_score.meteor_score(references=ref, hypothesis=pred, alpha=alpha, beta=beta, gamma=gamma)
             for ref, pred in zip(references, predictions)
         ]
         return {self.resulting_name: np.mean(scores)}
@@ -141,12 +137,8 @@ class Meteor(Metric):
 
 
 if __name__ == "__main__":
-    predictions = [[
-        "It is a guide to action which ensures that the military always obeys the commands of the party"
-    ]]
-    references = [[
-        "It is a guide to action that ensures that the military will forever heed Party commands"
-    ]]
+    predictions = [["It is a guide to action which ensures that the military always obeys the commands of the party"]]
+    references = [["It is a guide to action that ensures that the military will forever heed Party commands"]]
 
     # references = [[
     #     "It is a guide to action that ensures that the military will forever heed Party commands",
@@ -165,4 +157,3 @@ if __name__ == "__main__":
     bleu = Meteor()
     score = bleu.compute(predictions=predictions, references=references)
     print(score)
-

@@ -1,5 +1,5 @@
-from jury.metrics.meteor import Meteor
 from jury.metrics.bleu import Bleu
+from jury.metrics.meteor import Meteor
 
 DEFAULT_METRICS = [
     Bleu(resulting_name="bleu_1", params={"max_order": 1}),

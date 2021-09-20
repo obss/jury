@@ -6,7 +6,7 @@ from tqdm import tqdm
 
 from jury.collator import Collator
 from jury.definitions import DEFAULT_METRICS
-from jury.metrics import load_metric, Metric, MetricCollator
+from jury.metrics import Metric, MetricCollator, load_metric
 from jury.utils import is_reduce_fn, replace, set_env
 
 

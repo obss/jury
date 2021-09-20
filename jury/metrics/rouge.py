@@ -15,7 +15,7 @@
 """ ROUGE metric. The part of this file is adapted from HuggingFace's
 datasets package implementation of ROUGE metric."""
 
-from typing import Dict, Optional, List, Union
+from typing import Dict, List, Optional, Union
 
 import datasets
 import pandas as pd
@@ -120,7 +120,10 @@ class Rouge(Metric):
         return aggregator
 
     @staticmethod
-    def _add_score(aggregator: Union[List, scoring.BootstrapAggregator], score: Union[Dict[str, float], Dict[str, scoring.BootstrapAggregator]]) -> Union[List, scoring.BootstrapAggregator]:
+    def _add_score(
+        aggregator: Union[List, scoring.BootstrapAggregator],
+        score: Union[Dict[str, float], Dict[str, scoring.BootstrapAggregator]],
+    ) -> Union[List, scoring.BootstrapAggregator]:
         if isinstance(aggregator, scoring.BootstrapAggregator):
             aggregator.add_scores(score)
         else:
@@ -138,7 +141,9 @@ class Rouge(Metric):
         return result
 
     @staticmethod
-    def _normalize_score_list(score_list: List[Dict[str, scoring.BootstrapAggregator]], metric_to_select: str) -> List[Dict[str, scoring.BootstrapAggregator]]:
+    def _normalize_score_list(
+        score_list: List[Dict[str, scoring.BootstrapAggregator]], metric_to_select: str
+    ) -> List[Dict[str, scoring.BootstrapAggregator]]:
         for score_dict in score_list:
             for metric, score in score_dict.items():
                 score_dict[metric] = getattr(score, metric_to_select)
@@ -152,7 +157,16 @@ class Rouge(Metric):
     def _select_mid_from_aggregation(aggregated_scores: Dict[str, scoring.AggregateScore]) -> Dict[str, float]:
         return {metric: score.mid for metric, score in aggregated_scores.items()}
 
-    def evaluate(self, predictions: Collator, references: Collator, reduce_fn: callable, rouge_types=None, use_aggregator=True, use_stemmer=False, metric_to_select: Optional[str] = "fmeasure"):
+    def evaluate(
+        self,
+        predictions: Collator,
+        references: Collator,
+        reduce_fn: callable,
+        rouge_types=None,
+        use_aggregator=True,
+        use_stemmer=False,
+        metric_to_select: Optional[str] = "fmeasure",
+    ):
         if rouge_types is None:
             rouge_types = ["rouge1", "rouge2", "rougeL", "rougeLsum"]
 
@@ -162,16 +176,22 @@ class Rouge(Metric):
             aggregator = self._get_aggregator(use_aggregator)
             predictions = predictions.collapse()
             references = references.collapse()
-            aggregator = self._compute_single_pred_single_ref(predictions, references, reduce_fn, scorer, aggregator, metric_to_select)
+            aggregator = self._compute_single_pred_single_ref(
+                predictions, references, reduce_fn, scorer, aggregator, metric_to_select
+            )
         elif predictions.can_collapse() and not references.can_collapse():
             # Force to use BootstrapAggregator
             aggregator = self._get_aggregator(use_aggregator=True)
             predictions = predictions.collapse()
-            aggregator = self._compute_single_pred_multi_ref(predictions, references, reduce_fn, scorer, aggregator, metric_to_select)
+            aggregator = self._compute_single_pred_multi_ref(
+                predictions, references, reduce_fn, scorer, aggregator, metric_to_select
+            )
         else:
             # Force to use BootstrapAggregator
             aggregator = self._get_aggregator(use_aggregator=True)
-            aggregator = self._compute_multi_pred_multi_ref(predictions, references, reduce_fn, scorer, aggregator, metric_to_select)
+            aggregator = self._compute_multi_pred_multi_ref(
+                predictions, references, reduce_fn, scorer, aggregator, metric_to_select
+            )
 
         result = self._aggregate(aggregator)
 
@@ -182,7 +202,9 @@ class Rouge(Metric):
 
         return result
 
-    def _compute_single_pred_single_ref(self, predictions, references, reduce_fn=None, scorer=None, aggregator=None, metric_to_select=None):
+    def _compute_single_pred_single_ref(
+        self, predictions, references, reduce_fn=None, scorer=None, aggregator=None, metric_to_select=None
+    ):
         for ref, pred in zip(references, predictions):
             score = scorer.score(target=ref, prediction=pred)
             if metric_to_select is not None:
@@ -190,7 +212,9 @@ class Rouge(Metric):
             aggregator = self._add_score(aggregator, score)
         return aggregator
 
-    def _compute_single_pred_multi_ref(self, predictions, references, reduce_fn, scorer=None, aggregator=None, metric_to_select=None):
+    def _compute_single_pred_multi_ref(
+        self, predictions, references, reduce_fn, scorer=None, aggregator=None, metric_to_select=None
+    ):
         for pred, refs in zip(predictions, references):
             pred_scores = [scorer.score(target=ref, prediction=pred) for ref in refs]
             pred_scores = self._normalize_score_list(pred_scores, metric_to_select)
@@ -198,11 +222,15 @@ class Rouge(Metric):
             aggregator = self._add_score(aggregator, score)
         return aggregator
 
-    def _compute_multi_pred_multi_ref(self, predictions, references, reduce_fn, scorer=None, aggregator=None, metric_to_select=None):
+    def _compute_multi_pred_multi_ref(
+        self, predictions, references, reduce_fn, scorer=None, aggregator=None, metric_to_select=None
+    ):
         for preds, refs in zip(predictions, references):
             multi_aggregator = self._get_aggregator(use_aggregator=True)
             for pred in preds:
-                pred_score = self._normalize_score_list([scorer.score(target=ref, prediction=pred) for ref in refs], metric_to_select)
+                pred_score = self._normalize_score_list(
+                    [scorer.score(target=ref, prediction=pred) for ref in refs], metric_to_select
+                )
                 pred_score = self._reduce_dict(pred_score, reduce_fn)
                 multi_aggregator = self._add_score(multi_aggregator, pred_score)
             score = self._select_mid_from_aggregation(self._aggregate(multi_aggregator))

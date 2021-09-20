@@ -21,6 +21,7 @@ class TokenizerWrapper:
     Args:
         tokenizer: Tokenizer object that implements `tokenize` method.
     """
+
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
 

@@ -1,5 +1,5 @@
 import importlib
-from typing import Dict, Optional, Tuple, Union, List
+from typing import Dict, List, Optional, Tuple, Union
 
 import datasets
 import numpy
@@ -45,7 +45,9 @@ class Metric(datasets.Metric):
     def _compute_single_pred_single_ref(self, predictions: Collator, references: Collator, **kwargs):
         raise NotImplementedError
 
-    def _compute_single_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: callable, **kwargs):
+    def _compute_single_pred_multi_ref(
+        self, predictions: Collator, references: Collator, reduce_fn: callable, **kwargs
+    ):
         raise NotImplementedError
 
     def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: callable, **kwargs):

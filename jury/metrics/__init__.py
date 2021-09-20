@@ -1,1 +1,1 @@
-from jury.metrics._base import load_metric, Metric, MetricCollator
+from jury.metrics._base import Metric, MetricCollator, load_metric
