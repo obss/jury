@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The HuggingFace Datasets Authors.
+# Copyright 2020 Open Business Software Solutions, The HuggingFace Datasets Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,11 +12,17 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" BLEU metric. """
+""" BLEU metric. The part of this file is adapted from BLEU implementation
+ of datasets package.
+"""
 import importlib.util
+import math
+import os
 
 import datasets
-from typing import Dict
+from typing import Dict, Tuple, Iterable, Union, List, Callable
+
+import numpy as np
 
 from jury.collator import Collator
 from jury.metrics._base import Metric
@@ -123,30 +129,31 @@ class Bleu(Metric):
             ],
         )
 
-    def _download_and_prepare(self, dl_manager):
+    def _download_and_prepare(self, dl_manager) -> None:
+        """
+        Downloads and import the computation of bleu score from the BLEU implementation
+        from tensorflow/nmt module.
+        """
         nmt_source = "https://raw.githubusercontent.com/tensorflow/nmt/master/nmt/scripts/bleu.py"
-        nmt_dest = "metrics/bleu/nmt_bleu.py"
-        module_path = download(nmt_source, nmt_dest)
-        spec = importlib.util.spec_from_file_location("nmt_bleu", module_path)
+        nmt_dest = os.path.join(self.data_dir, "nmt_bleu.py")
+        download(nmt_source, nmt_dest)
+        spec = importlib.util.spec_from_file_location("nmt_bleu", nmt_dest)
         nmt_bleu = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(nmt_bleu)
         self.compute_bleu = nmt_bleu.compute_bleu
 
-    def _preprocess(self, predictions, references):
+    def _tokenize(self, predictions: Collator, references: Collator) -> Tuple[Collator, Collator]:
         tokenizer_wrapper = TokenizerWrapper(self.tokenizer)
-        predictions, references = tokenizer_wrapper.tokenize(predictions, references)
-        if predictions.ndim > 2:
-            predictions = predictions.reshape_len(-1)
+        return tokenizer_wrapper.tokenize(predictions, references)
 
-        if references.ndim == 3:
-            ref_count = references.shape[0]
-            references = references.reshape(1, ref_count, -1)
-        else:
-            references = references.reshape(1, -1)
+    @staticmethod
+    def _get_token_lengths(sequences: Iterable, reduce_fn: Callable = None) -> Union[int, List[int]]:
+        token_lengths = [len(item) for item in sequences]
+        if reduce_fn is not None:
+            return int(reduce_fn(token_lengths))
+        return token_lengths
 
-        return predictions, references
-
-    def _compute_single_pred_single_ref(self, predictions: Collator, references: Collator, max_order=4, smooth=False):
+    def _compute_bleu_score(self, predictions: Collator, references: Collator, max_order=4, smooth=False):
         score = self.compute_bleu(
             reference_corpus=references, translation_corpus=predictions, max_order=max_order, smooth=smooth
         )
@@ -160,30 +167,72 @@ class Bleu(Metric):
             "reference_length": reference_length,
         }
 
+    def _compute_single_pred_single_ref(self, predictions: Collator, references: Collator, reduce_fn=None, max_order=4, smooth=False):
+        predictions = predictions.reshape(len(predictions),)
+        return self._compute_bleu_score(predictions=predictions, references=references)
 
-if __name__ == "__main__":
-    predictions = [[
-        "It is a guide to action which ensures that the military always obeys the commands of the party"
-    ]]
-    references = [[
-        "It is a guide to action that ensures that the military will forever heed Party commands"
-    ]]
+    def _compute_single_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn=None, max_order=4, smooth=False):
+        # Bleu score implementation can natively handle multiple references.
+        return self._compute_single_pred_single_ref(predictions=predictions, references=references, reduce_fn=reduce_fn, max_order=max_order, smooth=smooth)
 
-    # references = [[
-    #     "It is a guide to action that ensures that the military will forever heed Party commands",
-    #     "It is a guide to action which ensures that the military will forever heed Party commands"
-    # ]]
+    def _compute_multi_pred_multi_ref2(self, predictions: Collator, references: Collator, reduce_fn=None, max_order=4, smooth=False):
+        scores = []
+        for preds, refs in zip(predictions, references):
+            pred_scores = []
+            refs = Collator([refs], keep=True)
+            for pred in preds:
+                pred = Collator([pred], keep=True)
+                pred_score = self._compute_bleu_score(predictions=pred, references=refs)["bleu"]
+                pred_scores.append(pred_score)
+            reduced_score = reduce_fn(pred_scores)
+            scores.append(reduced_score)
 
-    # Multi pred multi ref
-    # predictions = [[
-    #     "It is a guide to action which ensures that the military always obeys the commands of the party",
-    #     "It is a guide to action that will ensure that the military always obeys the commands of the party"
-    # ]]
-    # references = [[
-    #     "It is a guide to action that ensures that the military will forever heed Party commands",
-    #     "It is a guide to action which ensures that the military will forever heed Party commands"
-    # ]]
-    bleu = Bleu()
-    score = bleu.compute(predictions=predictions, references=references, use_aggregator=False)
-    print(score)
+        return {
+            "bleu": float(np.mean(scores))
+        }
 
+    def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn=None, max_order=4, smooth=False):
+        flattened_predictions = []
+        matched_references = []
+        reference_length = prediction_length = adjusted_reference_length = adjusted_prediction_length = 0
+        for preds, refs in zip(predictions, references):
+            n_preds = len(preds)
+            reference_length += self._get_token_lengths(refs, reduce_fn=min) * n_preds
+            adjusted_reference_length += self._get_token_lengths(refs, reduce_fn=min)
+            prediction_length += self._get_token_lengths(preds, reduce_fn=sum)
+            adjusted_prediction_length += self._get_token_lengths(preds, reduce_fn=max)
+            flattened_predictions.extend([pred for pred in preds])
+            matched_references.extend([refs] * n_preds)
+
+        flattened_predictions = Collator(flattened_predictions, keep=True)
+        matched_references = Collator(matched_references, keep=True)
+        score = self._compute_single_pred_multi_ref(predictions=flattened_predictions, references=matched_references)
+
+        ratio = prediction_length / reference_length
+        adjusted_ratio = adjusted_prediction_length / adjusted_reference_length
+        if ratio > 1.0:
+            adjusted_bp = 1.
+            bleu_score = score["bleu"]
+        else:
+            bp = math.exp(1 - 1. / ratio)
+            adjusted_bp = math.exp(1 - 1. / adjusted_ratio)
+            bleu_score = score["bleu"] * (adjusted_bp/bp)
+
+        return {
+            "bleu": bleu_score,
+            "precisions": score["precisions"],
+            "brevity_penalty": adjusted_bp,
+            "length_ratio": adjusted_ratio,
+            "translation_length": adjusted_prediction_length,
+            "reference_length": adjusted_reference_length,
+        }
+
+    def evaluate(self, predictions: Collator, references: Collator, reduce_fn: callable, **kwargs) -> Dict[str, float]:
+        if predictions.can_collapse() and references.can_collapse():
+            eval_fn = self._compute_single_pred_single_ref
+        elif predictions.can_collapse() and not references.can_collapse():
+            eval_fn = self._compute_single_pred_multi_ref
+        else:
+            eval_fn = self._compute_multi_pred_multi_ref
+        predictions, references = self._tokenize(predictions=predictions, references=references)
+        return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)

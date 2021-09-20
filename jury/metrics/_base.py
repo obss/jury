@@ -26,20 +26,8 @@ class Metric(datasets.Metric):
     def __init__(self, resulting_name: Optional[str] = None, params: Optional[Dict] = None):
         self.resulting_name = resulting_name if resulting_name is not None else self.name
         self.params = params if params is not None else {"reduce_fn": "mean"}
-        self.download_and_prepare()
         super().__init__()
-
-    def evaluate(self, predictions: Collator, references: Collator, reduce_fn: callable, **kwargs) -> Dict[str, float]:
-        if predictions.can_collapse() and references.can_collapse():
-            predictions = predictions.collapse()
-            references = references.collapse()
-            eval_fn = self._compute_single_pred_single_ref
-        elif predictions.can_collapse() and not references.can_collapse():
-            predictions = predictions.collapse()
-            eval_fn = self._compute_single_pred_multi_ref
-        else:
-            eval_fn = self._compute_multi_pred_multi_ref
-        return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)
+        self.download_and_prepare()
 
     def _compute(self, predictions: List[List[str]], references: List[List[str]], **kwargs) -> Dict[str, float]:
         assert len(predictions) == len(references), "Predictions and references length does not match."
@@ -62,6 +50,18 @@ class Metric(datasets.Metric):
 
     def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: callable, **kwargs):
         raise NotImplementedError
+
+    def evaluate(self, predictions: Collator, references: Collator, reduce_fn: callable, **kwargs) -> Dict[str, float]:
+        if predictions.can_collapse() and references.can_collapse():
+            predictions = predictions.collapse()
+            references = references.collapse()
+            eval_fn = self._compute_single_pred_single_ref
+        elif predictions.can_collapse() and not references.can_collapse():
+            predictions = predictions.collapse()
+            eval_fn = self._compute_single_pred_multi_ref
+        else:
+            eval_fn = self._compute_multi_pred_multi_ref
+        return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)
 
 
 class MetricCollator(list):

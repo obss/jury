@@ -14,6 +14,13 @@ class BLEUDefaultTokenizer:
 
 
 class TokenizerWrapper:
+    """
+    Wraps the tokenizer object to adapt tokenize method such that it returns
+    a tuple of jury.Collator object instead of list.
+
+    Args:
+        tokenizer: Tokenizer object that implements `tokenize` method.
+    """
     def __init__(self, tokenizer):
         self.tokenizer = tokenizer
 
