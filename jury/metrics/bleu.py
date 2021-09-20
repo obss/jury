@@ -12,9 +12,12 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" BLEU metric. The part of this file is adapted from BLEU implementation
- of datasets package.
 """
+BLEU metric. The part of this file is adapted from HuggingFace's
+datasets package implementation of BLEU metric. See
+https://github.com/huggingface/datasets/blob/master/metrics/bleu/bleu.py
+"""
+
 import importlib.util
 import math
 import os
@@ -117,8 +120,8 @@ class Bleu(Metric):
             inputs_description=_KWARGS_DESCRIPTION,
             features=datasets.Features(
                 {
-                    "predictions": datasets.Sequence(datasets.Value("string"), id="sequence"),
-                    "references": datasets.Sequence(datasets.Value("string"), id="sequence"),
+                    "predictions": datasets.Sequence(datasets.Value("string", id="tokens"), id="sequence"),
+                    "references": datasets.Sequence(datasets.Value("string", id="tokens"), id="sequence"),
                 }
             ),
             codebase_urls=["https://github.com/tensorflow/nmt/blob/master/nmt/scripts/bleu.py"],
@@ -130,12 +133,14 @@ class Bleu(Metric):
 
     def _download_and_prepare(self, dl_manager) -> None:
         """
-        Downloads and import the computation of bleu score from the BLEU implementation
-        from tensorflow/nmt module.
+        Downloads and import the computation of bleu score from the implementation
+        of BLEU computation from tensorflow/nmt module. See
+        https://github.com/tensorflow/nmt/blob/master/nmt/scripts/bleu.py
         """
         nmt_source = "https://raw.githubusercontent.com/tensorflow/nmt/master/nmt/scripts/bleu.py"
         nmt_dest = os.path.join(self.data_dir, "nmt_bleu.py")
-        download(nmt_source, nmt_dest)
+        if not os.path.exists(nmt_dest):
+            download(nmt_source, nmt_dest)
         spec = importlib.util.spec_from_file_location("nmt_bleu", nmt_dest)
         nmt_bleu = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(nmt_bleu)

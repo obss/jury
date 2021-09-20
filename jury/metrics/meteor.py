@@ -12,8 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" METEOR metric. Part of this file is adapted from the implementation
-of METEOR from datasets package. See
+""" METEOR metric. The part of this file is adapted from HuggingFace's
+datasets package implementation of METEOR metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/meteor/meteor.py
 """
 from typing import Dict, Optional

@@ -12,8 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" ROUGE metric. The part of this file is adapted from HuggingFace's
-datasets package implementation of ROUGE metric."""
+"""
+ROUGE metric. The part of this file is adapted from HuggingFace's
+datasets package implementation of ROUGE metric. See
+https://github.com/huggingface/datasets/blob/master/metrics/rouge/rouge.py
+"""
 
 from typing import Dict, List, Optional, Union
 

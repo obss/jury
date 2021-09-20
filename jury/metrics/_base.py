@@ -1,4 +1,5 @@
 import importlib
+from abc import ABC
 from typing import Dict, List, Optional, Tuple, Union
 
 import datasets
@@ -22,7 +23,7 @@ def load_metric(metric_name: str, resulting_name: str = None, params: Dict = Non
     return c(resulting_name=resulting_name, params=params)
 
 
-class Metric(datasets.Metric):
+class Metric(datasets.Metric, ABC):
     def __init__(self, resulting_name: Optional[str] = None, params: Optional[Dict] = None):
         self.resulting_name = resulting_name if resulting_name is not None else self.name
         self.params = params if params is not None else {"reduce_fn": "mean"}
