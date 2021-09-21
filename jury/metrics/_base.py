@@ -34,14 +34,14 @@ class Metric(datasets.Metric, ABC):
         assert len(predictions) == len(references), "Predictions and references length does not match."
         reduce_fn_name = kwargs.get("reduce_fn", self.params["reduce_fn"])
         reduce_fn = getattr(numpy, reduce_fn_name)
-        predictions, references = self._preprocess(predictions, references)
         eval_params = {**self.params, **kwargs}
         eval_params.pop("reduce_fn")
+        predictions, references = Collator(predictions), Collator(references)
         result = self.evaluate(predictions=predictions, references=references, reduce_fn=reduce_fn, **eval_params)
         return result
 
     def _preprocess(self, predictions: List[List[str]], references: List[List[str]]) -> Tuple[Collator, Collator]:
-        return Collator(predictions), Collator(references)
+        return Collator(predictions, keep=True), Collator(references, keep=True)
 
     def _compute_single_pred_single_ref(
         self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
@@ -66,6 +66,8 @@ class Metric(datasets.Metric, ABC):
             eval_fn = self._compute_single_pred_multi_ref
         else:
             eval_fn = self._compute_multi_pred_multi_ref
+
+        predictions, references = self._preprocess(predictions, references)
         return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)
 
 

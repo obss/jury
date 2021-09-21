@@ -1,22 +1,125 @@
-from typing import Dict
+# coding=utf-8
+# Copyright 2020 Open Business Software Solutions, The HuggingFace Datasets Authors.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+""" SQuAD metric. The part of this file is adapted from SacreBLEU implementation
+of datasets package. See
+https://github.com/huggingface/datasets/blob/master/metrics/squad/squad.py"""
+import os
+from typing import Dict, Callable, List
+
+import datasets
+import numpy as np
+import pandas as pd
 
 from jury.collator import Collator
 from jury.metrics._base import Metric
-
-__class_names__ = {"squad": "SQUAD_F1", "squad_f1": "SQUAD_F1", "squad_em": "SQUAD_EM"}
-
+from jury.metrics._utils import download_and_import_module
 from jury.utils import NestedSingleType
 
 
-class SQUAD(Metric):
-    def __init__(self, metric_name: str = None, resulting_name: str = None, params: Dict = None):
-        metric_name = self.__class__.__name__ if metric_name is None else metric_name
-        resulting_name = metric_name if resulting_name is None else resulting_name
-        super().__init__(metric_name=metric_name, resulting_name=resulting_name, params=params)
+__class_names__ = {"squad": "SQUAD_F1", "squad_f1": "SQUAD_F1", "squad_em": "SQUAD_EM"}
 
-    def _preprocess(self, predictions, references, fn_multiple):
-        if NestedSingleType.get_type(predictions, order=-1) == "str":
+
+_CITATION = """\
+@inproceedings{Rajpurkar2016SQuAD10,
+  title={SQuAD: 100, 000+ Questions for Machine Comprehension of Text},
+  author={Pranav Rajpurkar and Jian Zhang and Konstantin Lopyrev and Percy Liang},
+  booktitle={EMNLP},
+  year={2016}
+}
+"""
+
+_DESCRIPTION = """
+This metric wrap the official scoring script for version 1 of the Stanford Question Answering Dataset (SQuAD).
+
+Stanford Question Answering Dataset (SQuAD) is a reading comprehension dataset, consisting of questions posed by
+crowdworkers on a set of Wikipedia articles, where the answer to every question is a segment of text, or span,
+from the corresponding reading passage, or the question might be unanswerable.
+"""
+
+_KWARGS_DESCRIPTION = """
+Computes SQuAD scores (F1 and EM).
+Args:
+    predictions: List of question-answers dictionaries with the following key-values:
+        - 'id': id of the question-answer pair as given in the references (see below)
+        - 'prediction_text': the text of the answer
+    references: List of question-answers dictionaries with the following key-values:
+        - 'id': id of the question-answer pair (see above),
+        - 'answers': a Dict in the SQuAD dataset format
+            {
+                'text': list of possible texts for the answer, as a list of strings
+                'answer_start': list of start positions for the answer, as a list of ints
+            }
+            Note that answer_start values are not taken into account to compute the metric.
+Returns:
+    'exact_match': Exact match (the normalized answer exactly match the gold answer)
+    'f1': The F-score of predicted tokens versus the gold answer
+Examples:
+
+    >>> predictions = [{'prediction_text': '1976', 'id': '56e10a3be3433e1400422b22'}]
+    >>> references = [{'answers': {'answer_start': [97], 'text': ['1976']}, 'id': '56e10a3be3433e1400422b22'}]
+    >>> squad_metric = datasets.load_metric("squad")
+    >>> results = squad_metric.compute(predictions=predictions, references=references)
+    >>> print(results)
+    {'exact_match': 100.0, 'f1': 100.0}
+"""
+
+
+@datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
+class Squad(Metric):
+    def __init__(self, resulting_name: str = None, params: Dict = None):
+        resulting_name = "squad" if resulting_name is None else resulting_name
+        super().__init__(resulting_name=resulting_name, params=params)
+
+    def _download_and_prepare(self, dl_manager) -> None:
+        """
+        Downloads and import the computation of squad score from the implementation
+        of Squad computation from huggingface/datasets. See
+        https://github.com/huggingface/datasets/blob/master/metrics/squad/evaluate.py
+        """
+        squad_source = "https://raw.githubusercontent.com/huggingface/datasets/master/metrics/squad/evaluate.py"
+        squad_dest = os.path.join(self.data_dir, "squad_evaluate.py")
+        squad_evaluate = download_and_import_module(
+                source=squad_source,
+                destination=squad_dest,
+                module_name="squad_evaluate",
+        )
+        self.squad_evaluate = squad_evaluate.evaluate
+
+    def _info(self):
+        return datasets.MetricInfo(
+            description=_DESCRIPTION,
+            citation=_CITATION,
+            inputs_description=_KWARGS_DESCRIPTION,
+            features=datasets.Features(
+                {
+                    "predictions": datasets.Sequence(datasets.Value("string")),
+                    "references": datasets.Sequence(datasets.Value("string"))
+                }
+            ),
+            codebase_urls=["https://rajpurkar.github.io/SQuAD-explorer/"],
+            reference_urls=["https://rajpurkar.github.io/SQuAD-explorer/"],
+        )
+
+    def _preprocess(self, predictions: Collator, references: Collator):
+        if NestedSingleType.get_type(predictions, order=-1) == "str" and predictions.can_collapse():
             predictions = [{"prediction_text": pred, "id": str(i)} for i, pred in enumerate(predictions.collapse())]
+        elif NestedSingleType.get_type(predictions, order=-1) == "str" and not predictions.can_collapse():
+            _predictions = []
+            for i, preds in enumerate(predictions):
+                _predictions.append([{"prediction_text": pred, "id": str(i)} for pred in preds])
+            predictions = _predictions
         if NestedSingleType.get_type(references, order=-1) == "str":
             references = [
                 {"answers": {"answer_start": [-1], "text": Collator(ref).collapse()}, "id": str(i)}
@@ -24,24 +127,90 @@ class SQUAD(Metric):
             ]
         return predictions, references
 
+    def _compute_single_pred_single_ref(
+        self, predictions: Collator, references: Collator, **kwargs
+    ):
+        pred_dict = {prediction["id"]: prediction["prediction_text"] for prediction in predictions}
+        dataset = [
+            {
+                "paragraphs": [
+                    {
+                        "qas": [
+                            {
+                                "answers": [{"text": answer_text} for answer_text in ref["answers"]["text"]],
+                                "id": ref["id"],
+                            }
+                            for ref in references
+                        ]
+                    }
+                ]
+            }
+        ]
+        score = self.squad_evaluate(dataset=dataset, predictions=pred_dict)
+        return score
 
-class SQUAD_EM(SQUAD):
-    def __init__(self, resulting_name: str = None, params: Dict = None):
-        metric_name = "squad"
-        resulting_name = self.__class__.__name__.lower() if resulting_name is None else resulting_name
-        super().__init__(metric_name=metric_name, resulting_name=resulting_name, params=params)
+    def _compute_single_pred_multi_ref(
+        self, predictions: Collator, references: Collator, reduce_fn=None, **kwargs
+    ):
+        return self._compute_single_pred_single_ref(
+                predictions=predictions,
+                references=references,
+                reduce_fn=reduce_fn
+        )
 
-    def _postprocess(self, result, return_dict):
-        result = {self.metric_name: result["exact_match"] / 100}
-        return super()._postprocess(result, return_dict)
+    def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs):
+        scores = []
+        for preds, refs in zip(predictions, references):
+            pred_scores = []
+            for pred in preds:
+                pred_scores.append(self._compute_single_pred_multi_ref(
+                        predictions=Collator([pred], keep=True),
+                        references=Collator([refs], keep=True),
+                        reduce_fn=reduce_fn
+                ))
+            reduced_score = self._reduce_multi_pred_scores(pred_scores, reduce_fn)
+            scores.append(reduced_score)
+
+        # Average reduced scores
+        return self._reduce_multi_pred_scores(scores, np.mean)
+
+    def _reduce_multi_pred_scores(self, results: List[Dict], reduce_fn) -> Dict:
+        df = pd.DataFrame(results)
+        return df.apply(reduce_fn, axis=0).to_dict()
 
 
-class SQUAD_F1(SQUAD):
-    def __init__(self, resulting_name: str = None, params: Dict = None):
-        metric_name = "squad"
-        resulting_name = self.__class__.__name__.lower() if resulting_name is None else resulting_name
-        super().__init__(metric_name=metric_name, resulting_name=resulting_name, params=params)
+if __name__ == "__main__":
+    predictions = [
+        ["It is a guide to action which ensures that the military always obeys the commands of the party"],
+        ["bar foo foobar"]
+    ]
+    references = [
+        ["It is a guide to action that ensures that the military will forever heed Party commands"],
+        ["foo bar foobar"]
+    ]
 
-    def _postprocess(self, result, return_dict):
-        result = {self.metric_name: result["f1"] / 100}
-        return super()._postprocess(result, return_dict)
+    # Multi pred multi ref
+    # predictions = [
+    #     [
+    #         "It is a guide to action which ensures that the military always obeys the commands of the party",
+    #         "It is a guide to action that will ensure that the military always obeys the commands of the party"
+    #     ],
+    #     [
+    #         "bar foo foobar",
+    #         "bar foo"
+    #     ]
+    # ]
+    # references = [
+    #     [
+    #         "It is a guide to action that ensures that the military will forever heed Party commands",
+    #         "It is a guide to action which ensures that the military will forever heed Party commands"
+    #     ],
+    #     [
+    #         "foo bar foobar",
+    #         "foo bar"
+    #     ]
+    # ]
+    squad = Squad()
+    score = squad.compute(predictions=predictions, references=references, reduce_fn="max")
+    print(score)
+

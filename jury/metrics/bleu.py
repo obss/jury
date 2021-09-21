@@ -134,7 +134,7 @@ class Bleu(Metric):
     def _download_and_prepare(self, dl_manager) -> None:
         """
         Downloads and import the computation of bleu score from the implementation
-        of BLEU computation from tensorflow/nmt module. See
+        of BLEU computation from tensorflow/nmt. See
         https://github.com/tensorflow/nmt/blob/master/nmt/scripts/bleu.py
         """
         nmt_source = "https://raw.githubusercontent.com/tensorflow/nmt/master/nmt/scripts/bleu.py"

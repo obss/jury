@@ -18,7 +18,7 @@ of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/sacrebleu/sacrebleu.py
 """
 import math
-from typing import Dict, Callable, Sequence, Union
+from typing import Dict, Callable, Sequence
 
 import datasets
 import sacrebleu as scb
@@ -26,11 +26,12 @@ from packaging import version
 
 from jury.collator import Collator
 from jury.metrics._base import Metric
+from jury.metrics._utils import get_token_lengths
+from jury.tokenizer import BLEUDefaultTokenizer
+
 
 __class_names__ = {"sacrebleu": "Sacrebleu"}
 
-from jury.metrics._utils import get_token_lengths
-from jury.tokenizer import BLEUDefaultTokenizer
 
 _CITATION = """\
 @inproceedings{post-2018-call,

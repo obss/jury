@@ -328,39 +328,3 @@ class Bertscore(Metric):
         if isinstance(reference, str):
             reference = [reference]
         super().add(prediction=prediction, reference=reference, **kwargs)
-
-
-if __name__ == "__main__":
-    # predictions = [
-    #     ["It is a guide to action which ensures that the military always obeys the commands of the party"],
-    #     ["bar foo foobar"]
-    # ]
-    # references = [
-    #     ["It is a guide to action that ensures that the military will forever heed Party commands"],
-    #     ["foo bar foobar"]
-    # ]
-
-    # Multi pred multi ref
-    predictions = [
-        [
-            "It is a guide to action which ensures that the military always obeys the commands of the party",
-            "It is a guide to action that will ensure that the military always obeys the commands of the party"
-        ],
-        [
-            "bar foo foobar",
-            "bar foo"
-        ]
-    ]
-    references = [
-        [
-            "It is a guide to action that ensures that the military will forever heed Party commands",
-            "It is a guide to action which ensures that the military will forever heed Party commands"
-        ],
-        [
-            "foo bar foobar",
-            "foo bar"
-        ]
-    ]
-    bertscore = Bertscore()
-    score = bertscore.compute(predictions=predictions, references=references)
-    print(score)

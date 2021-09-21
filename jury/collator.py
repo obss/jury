@@ -33,10 +33,10 @@ class Collator(list):
         return self.reshape(_len, *args)
 
     def can_collapse(self):
-        if self.ndim != 2:
-            return False
+        if self.ndim >= 2:
+            return self.shape[1] == 1
+        return True
 
-        return self.shape[1] == 1
 
     def to_list(self, collapse=True):
         if collapse:
