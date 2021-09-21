@@ -17,8 +17,8 @@ SacreBLEU metric. The part of this file is adapted from SacreBLEU implementation
 of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/sacrebleu/sacrebleu.py
 """
-
-from typing import Dict
+import math
+from typing import Dict, Callable, Sequence, Union
 
 import datasets
 import sacrebleu as scb
@@ -29,6 +29,8 @@ from jury.metrics._base import Metric
 
 __class_names__ = {"sacrebleu": "Sacrebleu"}
 
+from jury.metrics._utils import get_token_lengths
+from jury.tokenizer import BLEUDefaultTokenizer
 
 _CITATION = """\
 @inproceedings{post-2018-call,
@@ -119,7 +121,11 @@ class Sacrebleu(Metric):
             ],
         )
 
-    def validate_references(self, references: Collator) -> Collator:
+    def _tokenize(self, seq: Sequence[str]) -> Sequence[Sequence[str]]:
+        tokenizer = BLEUDefaultTokenizer()
+        return [tokenizer.tokenize(s) for s in seq]
+
+    def _validate_references(self, references: Collator) -> Collator:
         references_per_prediction = len(references[0])
         if any(len(refs) != references_per_prediction for refs in references):
             raise ValueError("Sacrebleu requires the same number of references for each prediction")
@@ -130,7 +136,7 @@ class Sacrebleu(Metric):
         self,
         predictions: Collator,
         references: Collator,
-        reduce_fn=None,
+        reduce_fn: Callable = None,
         smooth_method="exp",
         smooth_value=None,
         force=False,
@@ -163,7 +169,7 @@ class Sacrebleu(Metric):
         self,
         predictions: Collator,
         references: Collator,
-        reduce_fn: callable,
+        reduce_fn: Callable,
         smooth_method="exp",
         smooth_value=None,
         force=False,
@@ -171,6 +177,7 @@ class Sacrebleu(Metric):
         tokenize=None,
         use_effective_order=False,
     ):
+        # SacreBleu score implementation can natively handle multiple references.
         return self._compute_single_pred_single_ref(
             predictions=predictions,
             references=references,
@@ -187,7 +194,7 @@ class Sacrebleu(Metric):
         self,
         predictions: Collator,
         references: Collator,
-        reduce_fn: callable,
+        reduce_fn: Callable,
         smooth_method="exp",
         smooth_value=None,
         force=False,
@@ -195,7 +202,52 @@ class Sacrebleu(Metric):
         tokenize=None,
         use_effective_order=False,
     ):
-        pass
+        flattened_predictions = []
+        matched_references = []
+        adjusted_prediction_length = 0
+        for preds, refs in zip(predictions, references):
+            n_preds = len(preds)
+            tokenized_preds = self._tokenize(preds)
+            adjusted_prediction_length += get_token_lengths(tokenized_preds, reduce_fn=max)
+            flattened_predictions.extend([pred for pred in preds])
+            matched_references.extend([refs] * n_preds)
+        flattened_predictions = Collator(flattened_predictions, keep=True)
+        matched_references = Collator(matched_references, keep=True)
+        score = self._compute_single_pred_multi_ref(
+                predictions=flattened_predictions,
+                references=matched_references,
+                reduce_fn=reduce_fn,
+                smooth_method=smooth_method,
+                smooth_value=smooth_value,
+                force=force,
+                lowercase=lowercase,
+                tokenize=tokenize,
+                use_effective_order=use_effective_order,
+        )
+        prediction_length, reference_length = score["sys_len"], score["ref_len"]
+        ratio = prediction_length / reference_length
+        adjusted_ratio = adjusted_prediction_length / reference_length
+        if ratio > 1.0:
+            adjusted_bp = 1.0
+            scb_score = score["score"]
+        else:
+            bp = math.exp(1 - 1.0 / ratio)
+            adjusted_bp = math.exp(1 - 1.0 / adjusted_ratio)
+            scb_score = score["score"] * (adjusted_bp / bp)
+
+        scb_score = scb_score * n_preds
+        precisions = [p * n_preds for p in score["precisions"]]
+
+        score.update(
+                {
+                    "score": scb_score,
+                    "adjusted_precisions": precisions,
+                    "bp": adjusted_bp,
+                    "sys_len": adjusted_prediction_length
+                }
+        )
+
+        return score
 
     def evaluate(self, predictions: Collator, references: Collator, reduce_fn: callable, **kwargs) -> Dict[str, float]:
         if predictions.can_collapse() and references.can_collapse():
@@ -206,41 +258,5 @@ class Sacrebleu(Metric):
             eval_fn = self._compute_single_pred_multi_ref
         else:
             eval_fn = self._compute_multi_pred_multi_ref
-        references = self.validate_references(references)
+        references = self._validate_references(references)
         return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)
-
-
-if __name__ == "__main__":
-    predictions = [
-        ["It is a guide to action which ensures that the military always obeys the commands of the party"],
-        ["bar foo foobar"],
-    ]
-    references = [
-        ["It is a guide to action that ensures that the military will forever heed Party commands"],
-        ["foo bar foobar"],
-    ]
-
-    # Multi pred multi ref
-    # predictions = [
-    #     [
-    #         "It is a guide to action which ensures that the military always obeys the commands of the party",
-    #         "It is a guide to action that will ensure that the military always obeys the commands of the party"
-    #     ],
-    #     [
-    #         "bar foo foobar",
-    #         "bar foo"
-    #     ]
-    # ]
-    # references = [
-    #     [
-    #         "It is a guide to action that ensures that the military will forever heed Party commands",
-    #         "It is a guide to action which ensures that the military will forever heed Party commands"
-    #     ],
-    #     [
-    #         "foo bar foobar",
-    #         "foo bar"
-    #     ]
-    # ]
-    sb = Sacrebleu()
-    score = sb.compute(predictions=predictions, references=references)
-    print(score)

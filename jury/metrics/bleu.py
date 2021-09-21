@@ -28,7 +28,7 @@ import numpy as np
 
 from jury.collator import Collator
 from jury.metrics._base import Metric
-from jury.metrics._utils import download
+from jury.metrics._utils import download, get_token_lengths, download_and_import_module
 from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
 
 __class_names__ = {"bleu": "BLEU"}
@@ -139,23 +139,16 @@ class Bleu(Metric):
         """
         nmt_source = "https://raw.githubusercontent.com/tensorflow/nmt/master/nmt/scripts/bleu.py"
         nmt_dest = os.path.join(self.data_dir, "nmt_bleu.py")
-        if not os.path.exists(nmt_dest):
-            download(nmt_source, nmt_dest)
-        spec = importlib.util.spec_from_file_location("nmt_bleu", nmt_dest)
-        nmt_bleu = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(nmt_bleu)
+        nmt_bleu = download_and_import_module(
+                source=nmt_source,
+                destination=nmt_dest,
+                module_name="nmt_bleu",
+        )
         self.compute_bleu = nmt_bleu.compute_bleu
 
     def _tokenize(self, predictions: Collator, references: Collator) -> Tuple[Collator, Collator]:
         tokenizer_wrapper = TokenizerWrapper(self.tokenizer)
         return tokenizer_wrapper.tokenize(predictions, references)
-
-    @staticmethod
-    def _get_token_lengths(sequences: Iterable, reduce_fn: Callable = None) -> Union[int, List[int]]:
-        token_lengths = [len(item) for item in sequences]
-        if reduce_fn is not None:
-            return int(reduce_fn(token_lengths))
-        return token_lengths
 
     def _compute_bleu_score(self, predictions: Collator, references: Collator, max_order=4, smooth=False):
         score = self.compute_bleu(
@@ -192,13 +185,11 @@ class Bleu(Metric):
     ):
         flattened_predictions = []
         matched_references = []
-        reference_length = prediction_length = adjusted_reference_length = adjusted_prediction_length = 0
+        adjusted_reference_length = adjusted_prediction_length = 0
         for preds, refs in zip(predictions, references):
             n_preds = len(preds)
-            reference_length += self._get_token_lengths(refs, reduce_fn=min) * n_preds
-            adjusted_reference_length += self._get_token_lengths(refs, reduce_fn=min)
-            prediction_length += self._get_token_lengths(preds, reduce_fn=sum)
-            adjusted_prediction_length += self._get_token_lengths(preds, reduce_fn=max)
+            adjusted_reference_length += get_token_lengths(refs, reduce_fn=min)
+            adjusted_prediction_length += get_token_lengths(preds, reduce_fn=max)
             flattened_predictions.extend([pred for pred in preds])
             matched_references.extend([refs] * n_preds)
 
@@ -206,6 +197,7 @@ class Bleu(Metric):
         matched_references = Collator(matched_references, keep=True)
         score = self._compute_single_pred_multi_ref(predictions=flattened_predictions, references=matched_references)
 
+        prediction_length, reference_length = score["translation_length"], score["reference_length"]
         ratio = prediction_length / reference_length
         adjusted_ratio = adjusted_prediction_length / adjusted_reference_length
         if ratio > 1.0:
@@ -216,14 +208,18 @@ class Bleu(Metric):
             adjusted_bp = math.exp(1 - 1.0 / adjusted_ratio)
             bleu_score = score["bleu"] * (adjusted_bp / bp)
 
-        return {
+        bleu_score *= adjusted_ratio**2 / ratio
+
+        score.update({
             "bleu": bleu_score,
             "precisions": score["precisions"],
             "brevity_penalty": adjusted_bp,
             "length_ratio": adjusted_ratio,
             "translation_length": adjusted_prediction_length,
-            "reference_length": adjusted_reference_length,
-        }
+            "reference_length": adjusted_reference_length
+        })
+
+        return score
 
     def evaluate(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs) -> Dict[str, float]:
         if predictions.can_collapse() and references.can_collapse():
