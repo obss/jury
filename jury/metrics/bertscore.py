@@ -18,12 +18,15 @@ https://github.com/huggingface/datasets/blob/master/metrics/bertscore/bertscore.
 
 import functools
 from contextlib import contextmanager
-from typing import Dict
+from typing import Dict, List
 
 import bert_score
 import datasets
+import numpy as np
+import pandas as pd
 from packaging import version
 
+from jury.collator import Collator
 from jury.metrics._base import Metric
 
 __class_names__ = {"bertscore": "Bertscore"}
@@ -146,6 +149,7 @@ class Bertscore(Metric):
         rescale_with_baseline=False,
         baseline_path=None,
         use_fast_tokenizer=False,
+        return_average_scores=False
     ):
         get_hash = bert_score.utils.get_hash
         scorer = bert_score.BERTScorer
@@ -195,11 +199,22 @@ class Bertscore(Metric):
             verbose=verbose,
             batch_size=batch_size,
         )
+
+        P = P.tolist()
+        R = R.tolist()
+        F = F.tolist()
+        score = float(np.mean(F))
+
+        if return_average_scores:
+            P = np.mean(P)
+            R = np.mean(R)
+            F = np.mean(F)
+
         output_dict = {
-            "score": sum(F.tolist()) / len(F),
-            "precision": P.tolist(),
-            "recall": R.tolist(),
-            "f1": F.tolist(),
+            "score": score,
+            "precision": P,
+            "recall": R,
+            "f1": F,
             "hashcode": hashcode,
         }
         return output_dict
@@ -221,6 +236,7 @@ class Bertscore(Metric):
             rescale_with_baseline=False,
             baseline_path=None,
             use_fast_tokenizer=False,
+            return_average_scores=False
     ):
         # BERTScore inherently supports multiple references
         return self._compute_single_pred_single_ref(
@@ -238,7 +254,8 @@ class Bertscore(Metric):
                 all_layers=all_layers,
                 rescale_with_baseline=rescale_with_baseline,
                 baseline_path=baseline_path,
-                use_fast_tokenizer=use_fast_tokenizer
+                use_fast_tokenizer=use_fast_tokenizer,
+                return_average_scores=return_average_scores
         )
 
     def _compute_multi_pred_multi_ref(
@@ -259,9 +276,11 @@ class Bertscore(Metric):
             baseline_path=None,
             use_fast_tokenizer=False,
     ):
-        return self._compute_single_pred_single_ref(
-                predictions=predictions,
-                references=references,
+        scores = []
+        for preds, refs in zip(predictions, references):
+            pred_scores = [self._compute_single_pred_multi_ref(
+                predictions=Collator([pred], keep=True),
+                references=Collator([refs], keep=True),
                 reduce_fn=reduce_fn,
                 lang=lang,
                 model_type=model_type,
@@ -274,8 +293,25 @@ class Bertscore(Metric):
                 all_layers=all_layers,
                 rescale_with_baseline=rescale_with_baseline,
                 baseline_path=baseline_path,
-                use_fast_tokenizer=use_fast_tokenizer
-        )
+                use_fast_tokenizer=use_fast_tokenizer,
+                return_average_scores=True
+            )
+                for pred in preds
+            ]
+            hashcode = pred_scores[0]["hashcode"]
+            reduced_score = self._reduce_multi_pred_scores(pred_scores, reduce_fn)
+            scores.append(reduced_score)
+
+        # Average reduced scores
+        return self._reduce_multi_pred_scores(scores, np.mean, hashcode=hashcode)
+
+    def _reduce_multi_pred_scores(self, results: List[Dict], reduce_fn, **kwargs) -> Dict:
+        df = pd.DataFrame(results)
+        if "hashcode" in df:
+            df.drop("hashcode", axis=1, inplace=True)
+        scores = df.apply(reduce_fn, axis=0).to_dict()
+        scores.update(kwargs)
+        return scores
 
     def add_batch(self, predictions=None, references=None, **kwargs):
         """Add a batch of predictions and references for the metric's stack."""
@@ -297,11 +333,11 @@ class Bertscore(Metric):
 if __name__ == "__main__":
     # predictions = [
     #     ["It is a guide to action which ensures that the military always obeys the commands of the party"],
-    #     ["bar foo foobar"],
+    #     ["bar foo foobar"]
     # ]
     # references = [
     #     ["It is a guide to action that ensures that the military will forever heed Party commands"],
-    #     ["foo bar foobar"],
+    #     ["foo bar foobar"]
     # ]
 
     # Multi pred multi ref
@@ -328,5 +364,3 @@ if __name__ == "__main__":
     bertscore = Bertscore()
     score = bertscore.compute(predictions=predictions, references=references)
     print(score)
-
-# {'score': 0.9375587701797485, 'precision': [0.9580490589141846, 0.9124886989593506], 'recall': [0.9630367755889893, 0.9166830778121948], 'f1': [0.9605364203453064, 0.9145811200141907], 'hashcode': 'roberta-large_L17_no-idf_version=0.3.9(hug_trans=4.9.1)'}
