@@ -175,7 +175,7 @@ class Bleu(Metric):
     def _compute_single_pred_multi_ref(
         self, predictions: Collator, references: Collator, reduce_fn: Callable = None, max_order=4, smooth=False
     ):
-        # Bleu score implementation can natively handle multiple references.
+        # Bleu score inherently supports multiple references.
         return self._compute_single_pred_single_ref(
             predictions=predictions, references=references, reduce_fn=reduce_fn, max_order=max_order, smooth=smooth
         )
@@ -200,18 +200,22 @@ class Bleu(Metric):
         prediction_length, reference_length = score["translation_length"], score["reference_length"]
         ratio = prediction_length / reference_length
         adjusted_ratio = adjusted_prediction_length / adjusted_reference_length
+
+        bleu_score = score["bleu"]
+        score.pop("bleu")  # Standard is to use name 'score'
         if ratio > 1.0:
             adjusted_bp = 1.0
-            bleu_score = score["bleu"]
+            bleu_score = bleu_score
         else:
             bp = math.exp(1 - 1.0 / ratio)
             adjusted_bp = math.exp(1 - 1.0 / adjusted_ratio)
-            bleu_score = score["bleu"] * (adjusted_bp / bp)
+            bleu_score = bleu_score * (adjusted_bp / bp)
+
 
         bleu_score *= adjusted_ratio**2 / ratio
 
         score.update({
-            "bleu": bleu_score,
+            "score": bleu_score,
             "precisions": score["precisions"],
             "brevity_penalty": adjusted_bp,
             "length_ratio": adjusted_ratio,

@@ -177,7 +177,7 @@ class Sacrebleu(Metric):
         tokenize=None,
         use_effective_order=False,
     ):
-        # SacreBleu score implementation can natively handle multiple references.
+        # SacreBleu inherently supports multiple references.
         return self._compute_single_pred_single_ref(
             predictions=predictions,
             references=references,
