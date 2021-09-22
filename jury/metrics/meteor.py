@@ -84,10 +84,6 @@ Examples:
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class Meteor(Metric):
-    def __init__(self, resulting_name: str = None, params: Optional[Dict] = None):
-        resulting_name = "Meteor" if resulting_name is None else resulting_name
-        super(Meteor, self).__init__(resulting_name=resulting_name, params=params)
-
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,
@@ -116,44 +112,22 @@ class Meteor(Metric):
             meteor_score.single_meteor_score(ref, pred, alpha=alpha, beta=beta, gamma=gamma)
             for ref, pred in zip(references, predictions)
         ]
-        return {self.resulting_name: np.mean(scores)}
+        return {"score": self._reduce_scores(scores, reduce_fn=np.mean)}
 
     def _compute_single_pred_multi_ref(self, predictions, references, reduce_fn=None, alpha=0.9, beta=3, gamma=0.5):
         scores = [
             meteor_score.meteor_score(references=ref, hypothesis=pred, alpha=alpha, beta=beta, gamma=gamma)
             for ref, pred in zip(references, predictions)
         ]
-        return {self.resulting_name: np.mean(scores)}
+        return {"score": self._reduce_scores(scores, reduce_fn=np.mean)}
 
     def _compute_multi_pred_multi_ref(self, predictions, references, reduce_fn, alpha=0.9, beta=3, gamma=0.5):
         scores = []
         for pred, ref in zip(predictions, references):
-            score_reduced = [
+            score = [
                 meteor_score.meteor_score(references=ref, hypothesis=p, alpha=alpha, beta=beta, gamma=gamma)
                 for p in pred
             ]
-            scores.append(reduce_fn(score_reduced))
-        return {self.resulting_name: np.mean(scores)}
-
-
-if __name__ == "__main__":
-    predictions = [["It is a guide to action which ensures that the military always obeys the commands of the party"]]
-    references = [["It is a guide to action that ensures that the military will forever heed Party commands"]]
-
-    # references = [[
-    #     "It is a guide to action that ensures that the military will forever heed Party commands",
-    #     "It is a guide to action which ensures that the military will forever heed Party commands"
-    # ]]
-
-    # Multi pred multi ref
-    # predictions = [[
-    #     "It is a guide to action which ensures that the military always obeys the commands of the party",
-    #     "It is a guide to action that will ensure that the military always obeys the commands of the party"
-    # ]]
-    # references = [[
-    #     "It is a guide to action that ensures that the military will forever heed Party commands",
-    #     "It is a guide to action which ensures that the military will forever heed Party commands"
-    # ]]
-    bleu = Meteor()
-    score = bleu.compute(predictions=predictions, references=references)
-    print(score)
+            reduced_score = reduce_fn(score)
+            scores.append(reduce_fn(reduced_score))
+        return {"score": self._reduce_scores(scores, reduce_fn=np.mean)}

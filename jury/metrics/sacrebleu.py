@@ -18,7 +18,7 @@ of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/sacrebleu/sacrebleu.py
 """
 import math
-from typing import Dict, Callable, Sequence
+from typing import Callable, Dict, Sequence
 
 import datasets
 import sacrebleu as scb
@@ -28,7 +28,6 @@ from jury.collator import Collator
 from jury.metrics._base import Metric
 from jury.metrics._utils import get_token_lengths
 from jury.tokenizer import BLEUDefaultTokenizer
-
 
 __class_names__ = {"sacrebleu": "Sacrebleu"}
 
@@ -93,10 +92,6 @@ Examples:
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class Sacrebleu(Metric):
-    def __init__(self, resulting_name: str = None, params: Dict = None):
-        resulting_name = "SacreBLEU" if resulting_name is None else resulting_name
-        super().__init__(resulting_name=resulting_name, params=params)
-
     def _info(self):
         if version.parse(scb.__version__) < version.parse("1.4.12"):
             raise ImportWarning(
@@ -215,15 +210,15 @@ class Sacrebleu(Metric):
         flattened_predictions = Collator(flattened_predictions, keep=True)
         matched_references = Collator(matched_references, keep=True)
         score = self._compute_single_pred_multi_ref(
-                predictions=flattened_predictions,
-                references=matched_references,
-                reduce_fn=reduce_fn,
-                smooth_method=smooth_method,
-                smooth_value=smooth_value,
-                force=force,
-                lowercase=lowercase,
-                tokenize=tokenize,
-                use_effective_order=use_effective_order,
+            predictions=flattened_predictions,
+            references=matched_references,
+            reduce_fn=reduce_fn,
+            smooth_method=smooth_method,
+            smooth_value=smooth_value,
+            force=force,
+            lowercase=lowercase,
+            tokenize=tokenize,
+            use_effective_order=use_effective_order,
         )
         prediction_length, reference_length = score["sys_len"], score["ref_len"]
         ratio = prediction_length / reference_length
@@ -240,12 +235,12 @@ class Sacrebleu(Metric):
         precisions = [p * n_preds for p in score["precisions"]]
 
         score.update(
-                {
-                    "score": scb_score,
-                    "adjusted_precisions": precisions,
-                    "bp": adjusted_bp,
-                    "sys_len": adjusted_prediction_length
-                }
+            {
+                "score": scb_score,
+                "adjusted_precisions": precisions,
+                "bp": adjusted_bp,
+                "sys_len": adjusted_prediction_length,
+            }
         )
 
         return score

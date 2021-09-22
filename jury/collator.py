@@ -26,6 +26,10 @@ class Collator(list):
 
     def reshape(self, *args):
         _seq = np.array(self, dtype=object)
+        if _seq.shape[:2] == (1, 1):
+            return Collator(_seq.ravel().reshape(1, -1).tolist(), keep=True)
+        elif _seq.ndim == 3 and _seq.shape[1] == 1:
+            args = tuple(list(args) + [-1])
         return Collator(_seq.reshape(args).tolist(), keep=True)
 
     def reshape_len(self, *args):
@@ -35,8 +39,10 @@ class Collator(list):
     def can_collapse(self):
         if self.ndim >= 2:
             return self.shape[1] == 1
+        if isinstance(self[0], list):
+            n_item = len(self[0])
+            return all([len(items) == n_item for items in self])
         return True
-
 
     def to_list(self, collapse=True):
         if collapse:

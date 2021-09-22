@@ -18,20 +18,18 @@ datasets package implementation of BLEU metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/bleu/bleu.py
 """
 
-import importlib.util
 import math
 import os
-from typing import Callable, Dict, Iterable, List, Tuple, Union
+from typing import Callable, Dict, Tuple
 
 import datasets
-import numpy as np
 
 from jury.collator import Collator
 from jury.metrics._base import Metric
-from jury.metrics._utils import download, get_token_lengths, download_and_import_module
+from jury.metrics._utils import download, get_token_lengths
 from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
 
-__class_names__ = {"bleu": "BLEU"}
+__class_names__ = {"bleu": "Bleu"}
 
 
 _CITATION = """\
@@ -108,7 +106,6 @@ Examples:
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class Bleu(Metric):
     def __init__(self, resulting_name: str = None, params: Dict = None):
-        resulting_name = "BLEU" if resulting_name is None else resulting_name
         tokenizer = params.get("tokenizer", None) if params is not None else None
         self.tokenizer = BLEUDefaultTokenizer() if tokenizer is None else tokenizer
         super().__init__(resulting_name=resulting_name, params=params)
@@ -139,24 +136,24 @@ class Bleu(Metric):
         """
         nmt_source = "https://raw.githubusercontent.com/tensorflow/nmt/master/nmt/scripts/bleu.py"
         nmt_dest = os.path.join(self.data_dir, "nmt_bleu.py")
-        nmt_bleu = download_and_import_module(
-                source=nmt_source,
-                destination=nmt_dest,
-                module_name="nmt_bleu",
+        download(
+            source=nmt_source,
+            destination=nmt_dest,
         )
-        self.compute_bleu = nmt_bleu.compute_bleu
+        self.external_module_path = nmt_dest
 
     def _tokenize(self, predictions: Collator, references: Collator) -> Tuple[Collator, Collator]:
         tokenizer_wrapper = TokenizerWrapper(self.tokenizer)
         return tokenizer_wrapper.tokenize(predictions, references)
 
     def _compute_bleu_score(self, predictions: Collator, references: Collator, max_order=4, smooth=False):
-        score = self.compute_bleu(
+        evaluation_fn = self._get_external_resource("nmt_bleu", attr="compute_bleu")
+        score = evaluation_fn(
             reference_corpus=references, translation_corpus=predictions, max_order=max_order, smooth=smooth
         )
         (bleu, precisions, bp, ratio, translation_length, reference_length) = score
         return {
-            "bleu": bleu,
+            "score": bleu,
             "precisions": precisions,
             "brevity_penalty": bp,
             "length_ratio": ratio,
@@ -201,8 +198,7 @@ class Bleu(Metric):
         ratio = prediction_length / reference_length
         adjusted_ratio = adjusted_prediction_length / adjusted_reference_length
 
-        bleu_score = score["bleu"]
-        score.pop("bleu")  # Standard is to use name 'score'
+        bleu_score = score["score"]
         if ratio > 1.0:
             adjusted_bp = 1.0
             bleu_score = bleu_score
@@ -211,21 +207,25 @@ class Bleu(Metric):
             adjusted_bp = math.exp(1 - 1.0 / adjusted_ratio)
             bleu_score = bleu_score * (adjusted_bp / bp)
 
+        bleu_score *= adjusted_ratio ** 2 / ratio
 
-        bleu_score *= adjusted_ratio**2 / ratio
-
-        score.update({
-            "score": bleu_score,
-            "precisions": score["precisions"],
-            "brevity_penalty": adjusted_bp,
-            "length_ratio": adjusted_ratio,
-            "translation_length": adjusted_prediction_length,
-            "reference_length": adjusted_reference_length
-        })
+        score.update(
+            {
+                "score": bleu_score,
+                "precisions": score["precisions"],
+                "brevity_penalty": adjusted_bp,
+                "length_ratio": adjusted_ratio,
+                "translation_length": adjusted_prediction_length,
+                "reference_length": adjusted_reference_length,
+            }
+        )
 
         return score
 
     def evaluate(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs) -> Dict[str, float]:
+        max_order = kwargs.get("max_order")
+        if max_order is not None and "_" not in self.resulting_name:
+            self.resulting_name += f"_{max_order}"
         if predictions.can_collapse() and references.can_collapse():
             eval_fn = self._compute_single_pred_single_ref
         elif predictions.can_collapse() and not references.can_collapse():

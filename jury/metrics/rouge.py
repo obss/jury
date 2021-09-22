@@ -92,10 +92,6 @@ Examples:
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class Rouge(Metric):
-    def __init__(self, resulting_name: str = None, params: Optional[Dict] = None):
-        resulting_name = "Rouge" if resulting_name is None else resulting_name
-        super(Rouge, self).__init__(resulting_name=resulting_name, params=params)
-
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,

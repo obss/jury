@@ -4,9 +4,11 @@ from typing import Callable, Dict, List, Optional, Tuple, Union
 
 import datasets
 import numpy
+import pandas as pd
 from datasets.utils.logging import get_logger
 
 from jury.collator import Collator
+from jury.metrics._utils import import_module, is_reduce_fn
 from jury.utils import NestedSingleType
 
 logger = get_logger(__name__)
@@ -25,20 +27,57 @@ def load_metric(metric_name: str, resulting_name: str = None, params: Dict = Non
 
 class Metric(datasets.Metric, ABC):
     def __init__(self, resulting_name: Optional[str] = None, params: Optional[Dict] = None):
-        self.resulting_name = resulting_name if resulting_name is not None else self.name
-        self.params = params if params is not None else {"reduce_fn": "mean"}
         super().__init__()
+        self.resulting_name = resulting_name if resulting_name is not None else self.name
+        self.params = params if params is not None else {}
+        if "reduce_fn" not in self.params:
+            self.params.update({"reduce_fn": "max"})
         self.download_and_prepare()
+
+    def _download_and_prepare(self, dl_manager):
+        """Downloads and prepares resources for the metric.
+
+        This is the internal implementation to overwrite called when user calls
+        `download_and_prepare`. It should download all required resources for the metric.
+
+        Args:
+            dl_manager (:class:`DownloadManager`): `DownloadManager` used to download and cache data.
+        """
+        self.external_module_path = None
+        return None
+
+    def _get_external_resource(self, module_name: Optional[str], attr: Optional[str] = None):
+        if self.external_module_path is None:
+            raise AttributeError("'external_module_path' is not defined.")
+        if module_name is None:
+            module_name = "external_module"
+        external_module = import_module(module_name, self.external_module_path)
+        if attr is None:
+            return external_module
+        return getattr(external_module, attr)
+
+    def _reduce_scores(self, scores: Union[List[Dict[str, float]], List[float]], reduce_fn: Callable):
+        if isinstance(scores[0], dict):
+            score = pd.DataFrame(scores).apply(reduce_fn, axis=0).to_dict()
+        else:
+            score = float(reduce_fn(scores))
+        return score
 
     def _compute(self, predictions: List[List[str]], references: List[List[str]], **kwargs) -> Dict[str, float]:
         assert len(predictions) == len(references), "Predictions and references length does not match."
-        reduce_fn_name = kwargs.get("reduce_fn", self.params["reduce_fn"])
-        reduce_fn = getattr(numpy, reduce_fn_name)
+        reduce_fn = kwargs.get("reduce_fn")
+        reduce_fn = self.params["reduce_fn"] if reduce_fn is None else reduce_fn
+        if isinstance(reduce_fn, str):
+            reduce_fn = getattr(numpy, reduce_fn)
+        elif reduce_fn is not None and not callable(reduce_fn):
+            raise TypeError(f"'reduce_fn' Expected str or callable, got {type(reduce_fn)}")
+        if reduce_fn is not None and not is_reduce_fn(reduce_fn):
+            raise ValueError("'reduce_fn' must be an aggregation function.")
         eval_params = {**self.params, **kwargs}
         eval_params.pop("reduce_fn")
         predictions, references = Collator(predictions), Collator(references)
         result = self.evaluate(predictions=predictions, references=references, reduce_fn=reduce_fn, **eval_params)
-        return result
+        return {self.resulting_name: result}
 
     def _preprocess(self, predictions: List[List[str]], references: List[List[str]]) -> Tuple[Collator, Collator]:
         return Collator(predictions, keep=True), Collator(references, keep=True)
@@ -56,7 +95,9 @@ class Metric(datasets.Metric, ABC):
     def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs):
         raise NotImplementedError
 
-    def evaluate(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs) -> Dict[str, float]:
+    def evaluate(
+        self, predictions: Collator, references: Collator, reduce_fn: Optional[Callable] = None, **kwargs
+    ) -> Dict[str, float]:
         if predictions.can_collapse() and references.can_collapse():
             predictions = predictions.collapse()
             references = references.collapse()

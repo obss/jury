@@ -1,34 +1,14 @@
 import pytest
 
 from jury import Jury
-from jury.metrics.squad import Squad
+from jury.metrics import Recall
 from tests.jury.conftest import get_expected_output
 from tests.utils import assert_almost_equal_dict
 
 
 @pytest.fixture(scope="module")
 def jury():
-    return Jury(metrics=[Squad()])
-
-
-@pytest.fixture
-def predictions():
-    return ["1917", "Albert Einstein"]
-
-
-@pytest.fixture
-def references():
-    return ["1917", "Einstein"]
-
-
-@pytest.fixture
-def multiple_references():
-    return [["1917"], ["Einstein", "Albert Einstein"]]
-
-
-@pytest.fixture
-def multiple_predictions():
-    return [["1917", "November 1917"], ["Albert Einstein"]]
+    return Jury(metrics=[Recall()])
 
 
 @pytest.fixture

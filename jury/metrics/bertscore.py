@@ -109,10 +109,6 @@ Examples:
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class Bertscore(Metric):
-    def __init__(self, resulting_name: str = None, params: Dict = None):
-        resulting_name = "BERTScore" if resulting_name is None else resulting_name
-        super().__init__(resulting_name=resulting_name, params=params)
-
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,
@@ -149,7 +145,7 @@ class Bertscore(Metric):
         rescale_with_baseline=False,
         baseline_path=None,
         use_fast_tokenizer=False,
-        return_average_scores=False
+        return_average_scores=False,
     ):
         get_hash = bert_score.utils.get_hash
         scorer = bert_score.BERTScorer
@@ -220,90 +216,91 @@ class Bertscore(Metric):
         return output_dict
 
     def _compute_single_pred_multi_ref(
-            self,
-            predictions,
-            references,
-            reduce_fn=None,
-            lang="en",
-            model_type=None,
-            num_layers=None,
-            verbose=False,
-            idf=False,
-            device=None,
-            batch_size=64,
-            nthreads=4,
-            all_layers=False,
-            rescale_with_baseline=False,
-            baseline_path=None,
-            use_fast_tokenizer=False,
-            return_average_scores=False
+        self,
+        predictions,
+        references,
+        reduce_fn=None,
+        lang="en",
+        model_type=None,
+        num_layers=None,
+        verbose=False,
+        idf=False,
+        device=None,
+        batch_size=64,
+        nthreads=4,
+        all_layers=False,
+        rescale_with_baseline=False,
+        baseline_path=None,
+        use_fast_tokenizer=False,
+        return_average_scores=False,
     ):
         # BERTScore inherently supports multiple references
         return self._compute_single_pred_single_ref(
-                predictions=predictions,
-                references=references,
-                reduce_fn=reduce_fn,
-                lang=lang,
-                model_type=model_type,
-                num_layers=num_layers,
-                verbose=verbose,
-                idf=idf,
-                device=device,
-                batch_size=batch_size,
-                nthreads=nthreads,
-                all_layers=all_layers,
-                rescale_with_baseline=rescale_with_baseline,
-                baseline_path=baseline_path,
-                use_fast_tokenizer=use_fast_tokenizer,
-                return_average_scores=return_average_scores
+            predictions=predictions,
+            references=references,
+            reduce_fn=reduce_fn,
+            lang=lang,
+            model_type=model_type,
+            num_layers=num_layers,
+            verbose=verbose,
+            idf=idf,
+            device=device,
+            batch_size=batch_size,
+            nthreads=nthreads,
+            all_layers=all_layers,
+            rescale_with_baseline=rescale_with_baseline,
+            baseline_path=baseline_path,
+            use_fast_tokenizer=use_fast_tokenizer,
+            return_average_scores=return_average_scores,
         )
 
     def _compute_multi_pred_multi_ref(
-            self,
-            predictions,
-            references,
-            reduce_fn=None,
-            lang="en",
-            model_type=None,
-            num_layers=None,
-            verbose=False,
-            idf=False,
-            device=None,
-            batch_size=64,
-            nthreads=4,
-            all_layers=False,
-            rescale_with_baseline=False,
-            baseline_path=None,
-            use_fast_tokenizer=False,
+        self,
+        predictions,
+        references,
+        reduce_fn=None,
+        lang="en",
+        model_type=None,
+        num_layers=None,
+        verbose=False,
+        idf=False,
+        device=None,
+        batch_size=64,
+        nthreads=4,
+        all_layers=False,
+        rescale_with_baseline=False,
+        baseline_path=None,
+        use_fast_tokenizer=False,
     ):
         scores = []
         for preds, refs in zip(predictions, references):
-            pred_scores = [self._compute_single_pred_multi_ref(
-                predictions=Collator([pred], keep=True),
-                references=Collator([refs], keep=True),
-                reduce_fn=reduce_fn,
-                lang=lang,
-                model_type=model_type,
-                num_layers=num_layers,
-                verbose=verbose,
-                idf=idf,
-                device=device,
-                batch_size=batch_size,
-                nthreads=nthreads,
-                all_layers=all_layers,
-                rescale_with_baseline=rescale_with_baseline,
-                baseline_path=baseline_path,
-                use_fast_tokenizer=use_fast_tokenizer,
-                return_average_scores=True
-            )
+            pred_scores = [
+                self._compute_single_pred_multi_ref(
+                    predictions=Collator([pred], keep=True),
+                    references=Collator([refs], keep=True),
+                    reduce_fn=reduce_fn,
+                    lang=lang,
+                    model_type=model_type,
+                    num_layers=num_layers,
+                    verbose=verbose,
+                    idf=idf,
+                    device=device,
+                    batch_size=batch_size,
+                    nthreads=nthreads,
+                    all_layers=all_layers,
+                    rescale_with_baseline=rescale_with_baseline,
+                    baseline_path=baseline_path,
+                    use_fast_tokenizer=use_fast_tokenizer,
+                    return_average_scores=True,
+                )
                 for pred in preds
             ]
             hashcode = pred_scores[0]["hashcode"]
-            reduced_score = self._reduce_multi_pred_scores(pred_scores, reduce_fn)
+            reduced_score = self._reduce_multi_pred_scores(pred_scores, reduce_fn=reduce_fn)
             scores.append(reduced_score)
 
         # Average reduced scores
-        return self._reduce_multi_pred_scores(scores, np.mean, hashcode=hashcode)
+        return self._reduce_multi_pred_scores(scores, reduce_fn=np.mean, hashcode=hashcode)
 
     def _reduce_multi_pred_scores(self, results: List[Dict], reduce_fn, **kwargs) -> Dict:
         df = pd.DataFrame(results)
@@ -328,3 +325,35 @@ class Bertscore(Metric):
         if isinstance(reference, str):
             reference = [reference]
         super().add(prediction=prediction, reference=reference, **kwargs)
+
+
+if __name__ == "__main__":
+    # predictions = [
+    #     ["It is a guide to action which ensures that the military always obeys the commands of the party"],
+    #     ["bar foo foobar"],
+    # ]
+    # references = [
+    #     ["It is a guide to action that ensures that the military will forever heed Party commands"],
+    #     ["foo bar foobar"],
+    # ]
+    # predictions = ["foo bar", "boo foobar"]
+    # references = ["foo"]
+
+    # Multi pred multi ref
+    predictions = [
+        [
+            "It is a guide to action which ensures that the military always obeys the commands of the party",
+            "It is a guide to action that will ensure that the military always obeys the commands of the party",
+        ],
+        ["bar foo foobar"],
+    ]
+    references = [
+        [
+            "It is a guide to action that ensures that the military will forever heed Party commands",
+            "It is a guide to action which ensures that the military will forever heed Party commands",
+        ],
+        ["foo bar foobar", "foo bar"],
+    ]
+    bleu = Bertscore()
+    score = bleu.compute(predictions=predictions, references=references)
+    print(score)

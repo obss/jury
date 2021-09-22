@@ -15,8 +15,10 @@
 """ SQuAD metric. The part of this file is adapted from SacreBLEU implementation
 of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/squad/squad.py"""
+import copyreg
 import os
-from typing import Dict, Callable, List
+import types
+from typing import Callable, Dict, List
 
 import datasets
 import numpy as np
@@ -24,11 +26,10 @@ import pandas as pd
 
 from jury.collator import Collator
 from jury.metrics._base import Metric
-from jury.metrics._utils import download_and_import_module
+from jury.metrics._utils import download, import_module
 from jury.utils import NestedSingleType
 
-
-__class_names__ = {"squad": "SQUAD_F1", "squad_f1": "SQUAD_F1", "squad_em": "SQUAD_EM"}
+__class_names__ = {"squad": "Squad"}
 
 
 _CITATION = """\
@@ -78,10 +79,6 @@ Examples:
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class Squad(Metric):
-    def __init__(self, resulting_name: str = None, params: Dict = None):
-        resulting_name = "squad" if resulting_name is None else resulting_name
-        super().__init__(resulting_name=resulting_name, params=params)
-
     def _download_and_prepare(self, dl_manager) -> None:
         """
         Downloads and import the computation of squad score from the implementation
@@ -90,12 +87,11 @@ class Squad(Metric):
         """
         squad_source = "https://raw.githubusercontent.com/huggingface/datasets/master/metrics/squad/evaluate.py"
         squad_dest = os.path.join(self.data_dir, "squad_evaluate.py")
-        squad_evaluate = download_and_import_module(
-                source=squad_source,
-                destination=squad_dest,
-                module_name="squad_evaluate",
+        download(
+            source=squad_source,
+            destination=squad_dest,
         )
-        self.squad_evaluate = squad_evaluate.evaluate
+        self.external_module_path = squad_dest
 
     def _info(self):
         return datasets.MetricInfo(
@@ -105,7 +101,7 @@ class Squad(Metric):
             features=datasets.Features(
                 {
                     "predictions": datasets.Sequence(datasets.Value("string")),
-                    "references": datasets.Sequence(datasets.Value("string"))
+                    "references": datasets.Sequence(datasets.Value("string")),
                 }
             ),
             codebase_urls=["https://rajpurkar.github.io/SQuAD-explorer/"],
@@ -127,9 +123,7 @@ class Squad(Metric):
             ]
         return predictions, references
 
-    def _compute_single_pred_single_ref(
-        self, predictions: Collator, references: Collator, **kwargs
-    ):
+    def _compute_single_pred_single_ref(self, predictions: Collator, references: Collator, **kwargs):
         pred_dict = {prediction["id"]: prediction["prediction_text"] for prediction in predictions}
         dataset = [
             {
@@ -146,28 +140,25 @@ class Squad(Metric):
                 ]
             }
         ]
-        score = self.squad_evaluate(dataset=dataset, predictions=pred_dict)
+        evaluation_fn = self._get_external_resource("squad_evaluate", attr="evaluate")
+        score = evaluation_fn(dataset=dataset, predictions=pred_dict)
         return score
 
-    def _compute_single_pred_multi_ref(
-        self, predictions: Collator, references: Collator, reduce_fn=None, **kwargs
-    ):
-        return self._compute_single_pred_single_ref(
-                predictions=predictions,
-                references=references,
-                reduce_fn=reduce_fn
-        )
+    def _compute_single_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn=None, **kwargs):
+        return self._compute_single_pred_single_ref(predictions=predictions, references=references, reduce_fn=reduce_fn)
 
     def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs):
         scores = []
         for preds, refs in zip(predictions, references):
             pred_scores = []
             for pred in preds:
-                pred_scores.append(self._compute_single_pred_multi_ref(
+                pred_scores.append(
+                    self._compute_single_pred_multi_ref(
                         predictions=Collator([pred], keep=True),
                         references=Collator([refs], keep=True),
-                        reduce_fn=reduce_fn
-                ))
+                        reduce_fn=reduce_fn,
+                    )
+                )
             reduced_score = self._reduce_multi_pred_scores(pred_scores, reduce_fn)
             scores.append(reduced_score)
 
@@ -177,40 +168,3 @@ class Squad(Metric):
     def _reduce_multi_pred_scores(self, results: List[Dict], reduce_fn) -> Dict:
         df = pd.DataFrame(results)
         return df.apply(reduce_fn, axis=0).to_dict()
-
-
-if __name__ == "__main__":
-    predictions = [
-        ["It is a guide to action which ensures that the military always obeys the commands of the party"],
-        ["bar foo foobar"]
-    ]
-    references = [
-        ["It is a guide to action that ensures that the military will forever heed Party commands"],
-        ["foo bar foobar"]
-    ]
-
-    # Multi pred multi ref
-    # predictions = [
-    #     [
-    #         "It is a guide to action which ensures that the military always obeys the commands of the party",
-    #         "It is a guide to action that will ensure that the military always obeys the commands of the party"
-    #     ],
-    #     [
-    #         "bar foo foobar",
-    #         "bar foo"
-    #     ]
-    # ]
-    # references = [
-    #     [
-    #         "It is a guide to action that ensures that the military will forever heed Party commands",
-    #         "It is a guide to action which ensures that the military will forever heed Party commands"
-    #     ],
-    #     [
-    #         "foo bar foobar",
-    #         "foo bar"
-    #     ]
-    # ]
-    squad = Squad()
-    score = squad.compute(predictions=predictions, references=references, reduce_fn="max")
-    print(score)
-

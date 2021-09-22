@@ -1,7 +1,14 @@
+import functools
+import inspect
+import json
+import os
+from typing import Callable, Optional
+
 import pytest
 
 from jury import Jury
 from jury.metrics import load_metric
+from tests.jury import EXPECTED_OUTPUTS
 
 _TEST_METRICS = [
     load_metric("bleu"),
@@ -65,3 +72,22 @@ def jury_str():
 @pytest.fixture(scope="package")
 def jury_concurrent():
     return Jury(metrics=_CONCURRENT_TEST_METRICS, run_concurrent=True)
+
+
+def json_load(path: str):
+    with open(path, "r") as jf:
+        content = json.load(jf)
+    return content
+
+
+def get_expected_output(prefix: Optional[str] = None):
+    def wrapper(fn, *args, **kwargs):
+        module_name = os.path.basename(inspect.getfile(fn)).replace(".py", "")
+        path = os.path.join(EXPECTED_OUTPUTS, prefix, f"{module_name}.json")
+        test_name = fn.__name__.replace("output_", "")
+        fn.output = json_load(path)[test_name]
+        return fn
+
+    if prefix is None:
+        prefix = ""
+    return wrapper
