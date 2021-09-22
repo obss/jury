@@ -8,7 +8,7 @@ from tests.utils import assert_almost_equal_dict
 
 @pytest.fixture(scope="module")
 def jury():
-    return Jury(metrics=[Bertscore(params={"model_type": "albert-base-v1"})])
+    return Jury(metrics=[Bertscore(params={"model_type": "albert-base-v1", "device": "cpu"})])
 
 
 @pytest.fixture
