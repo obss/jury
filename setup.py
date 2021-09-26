@@ -43,7 +43,7 @@ _DEV_REQUIREMENTS = [
     "pytest-cov>=2.12.1",
 ]
 
-_METRIC_REQUIREMENTS = ["sacrebleu>=2.0.0", "bert_score==0.3.9"]
+_METRIC_REQUIREMENTS = ["sacrebleu>=2.0.0", "bert_score==0.3.10"]
 add_pywin(_METRIC_REQUIREMENTS)
 
 extras = {

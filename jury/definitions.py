@@ -1,4 +1,4 @@
-from jury.metrics import Bleu, Meteor, Rouge, Sacrebleu
+from jury.metrics import Bleu, Meteor, Rouge
 
 DEFAULT_METRICS = [
     Bleu(params={"max_order": 1}),
@@ -7,5 +7,4 @@ DEFAULT_METRICS = [
     Bleu(params={"max_order": 4}),
     Meteor(),
     Rouge(),
-    Sacrebleu(),
 ]
