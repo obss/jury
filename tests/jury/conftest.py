@@ -11,11 +11,15 @@ from jury.metrics import load_metric
 from tests.jury import EXPECTED_OUTPUTS
 
 _TEST_METRICS = [
+    load_metric("accuracy"),
+    load_metric("bertscore", params={"model_type": "albert-base-v1", "device": "cpu"}),
     load_metric("bleu"),
+    load_metric("f1"),
     load_metric("meteor"),
+    load_metric("precision"),
+    load_metric("recall"),
     load_metric("rouge"),
     load_metric("sacrebleu"),
-    load_metric("bertscore", params={"model_type": "albert-base-v1", "device": "cpu"}),
     load_metric("squad"),
 ]
 
@@ -23,8 +27,8 @@ _CONCURRENT_TEST_METRICS = [
     load_metric("bleu"),
     load_metric("meteor"),
     load_metric("rouge"),
-    # load_metric("sacrebleu"),
-    # load_metric("bertscore", params={"model_type": "albert-base-v1", "device": "cpu"}),  # Memory allocation
+    load_metric("sacrebleu"),
+    load_metric("bertscore", params={"model_type": "albert-base-v1", "device": "cpu"}),  # Memory allocation
     load_metric("squad"),
 ]
 

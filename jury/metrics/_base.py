@@ -26,6 +26,13 @@ def load_metric(metric_name: str, resulting_name: str = None, params: Dict = Non
 
 
 class Metric(datasets.Metric, ABC):
+    default_features = datasets.Features(
+                    {
+                        "predictions": datasets.Sequence(datasets.Value("string", id="sequence")),
+                        "references": datasets.Sequence(datasets.Value("string", id="sequence")),
+                    }
+                )
+
     def __init__(self, resulting_name: Optional[str] = None, params: Optional[Dict] = None):
         super().__init__()
         self.resulting_name = resulting_name if resulting_name is not None else self.name
@@ -33,6 +40,35 @@ class Metric(datasets.Metric, ABC):
         if "reduce_fn" not in self.params:
             self.params.update({"reduce_fn": "max"})
         self.download_and_prepare()
+
+    def _compute(self, predictions: List[List[str]], references: List[List[str]], **kwargs) -> Dict[str, float]:
+        assert len(predictions) == len(references), "Predictions and references length does not match."
+        reduce_fn = kwargs.get("reduce_fn")
+        reduce_fn = self.params["reduce_fn"] if reduce_fn is None else reduce_fn
+        if isinstance(reduce_fn, str):
+            reduce_fn = getattr(numpy, reduce_fn)
+        elif reduce_fn is not None and not callable(reduce_fn):
+            raise TypeError(f"'reduce_fn' Expected str or callable, got {type(reduce_fn)}")
+        if reduce_fn is not None and not is_reduce_fn(reduce_fn):
+            raise ValueError("'reduce_fn' must be an aggregation function.")
+        eval_params = {**self.params, **kwargs}
+        eval_params.pop("reduce_fn")
+        predictions, references = Collator(predictions), Collator(references)
+        result = self.evaluate(predictions=predictions, references=references, reduce_fn=reduce_fn, **eval_params)
+        return {self.resulting_name: result}
+
+    def _compute_single_pred_single_ref(
+            self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
+    ):
+        raise NotImplementedError
+
+    def _compute_single_pred_multi_ref(
+            self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs
+    ):
+        raise NotImplementedError
+
+    def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs):
+        raise NotImplementedError
 
     def _download_and_prepare(self, dl_manager):
         """Downloads and prepares resources for the metric.
@@ -56,44 +92,16 @@ class Metric(datasets.Metric, ABC):
             return external_module
         return getattr(external_module, attr)
 
-    def _reduce_scores(self, scores: Union[List[Dict[str, float]], List[float]], reduce_fn: Callable):
+    @staticmethod
+    def _reduce_scores(scores: Union[List[Dict[str, float]], List[float]], reduce_fn: Callable):
         if isinstance(scores[0], dict):
             score = pd.DataFrame(scores).apply(reduce_fn, axis=0).to_dict()
         else:
             score = float(reduce_fn(scores))
         return score
 
-    def _compute(self, predictions: List[List[str]], references: List[List[str]], **kwargs) -> Dict[str, float]:
-        assert len(predictions) == len(references), "Predictions and references length does not match."
-        reduce_fn = kwargs.get("reduce_fn")
-        reduce_fn = self.params["reduce_fn"] if reduce_fn is None else reduce_fn
-        if isinstance(reduce_fn, str):
-            reduce_fn = getattr(numpy, reduce_fn)
-        elif reduce_fn is not None and not callable(reduce_fn):
-            raise TypeError(f"'reduce_fn' Expected str or callable, got {type(reduce_fn)}")
-        if reduce_fn is not None and not is_reduce_fn(reduce_fn):
-            raise ValueError("'reduce_fn' must be an aggregation function.")
-        eval_params = {**self.params, **kwargs}
-        eval_params.pop("reduce_fn")
-        predictions, references = Collator(predictions), Collator(references)
-        result = self.evaluate(predictions=predictions, references=references, reduce_fn=reduce_fn, **eval_params)
-        return {self.resulting_name: result}
-
     def _preprocess(self, predictions: List[List[str]], references: List[List[str]]) -> Tuple[Collator, Collator]:
         return Collator(predictions, keep=True), Collator(references, keep=True)
-
-    def _compute_single_pred_single_ref(
-        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
-    ):
-        raise NotImplementedError
-
-    def _compute_single_pred_multi_ref(
-        self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs
-    ):
-        raise NotImplementedError
-
-    def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs):
-        raise NotImplementedError
 
     def evaluate(
         self, predictions: Collator, references: Collator, reduce_fn: Optional[Callable] = None, **kwargs

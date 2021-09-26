@@ -12,7 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Precision metric."""
+"""
+Accuracy metric. The part of this file is adapted from HuggingFace's
+datasets package implementation of Accuracy metric. See
+https://github.com/huggingface/datasets/blob/master/metrics/accuracy/accuracy.py
+"""
 from collections import Counter
 from typing import Callable, Dict
 
@@ -26,60 +30,44 @@ from jury.metrics._utils import normalize_text
 __class_names__ = {"accuracy": "Accuracy"}
 
 _DESCRIPTION = """
-Precision is the fraction of the true examples among the predicted examples. It can be computed with:
-Precision = TP / (TP + FP)
-TP: True positive
-FP: False positive
+This metric is derived from Modified Unigram Precision as an accuracy metric so that
+it will compute across maximum of reference or prediction. The computation is similar 
+to precision and recall, however, we call this accuracy since there is no measure 
+called "modified unigram accuracy".
+Accuracy is the fraction of the common unigrams between the prediction
+and the references among the max of prediction or reference tokens. It can be computed with:
+Accuracy = # of matching tokens / max(# of prediction tokens, # of reference tokens)
 """
 
 _KWARGS_DESCRIPTION = """
 Args:
-    predictions: Predicted labels, as returned by a model.
-    references: Ground truth labels.
-    labels: The set of labels to include when average != 'binary', and
-        their order if average is None. Labels present in the data can
-        be excluded, for example to calculate a multiclass average ignoring
-        a majority negative class, while labels not present in the data will
-        result in 0 components in a macro average. For multilabel targets,
-        labels are column indices. By default, all labels in y_true and
-        y_pred are used in sorted order.
-    average: This parameter is required for multiclass/multilabel targets.
-        If None, the scores for each class are returned. Otherwise, this
-        determines the type of averaging performed on the data:
-            binary: Only report results for the class specified by pos_label.
-                This is applicable only if targets (y_{true,pred}) are binary.
-            micro: Calculate metrics globally by counting the total true positives,
-                false negatives and false positives.
-            macro: Calculate metrics for each label, and find their unweighted mean.
-                This does not take label imbalance into account.
-            weighted: Calculate metrics for each label, and find their average
-                weighted by support (the number of true instances for each label).
-                This alters ‘macro’ to account for label imbalance; it can result
-                in an F-score that is not between precision and recall.
-            samples: Calculate metrics for each instance, and find their average
-                (only meaningful for multilabel classification).
-    sample_weight: Sample weights.
+    predictions: list of predictions to score. Each predictions
+        should be a string with tokens separated by spaces.
+    references: list of reference for each prediction. Each
+        reference should be a string with tokens separated by spaces.
 Returns:
     precision: Precision score.
 Examples:
 
-    >>> precision_metric = datasets.load_metric("precision")
-    >>> results = precision_metric.compute(references=[0, 1], predictions=[0, 1])
+    >>> accuracy = jury.load_metric("accuracy")
+    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
+    >>> references = [
+        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["Today is a wonderful day", "The weather outside is wonderful."]
+    ]
+    >>> results = accuracy.compute(predictions=predictions, references=references)
     >>> print(results)
-    {'precision': 1.0}
+    {'accuracy': {'score': 0.7285714285714285}}
 """
 
+
 _CITATION = """\
-@article{scikit-learn,
-  title={Scikit-learn: Machine Learning in {P}ython},
-  author={Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V.
-         and Thirion, B. and Grisel, O. and Blondel, M. and Prettenhofer, P.
-         and Weiss, R. and Dubourg, V. and Vanderplas, J. and Passos, A. and
-         Cournapeau, D. and Brucher, M. and Perrot, M. and Duchesnay, E.},
-  journal={Journal of Machine Learning Research},
-  volume={12},
-  pages={2825--2830},
-  year={2011}
+@inproceedings{papineni2002bleu,
+  title={Bleu: a method for automatic evaluation of machine translation},
+  author={Papineni, Kishore and Roukos, Salim and Ward, Todd and Zhu, Wei-Jing},
+  booktitle={Proceedings of the 40th annual meeting of the Association for Computational Linguistics},
+  pages={311--318},
+  year={2002}
 }
 """
 
@@ -91,12 +79,7 @@ class Accuracy(Metric):
             description=_DESCRIPTION,
             citation=_CITATION,
             inputs_description=_KWARGS_DESCRIPTION,
-            features=datasets.Features(
-                {
-                    "predictions": datasets.Sequence(datasets.Value("string")),
-                    "references": datasets.Sequence(datasets.Value("string")),
-                }
-            ),
+            features=self.default_features,
             reference_urls=["https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html"],
         )
 
