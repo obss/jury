@@ -2,6 +2,5 @@ datasets>=1.8.0
 fire>=0.4.0
 nltk==3.6.2
 numpy>=1.21.0
-pywin32==228
 rouge-score==0.0.4
 tqdm
