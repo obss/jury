@@ -243,7 +243,9 @@ class Sacrebleu(Metric):
 
         return score
 
-    def evaluate(self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs) -> Dict[str, float]:
+    def evaluate(
+        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
+    ) -> Dict[str, float]:
         if predictions.can_collapse() and references.can_collapse():
             predictions = predictions.collapse()
             eval_fn = self._compute_single_pred_single_ref
