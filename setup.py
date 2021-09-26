@@ -32,7 +32,7 @@ _DEV_REQUIREMENTS = [
     "pytest-cov>=2.12.1",
 ]
 
-_METRIC_REQUIREMENTS = ["sacrebleu==1.5.1", "bert_score==0.3.9"]
+_METRIC_REQUIREMENTS = ["sacrebleu>=2.0.0", "bert_score==0.3.9"]
 
 extras = {
     "tests": _DEV_REQUIREMENTS,

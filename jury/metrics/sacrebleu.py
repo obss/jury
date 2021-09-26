@@ -121,12 +121,10 @@ class Sacrebleu(Metric):
         tokenizer = BLEUDefaultTokenizer()
         return [tokenizer.tokenize(s) for s in seq]
 
-    def _validate_references(self, references: Collator) -> Collator:
+    def _validate_references(self, references: Collator) -> None:
         references_per_prediction = len(references[0])
         if any(len(refs) != references_per_prediction for refs in references):
             raise ValueError("Sacrebleu requires the same number of references for each prediction")
-        transformed_referenes = [[refs[i] for refs in references] for i in range(references_per_prediction)]
-        return Collator(transformed_referenes, keep=True)
 
     def _compute_single_pred_single_ref(
         self,
@@ -245,7 +243,7 @@ class Sacrebleu(Metric):
 
         return score
 
-    def evaluate(self, predictions: Collator, references: Collator, reduce_fn: callable, **kwargs) -> Dict[str, float]:
+    def evaluate(self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs) -> Dict[str, float]:
         if predictions.can_collapse() and references.can_collapse():
             predictions = predictions.collapse()
             eval_fn = self._compute_single_pred_single_ref
@@ -254,5 +252,5 @@ class Sacrebleu(Metric):
             eval_fn = self._compute_single_pred_multi_ref
         else:
             eval_fn = self._compute_multi_pred_multi_ref
-        references = self._validate_references(references)
+        self._validate_references(references)
         return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)
