@@ -27,11 +27,11 @@ def load_metric(metric_name: str, resulting_name: str = None, params: Dict = Non
 
 class Metric(datasets.Metric, ABC):
     default_features = datasets.Features(
-                    {
-                        "predictions": datasets.Sequence(datasets.Value("string", id="sequence")),
-                        "references": datasets.Sequence(datasets.Value("string", id="sequence")),
-                    }
-                )
+        {
+            "predictions": datasets.Sequence(datasets.Value("string", id="sequence")),
+            "references": datasets.Sequence(datasets.Value("string", id="sequence")),
+        }
+    )
 
     def __init__(self, resulting_name: Optional[str] = None, params: Optional[Dict] = None):
         super().__init__()
@@ -58,12 +58,12 @@ class Metric(datasets.Metric, ABC):
         return {self.resulting_name: result}
 
     def _compute_single_pred_single_ref(
-            self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
+        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
     ):
         raise NotImplementedError
 
     def _compute_single_pred_multi_ref(
-            self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs
+        self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs
     ):
         raise NotImplementedError
 

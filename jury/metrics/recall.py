@@ -71,7 +71,6 @@ _CITATION = """\
 """
 
 
-
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class Recall(Metric):
     def _info(self):
