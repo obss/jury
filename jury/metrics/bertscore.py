@@ -202,9 +202,9 @@ class Bertscore(Metric):
         score = float(np.mean(F))
 
         if return_average_scores:
-            P = np.mean(P)
-            R = np.mean(R)
-            F = np.mean(F)
+            P = float(np.mean(P))
+            R = float(np.mean(R))
+            F = float(np.mean(F))
 
         output_dict = {
             "score": score,

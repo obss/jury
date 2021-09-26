@@ -31,14 +31,14 @@ def output_multiple_pred_multiple_ref():
 
 def test_basic(predictions, references, jury, output_basic):
     scores = jury.evaluate(predictions, references)
-    assert_almost_equal_dict(actual=scores, desired=output_basic)
+    assert_almost_equal_dict(actual=scores, desired=output_basic, exclude_paths="root['bertscore']['hashcode']")
 
 
 def test_multiple_ref(predictions, multiple_references, jury, output_multiple_ref):
     scores = jury.evaluate(predictions, multiple_references)
-    assert_almost_equal_dict(actual=scores, desired=output_multiple_ref)
+    assert_almost_equal_dict(actual=scores, desired=output_multiple_ref, exclude_paths="root['hashcode']")
 
 
 def test_multiple_pred_multiple_ref(multiple_predictions, multiple_references, jury, output_multiple_pred_multiple_ref):
     scores = jury.evaluate(multiple_predictions, multiple_references)
-    assert_almost_equal_dict(actual=scores, desired=output_multiple_pred_multiple_ref)
+    assert_almost_equal_dict(actual=scores, desired=output_multiple_pred_multiple_ref, exclude_paths="root['hashcode']")
