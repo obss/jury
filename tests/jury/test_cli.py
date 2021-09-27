@@ -14,8 +14,8 @@ def output_cli():
 
 
 def test_cli(output_cli):
-    predictions_file = Path(TEST_DATA_DIR) / "predictions.txt"
-    references_file = Path(TEST_DATA_DIR) / "references.txt"
+    predictions_file = Path(TEST_DATA_DIR) / "cli" / "predictions.txt"
+    references_file = Path(TEST_DATA_DIR) / "cli" / "references.txt"
 
     cmd = f"jury eval --predictions {predictions_file} --references {references_file}"
 
