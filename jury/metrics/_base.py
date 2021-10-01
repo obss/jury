@@ -23,9 +23,11 @@ def load_metric(metric_name: str, resulting_name: str = None, params: Dict = Non
         m = importlib.import_module(module_name)
     except ModuleNotFoundError:
         # Metric not in Jury
-        warnings.warn(f"Metric {metric_name} is not available on Jury, falling back to datasets metric. "
-                      f"You may not fully utilize this metric for different input types, e.g multiple predictions"
-                      f"or multiple references.")
+        warnings.warn(
+            f"Metric {metric_name} is not available on Jury, falling back to datasets metric. "
+            f"You may not fully utilize this metric for different input types, e.g multiple predictions"
+            f"or multiple references."
+        )
         metric = datasets.load_metric(metric_name)
     else:
         # get the class, will raise AttributeError if class cannot be found

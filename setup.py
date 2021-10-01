@@ -42,7 +42,7 @@ _DEV_REQUIREMENTS = [
     "jiwer>=2.2.0",
     "pytest>=6.2.4",
     "pytest-cov>=2.12.1",
-    "pytest-timeout>=1.4.2"
+    "pytest-timeout>=1.4.2",
 ]
 
 _METRIC_REQUIREMENTS = ["sacrebleu>=2.0.0", "bert_score==0.3.10"]

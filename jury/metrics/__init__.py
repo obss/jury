@@ -10,4 +10,17 @@ from jury.metrics.rouge import Rouge
 from jury.metrics.sacrebleu import Sacrebleu
 from jury.metrics.squad import Squad
 
-__all__ = ["Accuracy", "Bertscore", "Bleu", "F1", "Meteor", "Metric", "MetricCollator", "Precision", "Recall", "Rouge", "Sacrebleu", "Squad"]
+__all__ = [
+    "Accuracy",
+    "Bertscore",
+    "Bleu",
+    "F1",
+    "Meteor",
+    "Metric",
+    "MetricCollator",
+    "Precision",
+    "Recall",
+    "Rouge",
+    "Sacrebleu",
+    "Squad",
+]
