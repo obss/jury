@@ -1,13 +1,11 @@
-import functools
 import inspect
 import json
 import os
-from typing import Callable, Optional
+from typing import Optional
 
 import pytest
 
-from jury import Jury
-from jury.metrics import load_metric
+from jury import Jury, load_metric
 from tests.jury import EXPECTED_OUTPUTS
 
 _TEST_METRICS = [
@@ -24,37 +22,47 @@ _TEST_METRICS = [
 ]
 
 _CONCURRENT_TEST_METRICS = [
+    load_metric("accuracy"),
+    load_metric("bertscore", params={"model_type": "albert-base-v1", "device": "cpu"}),
     load_metric("bleu"),
+    load_metric("f1"),
     load_metric("meteor"),
+    load_metric("precision"),
+    load_metric("recall"),
     load_metric("rouge"),
     load_metric("sacrebleu"),
     load_metric("squad"),
 ]
 
-_STR_TEST_METRICS = ["bleu", "meteor", "rouge", "sacrebleu", "squad"]
+_STR_TEST_METRICS = ["bleu", "meteor", "rouge", "sacrebleu", "squad", "wer"]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="package")
 def predictions():
     return ["There is a cat on the mat.", "Look! a wonderful day."]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="package")
 def references():
     return ["The cat is playing on the mat.", "Today is a wonderful day"]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="function")
+def inconsistent_predictions():
+    return ["There is a cat on the mat."]
+
+
+@pytest.fixture(scope="function")
 def single_prediction_array():
     return [["the cat is on the mat"], ["Look! a wonderful day."]]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="package")
 def multiple_predictions():
     return [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope="package")
 def multiple_references():
     return [
         ["the cat is playing on the mat.", "The cat plays on the mat."],
@@ -62,17 +70,17 @@ def multiple_references():
     ]
 
 
-@pytest.fixture(scope="package")
+@pytest.fixture(scope="module")
 def jury():
     return Jury(metrics=_TEST_METRICS)
 
 
-@pytest.fixture(scope="package")
+@pytest.fixture(scope="function")
 def jury_str():
     return Jury(metrics=_STR_TEST_METRICS)
 
 
-@pytest.fixture(scope="package")
+@pytest.fixture(scope="function")
 def jury_concurrent():
     return Jury(metrics=_CONCURRENT_TEST_METRICS, run_concurrent=True)
 

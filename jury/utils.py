@@ -1,9 +1,7 @@
 import os
 import re
 import string
-from typing import Callable, Dict, List, Optional
-
-import numpy as np
+from typing import Dict, List, Optional
 
 
 class NestedSingleType:

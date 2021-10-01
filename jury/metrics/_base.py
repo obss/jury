@@ -1,4 +1,5 @@
 import importlib
+import warnings
 from abc import ABC
 from typing import Callable, Dict, List, Optional, Tuple, Union
 
@@ -17,12 +18,20 @@ logger = get_logger(__name__)
 def load_metric(metric_name: str, resulting_name: str = None, params: Dict = None) -> "Metric":
     # load the module, will raise ImportError if module cannot be loaded
     metric_name = metric_name.lower()
-    base_name = metric_name.split("_")[0]
-    module_name = f"jury.metrics.{base_name}"
-    m = importlib.import_module(module_name)
-    # get the class, will raise AttributeError if class cannot be found
-    c = getattr(m, m.__class_names__.get(metric_name))
-    return c(resulting_name=resulting_name, params=params)
+    module_name = f"jury.metrics.{metric_name}"
+    try:
+        m = importlib.import_module(module_name)
+    except ModuleNotFoundError:
+        # Metric not in Jury
+        warnings.warn(f"Metric {metric_name} is not available on Jury, falling back to datasets metric. "
+                      f"You may not fully utilize this metric for different input types, e.g multiple predictions"
+                      f"or multiple references.")
+        metric = datasets.load_metric(metric_name)
+    else:
+        # get the class, will raise AttributeError if class cannot be found
+        c = getattr(m, m.__class_names__.get(metric_name))
+        metric = c(resulting_name=resulting_name, params=params)
+    return metric
 
 
 class Metric(datasets.Metric, ABC):

@@ -1,6 +1,8 @@
 from concurrent.futures import ProcessPoolExecutor
 from typing import Callable, Dict, List, Mapping, Optional, Union
 
+import datasets
+
 from jury.collator import Collator
 from jury.definitions import DEFAULT_METRICS
 from jury.metrics import Metric, MetricCollator, load_metric
@@ -51,31 +53,44 @@ class Jury:
         self.metrics = MetricCollator(metrics)
         self._concurrent = run_concurrent
 
+    def _score_to_dict(self, score, name: str) -> Dict[str, float]:
+        if isinstance(score, dict):
+            return score
+
+        return {name: score}
+
     def _compute_single_score(self, inputs) -> Mapping[str, float]:
         metric, predictions, references, reduce_fn = inputs
-        score = metric.compute(predictions=predictions, references=references, reduce_fn=reduce_fn)
+        if isinstance(metric, Metric):
+            predictions, references = Collator(predictions), Collator(references)
+            score = metric.compute(predictions=predictions, references=references, reduce_fn=reduce_fn)
+        else:
+            metric.resulting_name = metric.name
+            score = metric.compute(predictions=predictions, references=references)
+            score = self._score_to_dict(score, name=metric.name)
         return score
 
     def _prepare_concurrent_inputs(self, predictions, references, reduce_fn):
         inputs = []
         for metric in self.metrics:
-            inputs.append([metric, predictions, references, reduce_fn])
+            inputs.append((metric, predictions, references, reduce_fn))
         return inputs
 
     def evaluate(
         self,
-        predictions: Union[List[str], List[List[str]]],
-        references: Union[List[str], List[List[str]]],
+        *,
+        predictions: Union[List[str], List[List[str]]] = None,
+        references: Union[List[str], List[List[str]]] = None,
         reduce_fn: Optional[Union[str, Callable]] = None,
     ) -> Dict[str, float]:
+        if predictions is None or references is None:
+            raise TypeError("Both predictions and references have to be passed.")
         if len(predictions) != len(references):
             raise ValueError("Lengths of predictions and references must be equal.")
 
         metrics = dict()
         metrics["empty_predictions"] = len([1 for p in predictions if not p])
         metrics["total_items"] = len(references)
-
-        predictions, references = Collator(predictions), Collator(references)
 
         if self._concurrent:
             inputs_list = self._prepare_concurrent_inputs(predictions, references, reduce_fn)
@@ -85,7 +100,8 @@ class Jury:
                     metrics.update(score)
         else:
             for metric in self.metrics:
-                score = metric.compute(predictions=predictions, references=references, reduce_fn=reduce_fn)
+                inputs = (metric, predictions, references, reduce_fn)
+                score = self._compute_single_score(inputs)
                 metrics.update(score)
 
         return metrics

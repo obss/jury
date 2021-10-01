@@ -39,15 +39,16 @@ _DEV_REQUIREMENTS = [
     "deepdiff==5.5.0",
     "flake8==3.9.2",
     "isort==5.9.2",
+    "jiwer>=2.2.0",
     "pytest>=6.2.4",
     "pytest-cov>=2.12.1",
+    "pytest-timeout>=1.4.2"
 ]
 
 _METRIC_REQUIREMENTS = ["sacrebleu>=2.0.0", "bert_score==0.3.10"]
 add_pywin(_METRIC_REQUIREMENTS)
 
 extras = {
-    "tests": _DEV_REQUIREMENTS,
     "metrics": _METRIC_REQUIREMENTS,
     "develop": _DEV_REQUIREMENTS + _METRIC_REQUIREMENTS,
 }
