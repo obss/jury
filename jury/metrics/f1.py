@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The HuggingFace Datasets Authors and the current dataset script contributor.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Modified Unigram Precision metric. The part of this file is adapted from HuggingFace's
+F1  metric. The part of this file is adapted from HuggingFace's
 datasets package implementation of Accuracy metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/f1/f1.py
 """
@@ -30,6 +30,16 @@ from jury.metrics.recall import Recall
 
 __class_names__ = {"f1": "F1"}
 
+_CITATION = """\
+@inproceedings{papineni2002bleu,
+  title={Bleu: a method for automatic evaluation of machine translation},
+  author={Papineni, Kishore and Roukos, Salim and Ward, Todd and Zhu, Wei-Jing},
+  booktitle={Proceedings of the 40th annual meeting of the Association for Computational Linguistics},
+  pages={311--318},
+  year={2002}
+}
+"""
+
 _DESCRIPTION = """
 Harmonic mean of precision and recall metrics. The precision and recall it uses 
 are the implementations of `jury.metrics.precision` and `jury.metrics.recall` respectively.
@@ -42,7 +52,7 @@ Args:
     references: list of reference for each prediction. Each
         reference should be a string with tokens separated by spaces.
 Returns:
-    precision: Precision score.
+    'score': F1 score.
 Examples:
 
     >>> f1 = jury.load_metric("f1")
@@ -53,17 +63,7 @@ Examples:
     ]
     >>> results = f1.compute(predictions=predictions, references=references)
     >>> print(results)
-    {'precision': {'score': 0.875}}
-"""
-
-_CITATION = """\
-@inproceedings{papineni2002bleu,
-  title={Bleu: a method for automatic evaluation of machine translation},
-  author={Papineni, Kishore and Roukos, Salim and Ward, Todd and Zhu, Wei-Jing},
-  booktitle={Proceedings of the 40th annual meeting of the Association for Computational Linguistics},
-  pages={311--318},
-  year={2002}
-}
+    {'f1': {'score': 0.7948717948717947}}
 """
 
 

@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -91,19 +91,25 @@ Args:
     use_fast_tokenizer (bool): `use_fast` parameter passed to HF tokenizer. New in version 0.3.10.
 
 Returns:
-    precision: Precision.
-    recall: Recall.
-    f1: F1 score.
-    hashcode: Hashcode of the library.
+    'score': Bertscore f1. This is always the same as 'f1' in cases single-prediction and single-reference, and
+        single-prediction and multiple-references, otherwise it is reduced version of 'f1' by `reduce_fn`. 
+    'precision': Precision.
+    'recall': Recall.
+    'f1': F1 score.
+    'hashcode': Hashcode of the library.
 
 Examples:
 
-    >>> predictions = ["hello there", "general kenobi"]
-    >>> references = ["hello there", "general kenobi"]
-    >>> bertscore = datasets.load_metric("bertscore")
-    >>> results = bertscore.compute(predictions=predictions, references=references, lang="en")
-    >>> print([round(v, 2) for v in results["f1"]])
-    [1.0, 1.0]
+    >>> bertscore = jury.load_metric("bertscore")
+    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
+    >>> references = [
+        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["Today is a wonderful day", "The weather outside is wonderful."]
+    ]
+    >>> results = bertscore.compute(predictions=predictions, references=references)
+    >>> print(results)
+    {'bertscore': {'score': 0.9473764896392822, 'precision': 0.9467198252677917, 'recall': 0.9480386078357697, 
+        'f1': 0.9473764896392822, 'hashcode': 'roberta-large_L17_no-idf_version=0.3.10(hug_trans=4.9.1)'}}
 """
 
 
@@ -325,35 +331,3 @@ class Bertscore(Metric):
         if isinstance(reference, str):
             reference = [reference]
         super().add(prediction=prediction, reference=reference, **kwargs)
-
-
-if __name__ == "__main__":
-    # predictions = [
-    #     ["It is a guide to action which ensures that the military always obeys the commands of the party"],
-    #     ["bar foo foobar"],
-    # ]
-    # references = [
-    #     ["It is a guide to action that ensures that the military will forever heed Party commands"],
-    #     ["foo bar foobar"],
-    # ]
-    # predictions = ["foo bar", "boo foobar"]
-    # references = ["foo"]
-
-    # Multi pred multi ref
-    predictions = [
-        [
-            "It is a guide to action which ensures that the military always obeys the commands of the party",
-            "It is a guide to action that will ensure that the military always obeys the commands of the party",
-        ],
-        ["bar foo foobar"],
-    ]
-    references = [
-        [
-            "It is a guide to action that ensures that the military will forever heed Party commands",
-            "It is a guide to action which ensures that the military will forever heed Party commands",
-        ],
-        ["foo bar foobar", "foo bar"],
-    ]
-    bleu = Bertscore()
-    score = bleu.compute(predictions=predictions, references=references)
-    print(score)

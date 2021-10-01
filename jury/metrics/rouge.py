@@ -47,7 +47,8 @@ _CITATION = """\
 _DESCRIPTION = """\
 ROUGE, or Recall-Oriented Understudy for Gisting Evaluation, is a set of metrics and a software package used for
 evaluating automatic summarization and machine translation software in natural language processing.
-The metrics compare an automatically produced summary or translation against a reference or a set of references (human-produced) summary or translation.
+The metrics compare an automatically produced summary or translation against a reference or a set of references 
+(human-produced) summary or translation.
 
 Note that ROUGE is case insensitive, meaning that upper case letters are treated the same way as lower case letters.
 
@@ -77,16 +78,16 @@ Returns:
     rougeLsum: rouge_lsum (precision, recall, f1)
 Examples:
 
-    >>> rouge = datasets.load_metric('rouge')
-    >>> predictions = ["hello there", "general kenobi"]
-    >>> references = ["hello there", "general kenobi"]
+    >>> rouge = jury.load_metric("rouge")
+    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
+    >>> references = [
+        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["Today is a wonderful day", "The weather outside is wonderful."]
+    ]
     >>> results = rouge.compute(predictions=predictions, references=references)
-    >>> print(list(results.keys()))
-    ['rouge1', 'rouge2', 'rougeL', 'rougeLsum']
-    >>> print(results["rouge1"])
-    AggregateScore(low=Score(precision=1.0, recall=1.0, fmeasure=1.0), mid=Score(precision=1.0, recall=1.0, fmeasure=1.0), high=Score(precision=1.0, recall=1.0, fmeasure=1.0))
-    >>> print(results["rouge1"].mid.fmeasure)
-    1.0
+    >>> print(results)
+    {'rouge': {'rouge1': 0.7783882783882783, 'rouge2': 0.5925324675324675, 
+        'rougeL': 0.7426739926739926, 'rougeLsum': 0.7426739926739926}}
 """
 
 
@@ -158,13 +159,15 @@ class Rouge(Metric):
 
     def evaluate(
         self,
-        predictions: Collator,
-        references: Collator,
-        reduce_fn: callable,
-        rouge_types=None,
-        use_aggregator=True,
-        use_stemmer=False,
+        *,
+        predictions: Collator = None,
+        references: Collator = None,
+        reduce_fn: callable = None,
+        rouge_types: List[str] = None,
+        use_aggregator: bool = True,
+        use_stemmer: bool = False,
         metric_to_select: Optional[str] = "fmeasure",
+        **kwargs
     ):
         if rouge_types is None:
             rouge_types = ["rouge1", "rouge2", "rougeL", "rougeLsum"]

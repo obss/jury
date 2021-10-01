@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -55,18 +55,20 @@ _CITATION = """\
 """
 
 _DESCRIPTION = """\
-BLEU (bilingual evaluation understudy) is an algorithm for evaluating the quality of text which has been machine-translated from one natural language to another.
-Quality is considered to be the correspondence between a machine's output and that of a human: "the closer a machine translation is to a professional human translation,
-the better it is" – this is the central idea behind BLEU. BLEU was one of the first metrics to claim a high correlation with human judgements of quality, and
-remains one of the most popular automated and inexpensive metrics.
+BLEU (bilingual evaluation understudy) is an algorithm for evaluating the quality of text which has been 
+machine-translated from one natural language to another. Quality is considered to be the correspondence between a 
+machine's output and that of a human: "the closer a machine translation is to a professional human translation, the 
+better it is" – this is the central idea behind BLEU. BLEU was one of the first metrics to claim a high correlation 
+with human judgements of quality, and remains one of the most popular automated and inexpensive metrics.
 
-Scores are calculated for individual translated segments—generally sentences—by comparing them with a set of good quality reference translations.
-Those scores are then averaged over the whole corpus to reach an estimate of the translation's overall quality. Intelligibility or grammatical correctness
-are not taken into account[citation needed].
+Scores are calculated for individual translated segments—generally sentences—by comparing them with a set of good 
+quality reference translations. Those scores are then averaged over the whole corpus to reach an estimate of the 
+translation's overall quality. Intelligibility or grammatical correctness are not taken into account[citation needed].
 
-BLEU's output is always a number between 0 and 1. This value indicates how similar the candidate text is to the reference texts, with values closer to 1
-representing more similar texts. Few human translations will attain a score of 1, since this would indicate that the candidate is identical to one of the
-reference translations. For this reason, it is not necessary to attain a score of 1. Because there are more opportunities to match, adding additional
+BLEU's output is always a number between 0 and 1. This value indicates how similar the candidate text is to 
+the reference texts, with values closer to 1 representing more similar texts. Few human translations will attain a 
+score of 1, since this would indicate that the candidate is identical to one of the reference translations. For this 
+reason, it is not necessary to attain a score of 1. Because there are more opportunities to match, adding additional
 reference translations will increase the BLEU score.
 """
 
@@ -80,7 +82,7 @@ Args:
     max_order: Maximum n-gram order to use when computing BLEU score.
     smooth: Whether or not to apply Lin et al. 2004 smoothing.
 Returns:
-    'bleu': bleu score,
+    'score': BLEU score,
     'precisions': geometric mean of n-gram precisions,
     'brevity_penalty': brevity penalty,
     'length_ratio': ratio of lengths,
@@ -88,18 +90,17 @@ Returns:
     'reference_length': reference_length
 Examples:
 
-    >>> predictions = [
-    ...     ["hello", "there", "general", "kenobi"],                             # tokenized prediction of the first sample
-    ...     ["foo", "bar", "foobar"]                                             # tokenized prediction of the second sample
-    ... ]
+    >>> bleu = jury.load_metric("bleu")
+    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
     >>> references = [
-    ...     [["hello", "there", "general", "kenobi"], ["hello", "there", "!"]],  # tokenized references for the first sample (2 references)
-    ...     [["foo", "bar", "foobar"]]                                           # tokenized references for the second sample (1 reference)
-    ... ]
-    >>> bleu = datasets.load_metric("bleu")
+        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["Today is a wonderful day", "The weather outside is wonderful."]
+    ]
     >>> results = bleu.compute(predictions=predictions, references=references)
-    >>> print(results["bleu"])
-    1.0
+    >>> print(results)
+    {'bleu': {'score': 0.42370250917168295, 
+        'precisions': [0.8823529411764706, 0.6428571428571429, 0.45454545454545453, 0.125], 
+        'brevity_penalty': 1.0, 'length_ratio': 1.0, 'translation_length': 11, 'reference_length': 11}}
 """
 
 

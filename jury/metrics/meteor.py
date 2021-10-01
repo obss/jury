@@ -70,15 +70,18 @@ Args:
     beta: Parameter for controlling shape of penalty as a function of fragmentation. default: 3
     gamma: Relative weight assigned to fragmentation penalty. default: 0.5
 Returns:
-    'meteor': meteor score.
+    'score': meteor score.
 Examples:
 
-    >>> meteor = datasets.load_metric('meteor')
-    >>> predictions = ["It is a guide to action which ensures that the military always obeys the commands of the party"]
-    >>> references = ["It is a guide to action that ensures that the military will forever heed Party commands"]
+    >>> meteor = jury.load_metric("meteor")
+    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
+    >>> references = [
+        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["Today is a wonderful day", "The weather outside is wonderful."]
+    ]
     >>> results = meteor.compute(predictions=predictions, references=references)
-    >>> print(round(results["meteor"], 4))
-    0.7398
+    >>> print(results)
+    {'meteor': {'score': 0.5420511682934044}}
 """
 
 

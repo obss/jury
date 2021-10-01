@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -29,6 +29,16 @@ from jury.metrics._utils import normalize_text
 
 __class_names__ = {"accuracy": "Accuracy"}
 
+_CITATION = """\
+@inproceedings{papineni2002bleu,
+  title={Bleu: a method for automatic evaluation of machine translation},
+  author={Papineni, Kishore and Roukos, Salim and Ward, Todd and Zhu, Wei-Jing},
+  booktitle={Proceedings of the 40th annual meeting of the Association for Computational Linguistics},
+  pages={311--318},
+  year={2002}
+}
+"""
+
 _DESCRIPTION = """
 This metric is derived from Modified Unigram Precision as an accuracy metric so that
 it will compute across maximum of reference or prediction. The computation is similar 
@@ -46,7 +56,7 @@ Args:
     references: list of reference for each prediction. Each
         reference should be a string with tokens separated by spaces.
 Returns:
-    precision: Precision score.
+    'score': Accuracy score.
 Examples:
 
     >>> accuracy = jury.load_metric("accuracy")
@@ -58,17 +68,6 @@ Examples:
     >>> results = accuracy.compute(predictions=predictions, references=references)
     >>> print(results)
     {'accuracy': {'score': 0.7285714285714285}}
-"""
-
-
-_CITATION = """\
-@inproceedings{papineni2002bleu,
-  title={Bleu: a method for automatic evaluation of machine translation},
-  author={Papineni, Kishore and Roukos, Salim and Ward, Todd and Zhu, Wei-Jing},
-  booktitle={Proceedings of the 40th annual meeting of the Association for Computational Linguistics},
-  pages={311--318},
-  year={2002}
-}
 """
 
 

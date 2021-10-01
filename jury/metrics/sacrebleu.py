@@ -59,8 +59,10 @@ Produces BLEU scores along with its sufficient statistics
 from a source against one or more references.
 
 Args:
-    predictions: The system stream (a sequence of segments).
-    references: A list of one or more reference streams (each a sequence of segments).
+    predictions: list of predictions to score. Each predictions
+        should be a string with tokens separated by spaces.
+    references: list of reference for each prediction. Each
+        reference should be a string with tokens separated by spaces.
     smooth_method: The smoothing method to use. (Default: 'exp').
     smooth_value: The smoothing value. Only valid for 'floor' and 'add-k'. (Defaults: floor: 0.1, add-k: 1).
     tokenize: Tokenization method to use for BLEU. If not provided, defaults to 'zh' for Chinese, 'ja-mecab' for
@@ -76,17 +78,22 @@ Returns:
     'bp': Brevity penalty,
     'sys_len': predictions length,
     'ref_len': reference length,
+    'adjusted_precision': adjusted precisions with corrections for multiple predictions cases.
 
 Examples:
 
-    >>> predictions = ["hello there general kenobi", "foo bar foobar"]
-    >>> references = [["hello there general kenobi", "hello there !"], ["foo bar foobar", "foo bar foobar"]]
-    >>> sacrebleu = datasets.load_metric("sacrebleu")
+    >>> sacrebleu = jury.load_metric("sacrebleu")
+    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
+    >>> references = [
+        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["Today is a wonderful day", "The weather outside is wonderful."]
+    ]
     >>> results = sacrebleu.compute(predictions=predictions, references=references)
-    >>> print(list(results.keys()))
-    ['score', 'counts', 'totals', 'precisions', 'bp', 'sys_len', 'ref_len']
-    >>> print(round(results["score"], 1))
-    100.0
+    >>> print(results)
+    {'sacrebleu': {'score': 0.32377227131456443, 'counts': [11, 6, 3, 0], 'totals': [13, 11, 9, 7],
+         'precisions': [0.8461538461538461, 0.5454545454545454, 0.33333333333333337, 0.07142857142857144], 
+         'bp': 1.0, 'sys_len': 11, 'ref_len': 12, 
+         'adjusted_precisions': [0.8461538461538461, 0.5454545454545454, 0.33333333333333337, 0.07142857142857144]}}
 """
 
 

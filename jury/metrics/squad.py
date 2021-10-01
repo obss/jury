@@ -52,10 +52,14 @@ from the corresponding reading passage, or the question might be unanswerable.
 _KWARGS_DESCRIPTION = """
 Computes SQuAD scores (F1 and EM).
 Args:
-    predictions: List of question-answers dictionaries with the following key-values:
+    predictions: list of predictions to score. Each predictions
+        should be a string with tokens separated by spaces. Optionally,
+        List of question-answers dictionaries with the following key-values:
         - 'id': id of the question-answer pair as given in the references (see below)
         - 'prediction_text': the text of the answer
-    references: List of question-answers dictionaries with the following key-values:
+    references: list of reference for each prediction. Each
+        reference should be a string with tokens separated by spaces. Optionally,
+        List of question-answers dictionaries with the following key-values:
         - 'id': id of the question-answer pair (see above),
         - 'answers': a Dict in the SQuAD dataset format
             {
@@ -68,12 +72,15 @@ Returns:
     'f1': The F-score of predicted tokens versus the gold answer
 Examples:
 
-    >>> predictions = [{'prediction_text': '1976', 'id': '56e10a3be3433e1400422b22'}]
-    >>> references = [{'answers': {'answer_start': [97], 'text': ['1976']}, 'id': '56e10a3be3433e1400422b22'}]
-    >>> squad_metric = datasets.load_metric("squad")
-    >>> results = squad_metric.compute(predictions=predictions, references=references)
+    >>> squad = jury.load_metric("squad")
+    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
+    >>> references = [
+        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["Today is a wonderful day", "The weather outside is wonderful."]
+    ]
+    >>> results = squad.compute(predictions=predictions, references=references)
     >>> print(results)
-    {'exact_match': 100.0, 'f1': 100.0}
+    {'squad': {'exact_match': 0.0, 'f1': 74.02597402597402}}
 """
 
 

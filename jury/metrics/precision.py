@@ -29,6 +29,16 @@ from jury.metrics._utils import normalize_text
 
 __class_names__ = {"precision": "Precision"}
 
+_CITATION = """\
+@inproceedings{papineni2002bleu,
+  title={Bleu: a method for automatic evaluation of machine translation},
+  author={Papineni, Kishore and Roukos, Salim and Ward, Todd and Zhu, Wei-Jing},
+  booktitle={Proceedings of the 40th annual meeting of the Association for Computational Linguistics},
+  pages={311--318},
+  year={2002}
+}
+"""
+
 _DESCRIPTION = """
 Modified Unigram Precision is the fraction of the common unigrams between the prediction
 and the references among the prediction tokens. It can be computed with:
@@ -42,7 +52,7 @@ Args:
     references: list of reference for each prediction. Each
         reference should be a string with tokens separated by spaces.
 Returns:
-    precision: Precision score.
+    'score': Precision score.
 Examples:
 
     >>> precision = jury.load_metric("precision")
@@ -54,16 +64,6 @@ Examples:
     >>> results = precision.compute(predictions=predictions, references=references)
     >>> print(results)
     {'precision': {'score': 0.875}}
-"""
-
-_CITATION = """\
-@inproceedings{papineni2002bleu,
-  title={Bleu: a method for automatic evaluation of machine translation},
-  author={Papineni, Kishore and Roukos, Salim and Ward, Todd and Zhu, Wei-Jing},
-  booktitle={Proceedings of the 40th annual meeting of the Association for Computational Linguistics},
-  pages={311--318},
-  year={2002}
-}
 """
 
 
