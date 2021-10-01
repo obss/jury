@@ -45,17 +45,51 @@ It is only two lines of code to evaluate generated outputs.
 
     from jury import Jury
     
-    jury = Jury()
-
-    # Microsoft translator translation for "Yurtta sulh, cihanda sulh." (16.07.2021)
-    predictions = ["Peace in the dormitory, peace in the world."]
-    references = ["Peace at home, peace in the world."]
-    scores = jury.evaluate(predictions, references)
+    evaluator = Jury()
+    predictions = [
+        ["the cat is on the mat", "There is cat playing on the mat"], 
+        ["Look!    a wonderful day."]
+    ]
+    references = [
+        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["Today is a wonderful day", "The weather outside is wonderful."]
+    ]
+    scores = evaluator.evaluate(predictions=predictions, references=references)
 
 Specify metrics you want to use on instantiation.
 
     jury = Jury(metrics=["bleu", "meteor"])
     scores = jury.evaluate(predictions, references)
+
+#### Use of Metrics standalone
+
+You can directly import metrics from `jury.metrics` as classes, and then instantiate and use as desired.
+
+    from jury.metrics import Bleu
+    bleu = Bleu()
+    score = bleu.compute(predictions=predictions, references=references)
+
+The additional parameters can either be specified on `compute()`
+
+    from jury.metrics import Bleu
+
+    bleu = Bleu()
+    score = bleu.compute(predictions=predictions, references=references, max_order=4)
+
+, or alternatively on instantiation
+
+    bleu = Bleu(params={"max_order": 1})
+
+
+Note that you can seemlessly access both `jury` and `datasets` metrics through `jury.load_metric`. 
+
+    import jury
+    
+    bleu = jury.load_metric("bleu")
+    bleu_1 = jury.load_metric("bleu", resulting_name="bleu_1", params={"max_order": 1})
+    # metrics not available in `jury` but in `datasets`
+    wer = jury.load_metric("wer") # It falls back to `datasets` package with a warning
+
 
 ### CLI Usage
 
@@ -83,13 +117,34 @@ Then, you can call jury eval with `config` argument.
 
 ### Custom Metrics
 
-You can use custom metrics with inheriting `jury.metrics.Metric`, you can see current metrics on [datasets/metrics](https://github.com/huggingface/datasets/tree/master/metrics). The code snippet below gives a brief explanation.
+You can use custom metrics with inheriting `jury.metrics.Metric`, you can see current metrics implemented on Jury from [jury/metrics](https://github.com/obss/jury/tree/master/jury/metrics). Jury falls back to `datasets` implementation of metrics for the ones that are currently not supported by Jury, you can see the metrics available for `datasets` on [datasets/metrics](https://github.com/huggingface/datasets/tree/master/metrics). 
+
+Jury itself uses `datasets.Metric` as a base class to drive its own base class as `jury.metrics.Metric`. The interface is similar; however, Jury makes the metrics to take a unified input type by handling the inputs for each metrics, and allows supporting several input types as;
+
+- single prediction & single reference
+- single prediction & multiple reference
+- multiple prediction & multiple reference
+
+As a custom metric both base classes can be used; however, we strongly recommend using `jury.metrics.Metric` as it has several advantages such as supporting computations for the input types above or unifying the type of the input.
 
     from jury.metrics import Metric
+    
+    class CustomMetric(Metric):
+            def _compute_single_pred_single_ref(
+        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
+    ):
+        raise NotImplementedError
 
-    CustomMetric(Metric):
-        def compute(self, predictions, references):
-            pass
+    def _compute_single_pred_multi_ref(
+        self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs
+    ):
+        raise NotImplementedError
+
+    def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs
+    ):
+        raise NotImplementedError
+
+For more details, have a look at base metric implementation [jury.metrics.Metric](./jury/metrics/_base.py)
 
 ## <div align="center"> Contributing </div>
 

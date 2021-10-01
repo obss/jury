@@ -1,7 +1,27 @@
+# coding=utf-8
+# Copyright 2020 The HuggingFace Datasets Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+"""
+Metrics base class. The part of this file is adapted from HuggingFace's
+datasets package implementation of Accuracy metric. See
+https://github.com/huggingface/datasets/blob/master/src/datasets/metric.py
+"""
+
 import importlib
 import warnings
 from abc import ABC
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import datasets
 import numpy
@@ -37,6 +57,30 @@ def load_metric(metric_name: str, resulting_name: str = None, params: Dict = Non
 
 
 class Metric(datasets.Metric, ABC):
+    """Base metric class and common API for all metrics.
+
+    Args:
+        resulting_name (``Optional[str]``): Optional resulting name for :py:class:`jury.Jury` to use. By default, it
+            uses `metric.name` if not given. This is meant to prevent clashes for output dict of
+            :py:method:`jury.Jury.evaluate` such as when bleu-1, and bleu-2 are used together.
+        params (``Optional[Dict[str, Any]]``): These are the parameters to be passed to compute function of the metric.
+            It is meant to ease the support of computation from a jury configuration file, etc.
+        config_name (``str``): This is used to define a hash specific to a metrics computation script and prevents the metric's data
+            to be overridden when the metric loading script is modified.
+        keep_in_memory (``bool``): keep all predictions and references in memory. Not possible in distributed settings.
+        cache_dir (``str``): Path to a directory in which temporary prediction/references data will be stored.
+            The data directory should be located on a shared file-system in distributed setups.
+        num_process (``int``): specify the total number of nodes in a distributed settings.
+            This is useful to compute metrics in distributed setups (in particular non-additive metrics like F1).
+        process_id (``int``): specify the id of the current process in a distributed setup (between 0 and num_process-1)
+            This is useful to compute metrics in distributed setups (in particular non-additive metrics like F1).
+        seed (Optional ``int``): If specified, this will temporarily set numpy's random seed when :func:`datasets.Metric.compute` is run.
+        experiment_id (``str``): A specific experiment id. This is used if several distributed evaluations share the same file system.
+            This is useful to compute metrics in distributed setups (in particular non-additive metrics like F1).
+        max_concurrent_cache_files (``int``): Max number of concurrent metrics cache files (default 10000).
+        timeout (``Union[int, float]``): Timeout in second for distributed setting synchronization.
+    """
+
     default_features = datasets.Features(
         {
             "predictions": datasets.Sequence(datasets.Value("string", id="sequence")),
@@ -44,8 +88,8 @@ class Metric(datasets.Metric, ABC):
         }
     )
 
-    def __init__(self, resulting_name: Optional[str] = None, params: Optional[Dict] = None):
-        super().__init__()
+    def __init__(self, resulting_name: Optional[str] = None, params: Optional[Dict[str, Any]] = None, **kwargs):
+        super().__init__(**kwargs)
         self.resulting_name = resulting_name if resulting_name is not None else self.name
         self.params = params if params is not None else {}
         if "reduce_fn" not in self.params:
@@ -71,14 +115,47 @@ class Metric(datasets.Metric, ABC):
     def _compute_single_pred_single_ref(
         self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
     ):
+        """
+        Computes the metric score(s) for single prediction and single reference case.
+
+        Args:
+            predictions: (``List[str]``) Predictions
+            references: (``List[str]``) References
+            reduce_fn: (``str``) Reduce function name.
+            **kwargs: Additional arguments used for the metric computation.
+
+        Returns: score
+        """
         raise NotImplementedError
 
     def _compute_single_pred_multi_ref(
         self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs
     ):
+        """
+        Computes the metric score(s) for single prediction and multiple references case.
+
+        Args:
+            predictions: (``List[str]``) Predictions
+            references: (``List[List[str]]``) References
+            reduce_fn: (``str``) Reduce function name.
+            **kwargs: Additional arguments used for the metric computation.
+
+        Returns: score
+        """
         raise NotImplementedError
 
     def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs):
+        """
+        Computes the metric score(s) for single prediction and multiple references case.
+
+        Args:
+            predictions: (``List[List[str]]``) Predictions
+            references: (``List[List[str]]``) References
+            reduce_fn: (``str``) Reduce function name.
+            **kwargs: Additional arguments used for the metric computation.
+
+        Returns: score
+        """
         raise NotImplementedError
 
     def _download_and_prepare(self, dl_manager):
