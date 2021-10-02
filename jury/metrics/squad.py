@@ -149,6 +149,8 @@ class Squad(Metric):
         ]
         evaluation_fn = self._get_external_resource("squad_evaluate", attr="evaluate")
         score = evaluation_fn(dataset=dataset, predictions=pred_dict)
+        for metric_, score_ in score.items():
+            score[metric_] = score_ / 100
         return score
 
     def _compute_single_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn=None, **kwargs):

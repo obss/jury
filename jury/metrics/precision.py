@@ -18,7 +18,7 @@ datasets package implementation of Accuracy metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/precision/precision.py
 """
 from collections import Counter
-from typing import Callable, Dict
+from typing import Callable
 
 import datasets
 import numpy as np
