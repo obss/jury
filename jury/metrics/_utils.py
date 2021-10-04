@@ -9,6 +9,13 @@ import numpy as np
 import requests
 
 
+def warn_requirement(metric_name: str, package_name: str) -> None:
+    warnings.warn(
+        f"In order to use metric '{metric_name}', '{package_name}' is required. "
+        f"You can install the package by `pip install {package_name}`."
+    )
+
+
 def download(source: str, destination: str, overwrite: bool = False, warn: bool = False) -> None:
     if os.path.exists(destination) and not overwrite:
         if warn:

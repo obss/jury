@@ -20,7 +20,6 @@ import functools
 from contextlib import contextmanager
 from typing import Dict, List
 
-import bert_score
 import datasets
 import numpy as np
 import pandas as pd
@@ -28,6 +27,12 @@ from packaging import version
 
 from jury.collator import Collator
 from jury.metrics._base import Metric
+from jury.metrics._utils import warn_requirement
+
+try:
+    import bert_score
+except ImportError:
+    warn_requirement(metric_name="Bertscore", package_name="bert-score")
 
 __class_names__ = {"bertscore": "Bertscore"}
 

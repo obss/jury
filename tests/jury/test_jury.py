@@ -34,6 +34,12 @@ def test_evaluate_basic_str_input(predictions, references, jury_str):
     assert all([scores[metric.resulting_name] is not None for metric in jury_str.metrics])
 
 
+def test_evaluate_datasets_metric(predictions, references, jury_datasets):
+    scores = jury_datasets.evaluate(predictions=predictions, references=references)
+
+    assert all([scores[metric.resulting_name] is not None for metric in jury_datasets.metrics])
+
+
 def test_evaluate_corpus(single_prediction_array, multiple_references, jury):
     scores = jury.evaluate(predictions=single_prediction_array, references=multiple_references)
 

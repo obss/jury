@@ -21,20 +21,20 @@ _TEST_METRICS = [
     load_metric("squad"),
 ]
 
-_CONCURRENT_TEST_METRICS = [
-    load_metric("accuracy"),
-    load_metric("bertscore", params={"model_type": "albert-base-v1", "device": "cpu"}),
-    load_metric("bleu"),
-    load_metric("f1"),
-    load_metric("meteor"),
-    load_metric("precision"),
-    load_metric("recall"),
-    load_metric("rouge"),
-    load_metric("sacrebleu"),
-    load_metric("squad"),
+_STR_TEST_METRICS = [
+    "accuracy",
+    "bertscore",
+    "bleu",
+    "f1",
+    "meteor",
+    "precision",
+    "recall",
+    "rouge",
+    "sacrebleu",
+    "squad",
 ]
 
-_STR_TEST_METRICS = ["bleu", "meteor", "rouge", "sacrebleu", "squad", "wer"]
+_DATASETS_METRICS = ["wer"]
 
 
 @pytest.fixture(scope="package")
@@ -81,8 +81,13 @@ def jury_str():
 
 
 @pytest.fixture(scope="function")
+def jury_datasets():
+    return Jury(metrics=_DATASETS_METRICS)
+
+
+@pytest.fixture(scope="function")
 def jury_concurrent():
-    return Jury(metrics=_CONCURRENT_TEST_METRICS, run_concurrent=True)
+    return Jury(metrics=_TEST_METRICS, run_concurrent=True)
 
 
 def json_load(path: str):

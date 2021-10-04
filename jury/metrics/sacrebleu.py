@@ -21,13 +21,17 @@ import math
 from typing import Callable, Dict, Sequence
 
 import datasets
-import sacrebleu as scb
-from packaging import version
 
 from jury.collator import Collator
 from jury.metrics._base import Metric
-from jury.metrics._utils import get_token_lengths
+from jury.metrics._utils import get_token_lengths, warn_requirement
 from jury.tokenizer import BLEUDefaultTokenizer
+
+try:
+    import sacrebleu as scb
+    from packaging import version
+except ImportError:
+    warn_requirement(metric_name="Sacrebleu", package_name="sacrebleu")
 
 __class_names__ = {"sacrebleu": "Sacrebleu"}
 
