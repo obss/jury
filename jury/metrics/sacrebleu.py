@@ -30,7 +30,7 @@ from jury.tokenizer import BLEUDefaultTokenizer
 try:
     import sacrebleu as scb
     from packaging import version
-except ImportError:
+except ModuleNotFoundError:
     warn_requirement(metric_name="Sacrebleu", package_name="sacrebleu")
 
 __class_names__ = {"sacrebleu": "Sacrebleu"}

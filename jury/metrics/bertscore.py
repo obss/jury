@@ -31,7 +31,7 @@ from jury.metrics._utils import warn_requirement
 
 try:
     import bert_score
-except ImportError:
+except ModuleNotFoundError:
     warn_requirement(metric_name="Bertscore", package_name="bert-score")
 
 __class_names__ = {"bertscore": "Bertscore"}
