@@ -9,8 +9,13 @@ import numpy as np
 import requests
 
 
-def warn_requirement(metric_name: str, package_name: str) -> None:
-    warnings.warn(
+class PackagePlaceholder:
+    def __init__(self, version: str):
+        self.__version__ = version
+
+
+def requirement_message(metric_name: str, package_name: str) -> str:
+    return (
         f"In order to use metric '{metric_name}', '{package_name}' is required. "
         f"You can install the package by `pip install {package_name}`."
     )

@@ -91,7 +91,7 @@ class Metric(datasets.Metric, ABC):
     def __init__(self, resulting_name: Optional[str] = None, params: Optional[Dict[str, Any]] = None, **kwargs):
         super().__init__(**kwargs)
         self.resulting_name = resulting_name if resulting_name is not None else self.name
-        self.params = params if params is not None else {}
+        self.params = params or {}
         if "reduce_fn" not in self.params:
             self.params.update({"reduce_fn": "max"})
         self.download_and_prepare()

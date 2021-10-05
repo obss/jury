@@ -25,13 +25,11 @@ from packaging import version
 
 from jury.collator import Collator
 from jury.metrics._base import Metric
-from jury.metrics._utils import get_token_lengths, warn_requirement
+from jury.metrics._utils import PackagePlaceholder, get_token_lengths, requirement_message
 from jury.tokenizer import BLEUDefaultTokenizer
 
-try:
-    import sacrebleu as scb
-except ModuleNotFoundError:
-    warn_requirement(metric_name="Sacrebleu", package_name="sacrebleu")
+# `import sacrebleu as scb` placeholder
+scb = PackagePlaceholder(version="2.0.0")
 
 __class_names__ = {"sacrebleu": "Sacrebleu"}
 
@@ -103,6 +101,15 @@ Examples:
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class Sacrebleu(Metric):
+    def _download_and_prepare(self, dl_manager):
+        global scb
+        try:
+            import sacrebleu as scb
+        except ModuleNotFoundError:
+            raise ModuleNotFoundError(requirement_message(metric_name="Sacrebleu", package_name="sacrebleu"))
+        else:
+            super(Sacrebleu, self)._download_and_prepare(dl_manager)
+
     def _info(self):
         if version.parse(scb.__version__) < version.parse("1.4.12"):
             raise ImportWarning(

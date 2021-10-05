@@ -27,12 +27,10 @@ from packaging import version
 
 from jury.collator import Collator
 from jury.metrics._base import Metric
-from jury.metrics._utils import warn_requirement
+from jury.metrics._utils import PackagePlaceholder, requirement_message
 
-try:
-    import bert_score
-except ModuleNotFoundError:
-    warn_requirement(metric_name="Bertscore", package_name="bert-score")
+# `import bert_score` placeholder
+bert_score = PackagePlaceholder(version="0.3.10")
 
 __class_names__ = {"bertscore": "Bertscore"}
 
@@ -120,6 +118,16 @@ Examples:
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class Bertscore(Metric):
+    def _download_and_prepare(self, dl_manager):
+        global bert_score
+
+        try:
+            import bert_score
+        except ModuleNotFoundError:
+            raise ModuleNotFoundError(requirement_message(metric_name="Bertscore", package_name="bert-score"))
+        else:
+            super(Bertscore, self)._download_and_prepare(dl_manager)
+
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,
