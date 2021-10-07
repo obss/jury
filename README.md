@@ -45,7 +45,7 @@ It is only two lines of code to evaluate generated outputs.
 
     from jury import Jury
     
-    evaluator = Jury()
+    scorer = Jury()
     predictions = [
         ["the cat is on the mat", "There is cat playing on the mat"], 
         ["Look!    a wonderful day."]
@@ -54,12 +54,12 @@ It is only two lines of code to evaluate generated outputs.
         ["the cat is playing on the mat.", "The cat plays on the mat."], 
         ["Today is a wonderful day", "The weather outside is wonderful."]
     ]
-    scores = evaluator.evaluate(predictions=predictions, references=references)
+    scores = scorer(predictions=predictions, references=references)
 
 Specify metrics you want to use on instantiation.
 
-    jury = Jury(metrics=["bleu", "meteor"])
-    scores = jury.evaluate(predictions, references)
+    scorer = Jury(metrics=["bleu", "meteor"])
+    scores = scorer(predictions, references)
 
 #### Use of Metrics standalone
 

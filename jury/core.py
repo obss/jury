@@ -33,7 +33,7 @@ class Jury:
             ["Today is a wonderful day", "The weather outside is wonderful."]
         ]
         >>> evaluation = Jury()
-        >>> results = evaluation.evaluate(predictions=predictions, references=references)
+        >>> results = evaluation(predictions=predictions, references=references)
         >>> print(results)
         {'bleu_1': 0.6111111111111112, ..., 'rougeL': 0.6470588235294118, ...}
     """
@@ -52,6 +52,37 @@ class Jury:
 
         self.metrics = MetricCollator(metrics)
         self._concurrent = run_concurrent
+
+    def __call__(
+        self,
+        *,
+        predictions: Union[List[str], List[List[str]]] = None,
+        references: Union[List[str], List[List[str]]] = None,
+        reduce_fn: Optional[Union[str, Callable]] = None,
+    ) -> Dict[str, float]:
+        """Restricts positional arguments to prevent potential inconsistency between predictions and references."""
+        if predictions is None or references is None:
+            raise TypeError("Both predictions and references have to be passed.")
+        if len(predictions) != len(references):
+            raise ValueError("Lengths of predictions and references must be equal.")
+
+        metrics = dict()
+        metrics["empty_predictions"] = len([1 for p in predictions if not p])
+        metrics["total_items"] = len(references)
+
+        if self._concurrent:
+            inputs_list = self._prepare_concurrent_inputs(predictions, references, reduce_fn)
+            set_env("TOKENIZERS_PARALLELISM", "true")
+            with ProcessPoolExecutor() as executor:
+                for score in executor.map(self._compute_single_score, inputs_list):
+                    metrics.update(score)
+        else:
+            for metric in self.metrics:
+                inputs = (metric, predictions, references, reduce_fn)
+                score = self._compute_single_score(inputs)
+                metrics.update(score)
+
+        return metrics
 
     def _score_to_dict(self, score, name: str) -> Dict[str, float]:
         if isinstance(score, dict):
@@ -83,25 +114,5 @@ class Jury:
         references: Union[List[str], List[List[str]]] = None,
         reduce_fn: Optional[Union[str, Callable]] = None,
     ) -> Dict[str, float]:
-        if predictions is None or references is None:
-            raise TypeError("Both predictions and references have to be passed.")
-        if len(predictions) != len(references):
-            raise ValueError("Lengths of predictions and references must be equal.")
-
-        metrics = dict()
-        metrics["empty_predictions"] = len([1 for p in predictions if not p])
-        metrics["total_items"] = len(references)
-
-        if self._concurrent:
-            inputs_list = self._prepare_concurrent_inputs(predictions, references, reduce_fn)
-            set_env("TOKENIZERS_PARALLELISM", "true")
-            with ProcessPoolExecutor() as executor:
-                for score in executor.map(self._compute_single_score, inputs_list):
-                    metrics.update(score)
-        else:
-            for metric in self.metrics:
-                inputs = (metric, predictions, references, reduce_fn)
-                score = self._compute_single_score(inputs)
-                metrics.update(score)
-
-        return metrics
+        """Returns __call__() method. For backward compatibility."""
+        return self.__call__(predictions=predictions, references=references, reduce_fn=reduce_fn)

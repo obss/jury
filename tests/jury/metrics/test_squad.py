@@ -50,15 +50,15 @@ def output_multiple_pred_multiple_ref():
 
 
 def test_basic(predictions, references, jury, output_basic):
-    scores = jury.evaluate(predictions=predictions, references=references)
+    scores = jury(predictions=predictions, references=references)
     assert_almost_equal_dict(actual=scores, desired=output_basic)
 
 
 def test_multiple_ref(predictions, multiple_references, jury, output_multiple_ref):
-    scores = jury.evaluate(predictions=predictions, references=multiple_references)
+    scores = jury(predictions=predictions, references=multiple_references)
     assert_almost_equal_dict(actual=scores, desired=output_multiple_ref)
 
 
 def test_multiple_pred_multiple_ref(multiple_predictions, multiple_references, jury, output_multiple_pred_multiple_ref):
-    scores = jury.evaluate(predictions=multiple_predictions, references=multiple_references)
+    scores = jury(predictions=multiple_predictions, references=multiple_references)
     assert_almost_equal_dict(actual=scores, desired=output_multiple_pred_multiple_ref)

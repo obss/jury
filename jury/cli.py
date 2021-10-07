@@ -40,7 +40,7 @@ def from_file(predictions: str, references: str, reduce_fn: Optional[str] = None
     predictions = read_file(predictions)
     references = read_file(references)
     jury = Jury(metrics=metrics)
-    scores = jury.evaluate(predictions=predictions, references=references, reduce_fn=reduce_fn)
+    scores = jury(predictions=predictions, references=references, reduce_fn=reduce_fn)
     print(json.dumps(scores, default=str, indent=4))
 
 
