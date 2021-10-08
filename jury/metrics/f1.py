@@ -96,7 +96,10 @@ class F1(Metric):
         predictions, references = predictions.nested(), references.nested()
         recall_score = recall.compute(predictions=predictions, references=references)["recall"]["score"]
         precision_score = precision.compute(predictions=predictions, references=references)["precision"]["score"]
-        f1 = (2 * recall_score * precision_score) / (recall_score + precision_score)
+        try:
+            f1 = (2 * recall_score * precision_score) / (recall_score + precision_score)
+        except ZeroDivisionError:
+            return {"score": 0.0}
         return {"score": f1}
 
     def _compute_single_pred_multi_ref(
