@@ -39,9 +39,10 @@ _LIST_STR_TEST_METRICS = [
 _LIST_DICT_TEST_METRICS = [
     {"metric_name": "accuracy"},
     {"metric_name": "bertscore", "model_type": "albert-base-v1"},
-    {"metric_name": "bleu", "max_order": 1},
-    {"metric_name": "f1"},
-    {"metric_name": "meteor"},
+    {"metric_name": "bleu", "resulting_name": "bleu-1", "max_order": 1},
+    {"metric_name": "bleu", "resulting_name": "bleu-2", "max_order": 2},
+    {"metric_name": "f1", "resulting_name": "F1"},
+    {"metric_name": "meteor", "resulting_name": "METEOR"},
     {"metric_name": "precision"},
     {"metric_name": "recall"},
     {"metric_name": "rouge"},

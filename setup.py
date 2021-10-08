@@ -50,7 +50,7 @@ add_pywin(_METRIC_REQUIREMENTS)
 
 extras = {
     "metrics": _METRIC_REQUIREMENTS,
-    "develop": _DEV_REQUIREMENTS + _METRIC_REQUIREMENTS,
+    "dev": _DEV_REQUIREMENTS + _METRIC_REQUIREMENTS,
 }
 
 

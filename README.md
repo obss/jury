@@ -154,7 +154,7 @@ PRs are welcomed as always :)
 
     git clone https://github.com/obss/jury.git
     cd jury
-    pip install -e .[develop]
+    pip install -e .[dev]
 
 ### Tests
 
