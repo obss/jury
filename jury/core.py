@@ -1,12 +1,13 @@
 from concurrent.futures import ProcessPoolExecutor
-from typing import Callable, Dict, List, Mapping, Optional, Union
-
-import datasets
+from typing import Callable, Dict, List, Mapping, Optional, Union, Any
 
 from jury.collator import Collator
 from jury.definitions import DEFAULT_METRICS
 from jury.metrics import Metric, MetricCollator, load_metric
 from jury.utils import replace, set_env
+
+
+MetricParams = Union[str, List[str], Dict[str, Any]]
 
 
 class Jury:
@@ -43,14 +44,7 @@ class Jury:
         metrics: Optional[Union[List[str], List[Metric]]] = None,
         run_concurrent=False,
     ):
-        if metrics is None:
-            metrics = DEFAULT_METRICS
-        else:
-            for i, m in enumerate(metrics):
-                if isinstance(m, str):
-                    metrics = replace(metrics, load_metric(m.lower()), i)
-
-        self.metrics = MetricCollator(metrics)
+        self.metrics = self._load_metrics(metrics)
         self._concurrent = run_concurrent
 
     def __call__(
@@ -83,6 +77,16 @@ class Jury:
                 metrics.update(score)
 
         return metrics
+
+    def _load_metrics(self, metrics: MetricParams) -> MetricCollator:
+        # TODO: Implement load metrics with multiple supprorts.
+        if metrics is None:
+            metrics = DEFAULT_METRICS
+        else:
+            for i, m in enumerate(metrics):
+                if isinstance(m, str):
+                    metrics = replace(metrics, load_metric(m.lower()), i)
+        return MetricCollator(metrics)
 
     def _score_to_dict(self, score, name: str) -> Dict[str, float]:
         if isinstance(score, dict):
