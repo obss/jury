@@ -34,6 +34,24 @@ def test_evaluate_basic_str_input(predictions, references, jury_str):
     assert all([scores[metric.resulting_name] is not None for metric in jury_str.metrics])
 
 
+def test_evaluate_basic_list_str_input(predictions, references, jury_list_str):
+    scores = jury_list_str(predictions=predictions, references=references)
+
+    assert all([scores[metric.resulting_name] is not None for metric in jury_list_str.metrics])
+
+
+def test_evaluate_basic_list_dict_input(predictions, references, jury_list_dict):
+    scores = jury_list_dict(predictions=predictions, references=references)
+
+    assert all([scores[metric.resulting_name] is not None for metric in jury_list_dict.metrics])
+
+
+def test_evaluate_basic_list_mixed_input(predictions, references, jury_list_mixed):
+    scores = jury_list_mixed(predictions=predictions, references=references)
+
+    assert all([scores[metric.resulting_name] is not None for metric in jury_list_mixed.metrics])
+
+
 def test_evaluate_datasets_metric(predictions, references, jury_datasets):
     scores = jury_datasets(predictions=predictions, references=references)
 

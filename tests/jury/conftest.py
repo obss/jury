@@ -21,7 +21,9 @@ _TEST_METRICS = [
     load_metric("squad"),
 ]
 
-_STR_TEST_METRICS = [
+_STR_TEST_METRIC = "bleu"
+
+_LIST_STR_TEST_METRICS = [
     "accuracy",
     "bertscore",
     "bleu",
@@ -33,6 +35,33 @@ _STR_TEST_METRICS = [
     "sacrebleu",
     "squad",
 ]
+
+_LIST_DICT_TEST_METRICS = [
+    {"metric_name": "accuracy"},
+    {"metric_name": "bertscore", "model_type": "albert-base-v1"},
+    {"metric_name": "bleu", "max_order": 1},
+    {"metric_name": "f1"},
+    {"metric_name": "meteor"},
+    {"metric_name": "precision"},
+    {"metric_name": "recall"},
+    {"metric_name": "rouge"},
+    {"metric_name": "sacrebleu"},
+    {"metric_name": "squad"},
+]
+
+_LIST_MIXED_TEST_METRICS = [
+    "accuracy",
+    "bertscore",
+    "bleu",
+    {"metric_name": "f1"},
+    {"metric_name": "meteor"},
+    {"metric_name": "precision"},
+    "recall",
+    "rouge",
+    {"metric_name": "sacrebleu"},
+    {"metric_name": "squad"},
+]
+
 
 _DATASETS_METRICS = ["wer"]
 
@@ -76,18 +105,33 @@ def jury():
 
 
 @pytest.fixture(scope="function")
+def jury_concurrent():
+    return Jury(metrics=_TEST_METRICS, run_concurrent=True)
+
+
+@pytest.fixture(scope="function")
 def jury_str():
-    return Jury(metrics=_STR_TEST_METRICS)
+    return Jury(metrics=_STR_TEST_METRIC)
+
+
+@pytest.fixture(scope="function")
+def jury_list_str():
+    return Jury(metrics=_LIST_STR_TEST_METRICS)
+
+
+@pytest.fixture(scope="function")
+def jury_list_dict():
+    return Jury(metrics=_LIST_DICT_TEST_METRICS)
+
+
+@pytest.fixture(scope="function")
+def jury_list_mixed():
+    return Jury(metrics=_LIST_MIXED_TEST_METRICS)
 
 
 @pytest.fixture(scope="function")
 def jury_datasets():
     return Jury(metrics=_DATASETS_METRICS)
-
-
-@pytest.fixture(scope="function")
-def jury_concurrent():
-    return Jury(metrics=_TEST_METRICS, run_concurrent=True)
 
 
 def json_load(path: str):

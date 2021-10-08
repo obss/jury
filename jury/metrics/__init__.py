@@ -1,4 +1,4 @@
-from jury.metrics._base import Metric, MetricCollator, load_metric
+from jury.metrics._base import Metric, load_metric
 from jury.metrics.accuracy import Accuracy
 from jury.metrics.bertscore import Bertscore
 from jury.metrics.bleu import Bleu
@@ -17,7 +17,6 @@ __all__ = [
     "F1",
     "Meteor",
     "Metric",
-    "MetricCollator",
     "Precision",
     "Recall",
     "Rouge",

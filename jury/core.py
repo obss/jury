@@ -1,13 +1,12 @@
 from concurrent.futures import ProcessPoolExecutor
-from typing import Callable, Dict, List, Mapping, Optional, Union, Any
+from typing import Any, Callable, Dict, List, Mapping, Optional, Union
 
 from jury.collator import Collator
 from jury.definitions import DEFAULT_METRICS
-from jury.metrics import Metric, MetricCollator, load_metric
+from jury.metrics import Metric, load_metric
 from jury.utils import replace, set_env
 
-
-MetricParams = Union[str, List[str], Dict[str, Any]]
+MetricParam = Union[str, Metric, Dict[str, Any]]
 
 
 class Jury:
@@ -41,7 +40,7 @@ class Jury:
 
     def __init__(
         self,
-        metrics: Optional[Union[List[str], List[Metric]]] = None,
+        metrics: Optional[Union[MetricParam, List[MetricParam]]] = None,
         run_concurrent=False,
     ):
         self.metrics = self._load_metrics(metrics)
@@ -60,33 +59,57 @@ class Jury:
         if len(predictions) != len(references):
             raise ValueError("Lengths of predictions and references must be equal.")
 
-        metrics = dict()
-        metrics["empty_predictions"] = len([1 for p in predictions if not p])
-        metrics["total_items"] = len(references)
+        scores = dict()
+        scores["empty_predictions"] = len([1 for p in predictions if not p])
+        scores["total_items"] = len(references)
 
         if self._concurrent:
             inputs_list = self._prepare_concurrent_inputs(predictions, references, reduce_fn)
             set_env("TOKENIZERS_PARALLELISM", "true")
             with ProcessPoolExecutor() as executor:
                 for score in executor.map(self._compute_single_score, inputs_list):
-                    metrics.update(score)
+                    scores.update(score)
         else:
             for metric in self.metrics:
                 inputs = (metric, predictions, references, reduce_fn)
                 score = self._compute_single_score(inputs)
-                metrics.update(score)
+                scores.update(score)
 
-        return metrics
+        return scores
 
-    def _load_metrics(self, metrics: MetricParams) -> MetricCollator:
-        # TODO: Implement load metrics with multiple supprorts.
+    def _load_single_metric(self, metric_name: Union[str, Metric]) -> List[Metric]:
+        metric = load_metric(metric_name)
+        return [metric]
+
+    def _load_multiple_metrics(
+        self, metric_params: Union[List[str], List[Dict[str, Any]], List[Metric]]
+    ) -> List[Metric]:
+        for i, metric_param in enumerate(metric_params):
+            if isinstance(metric_param, str):
+                metric_name = metric_param
+                metric_params = replace(metric_params, load_metric(metric_name.lower()), i)
+            elif isinstance(metric_param, dict):
+                metric_name = metric_param.pop("metric_name")  # must be given
+                resulting_name = metric_param.pop("resulting_name") if "resulting_name" in metric_param else None
+                params = metric_param
+                metric_params = replace(
+                    metric_params, load_metric(metric_name=metric_name, resulting_name=resulting_name, params=params), i
+                )
+            elif isinstance(metric_param, Metric):
+                continue
+        return metric_params
+
+    def _load_metrics(self, metrics: Union[MetricParam, List[MetricParam]]) -> List[Metric]:
         if metrics is None:
             metrics = DEFAULT_METRICS
+        elif isinstance(metrics, (str, Metric)):
+            metrics = self._load_single_metric(metrics)
+        elif isinstance(metrics, list):
+            metrics = self._load_multiple_metrics(metrics)
         else:
-            for i, m in enumerate(metrics):
-                if isinstance(m, str):
-                    metrics = replace(metrics, load_metric(m.lower()), i)
-        return MetricCollator(metrics)
+            raise ValueError(f"Unknown input type {type(metrics)}")
+
+        return metrics
 
     def _score_to_dict(self, score, name: str) -> Dict[str, float]:
         if isinstance(score, dict):
@@ -110,6 +133,19 @@ class Jury:
         for metric in self.metrics:
             inputs.append((metric, predictions, references, reduce_fn))
         return inputs
+
+    def add_metric(self, metric_name: str, resulting_name: str = None, params: Dict = None) -> None:
+        metric = load_metric(metric_name, resulting_name=resulting_name, params=params)
+        self.metrics.append(metric)
+
+    def remove_metric(self, resulting_name: str, error: bool = True) -> None:
+        for i, metric in enumerate(self.metrics):
+            if metric.resulting_name == resulting_name:
+                self.metrics.pop(i)
+                return
+        if error:
+            # raise an error if resulting_metric is not found
+            raise ValueError(f"Metric with resulting name {resulting_name} does not exists.")
 
     def evaluate(
         self,

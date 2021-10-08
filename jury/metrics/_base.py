@@ -206,29 +206,3 @@ class Metric(datasets.Metric, ABC):
 
         predictions, references = self._preprocess(predictions, references)
         return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)
-
-
-class MetricCollator(list):
-    def __init__(self, metrics: Union[List[str], List[Metric]]):
-        metrics = self._constructor(metrics)
-        super(MetricCollator, self).__init__(metrics)
-
-    def _constructor(self, metrics: Union[List[str], List[Metric]]) -> list:
-        _type = NestedSingleType.get_type(metrics)
-        if _type == "list<str>":
-            _metrics = []
-            for metric in metrics:
-                _metrics.append(load_metric(metric))
-            metrics = _metrics
-        return metrics
-
-    def add_metric(self, metric_name: str, resulting_name: str = None, params: Dict = None) -> None:
-        metric = load_metric(metric_name, resulting_name=resulting_name, params=params)
-        self.append(metric)
-
-    def remove_metric(self, resulting_name: str) -> None:
-        for i, metric in enumerate(self):
-            if metric.resulting_name == resulting_name:
-                self.pop(i)
-                break
-        raise ValueError(f"Metric with resulting name {resulting_name} does not exists.")
