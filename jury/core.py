@@ -82,9 +82,7 @@ class Jury:
             metric = load_metric(metric)
         return [metric]
 
-    def _load_multiple_metrics(
-        self, metrics: Union[List[str], List[Dict[str, Any]], List[Metric]]
-    ) -> List[Metric]:
+    def _load_multiple_metrics(self, metrics: Union[List[str], List[Dict[str, Any]], List[Metric]]) -> List[Metric]:
         for i, metric_param in enumerate(metrics):
             if isinstance(metric_param, str):
                 metric_name = metric_param

@@ -17,6 +17,7 @@ def output_evaluate_concurrent():
 def output_evaluate():
     return output_evaluate.output
 
+
 @pytest.fixture
 @get_expected_output(prefix=None)
 def output_evaluate_str_input():
@@ -113,7 +114,9 @@ def test_evaluate_corpus(single_prediction_array, multiple_references, jury, out
     assert_almost_equal_dict(actual=scores, desired=output_evaluate_corpus)
 
 
-def test_evaluate_multiple_predictions(multiple_predictions, multiple_references, jury, output_evaluate_multiple_predictions):
+def test_evaluate_multiple_predictions(
+    multiple_predictions, multiple_references, jury, output_evaluate_multiple_predictions
+):
     scores = jury(predictions=multiple_predictions, references=multiple_references)
     assert_almost_equal_dict(actual=scores, desired=output_evaluate_multiple_predictions)
 
