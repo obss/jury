@@ -62,7 +62,9 @@ def output_evaluate_multiple_predictions():
 
 def test_evaluate_concurrent(predictions, references, jury_concurrent, output_evaluate_concurrent):
     scores = jury_concurrent(predictions=predictions, references=references)
-    assert_almost_equal_dict(actual=scores, desired=output_evaluate_concurrent)
+    assert_almost_equal_dict(
+        actual=scores, desired=output_evaluate_concurrent, exclude_paths="root['bertscore']['hashcode']"
+    )
 
 
 def test_evaluate_no_input(predictions, references, jury):
@@ -78,10 +80,9 @@ def test_evaluate_inconsistent_input(inconsistent_predictions, references, jury)
         jury(predictions=inconsistent_predictions, references=references)
 
 
-def test_evaluate(predictions, references, jury):
+def test_evaluate(predictions, references, jury, output_evaluate):
     scores = jury(predictions=predictions, references=references)
-
-    assert all([scores[metric.resulting_name] is not None for metric in jury.metrics])
+    assert_almost_equal_dict(actual=scores, desired=output_evaluate, exclude_paths="root['bertscore']['hashcode']")
 
 
 def test_evaluate_str_input(predictions, references, jury_str, output_evaluate_str_input):
@@ -91,17 +92,23 @@ def test_evaluate_str_input(predictions, references, jury_str, output_evaluate_s
 
 def test_evaluate_list_str_input(predictions, references, jury_list_str, output_evaluate_list_str_input):
     scores = jury_list_str(predictions=predictions, references=references)
-    assert_almost_equal_dict(actual=scores, desired=output_evaluate_list_str_input)
+    assert_almost_equal_dict(
+        actual=scores, desired=output_evaluate_list_str_input, exclude_paths="root['bertscore']['hashcode']"
+    )
 
 
 def test_evaluate_list_dict_input(predictions, references, jury_list_dict, output_evaluate_list_dict_input):
     scores = jury_list_dict(predictions=predictions, references=references)
-    assert_almost_equal_dict(actual=scores, desired=output_evaluate_list_dict_input)
+    assert_almost_equal_dict(
+        actual=scores, desired=output_evaluate_list_dict_input, exclude_paths="root['bertscore']['hashcode']"
+    )
 
 
 def test_evaluate_list_mixed_input(predictions, references, jury_list_mixed, output_evaluate_list_mixed_input):
     scores = jury_list_mixed(predictions=predictions, references=references)
-    assert_almost_equal_dict(actual=scores, desired=output_evaluate_list_mixed_input)
+    assert_almost_equal_dict(
+        actual=scores, desired=output_evaluate_list_mixed_input, exclude_paths="root['bertscore']['hashcode']"
+    )
 
 
 def test_evaluate_datasets_metric(predictions, references, jury_datasets, output_evaluate_datasets_metric):
@@ -111,14 +118,18 @@ def test_evaluate_datasets_metric(predictions, references, jury_datasets, output
 
 def test_evaluate_corpus(single_prediction_array, multiple_references, jury, output_evaluate_corpus):
     scores = jury(predictions=single_prediction_array, references=multiple_references)
-    assert_almost_equal_dict(actual=scores, desired=output_evaluate_corpus)
+    assert_almost_equal_dict(
+        actual=scores, desired=output_evaluate_corpus, exclude_paths="root['bertscore']['hashcode']"
+    )
 
 
 def test_evaluate_multiple_predictions(
     multiple_predictions, multiple_references, jury, output_evaluate_multiple_predictions
 ):
     scores = jury(predictions=multiple_predictions, references=multiple_references)
-    assert_almost_equal_dict(actual=scores, desired=output_evaluate_multiple_predictions)
+    assert_almost_equal_dict(
+        actual=scores, desired=output_evaluate_multiple_predictions, exclude_paths="root['bertscore']['hashcode']"
+    )
 
 
 def test_reduce_fn(predictions, references, jury):
