@@ -43,53 +43,64 @@ or build from source,
 
 It is only two lines of code to evaluate generated outputs.
 
-    from jury import Jury
-    
-    scorer = Jury()
-    predictions = [
-        ["the cat is on the mat", "There is cat playing on the mat"], 
-        ["Look!    a wonderful day."]
-    ]
-    references = [
-        ["the cat is playing on the mat.", "The cat plays on the mat."], 
-        ["Today is a wonderful day", "The weather outside is wonderful."]
-    ]
-    scores = scorer(predictions=predictions, references=references)
+```python
+from jury import Jury
+
+scorer = Jury()
+predictions = [
+    ["the cat is on the mat", "There is cat playing on the mat"], 
+    ["Look!    a wonderful day."]
+]
+references = [
+    ["the cat is playing on the mat.", "The cat plays on the mat."], 
+    ["Today is a wonderful day", "The weather outside is wonderful."]
+]
+scores = scorer(predictions=predictions, references=references)
+```
 
 Specify metrics you want to use on instantiation.
 
-    scorer = Jury(metrics=["bleu", "meteor"])
-    scores = scorer(predictions, references)
+```python
+scorer = Jury(metrics=["bleu", "meteor"])
+scores = scorer(predictions, references)
+```
 
 #### Use of Metrics standalone
 
 You can directly import metrics from `jury.metrics` as classes, and then instantiate and use as desired.
 
-    from jury.metrics import Bleu
-    bleu = Bleu()
-    score = bleu.compute(predictions=predictions, references=references)
+```python
+from jury.metrics import Bleu
+
+bleu = Bleu()
+score = bleu.compute(predictions=predictions, references=references)
+```
 
 The additional parameters can either be specified on `compute()`
 
-    from jury.metrics import Bleu
+```python
+from jury.metrics import Bleu
 
-    bleu = Bleu()
-    score = bleu.compute(predictions=predictions, references=references, max_order=4)
+bleu = Bleu()
+score = bleu.compute(predictions=predictions, references=references, max_order=4)
+```
 
 , or alternatively on instantiation
 
-    bleu = Bleu(params={"max_order": 1})
-
+```python
+bleu = Bleu(params={"max_order": 1})
+```
 
 Note that you can seemlessly access both `jury` and `datasets` metrics through `jury.load_metric`. 
 
-    import jury
-    
-    bleu = jury.load_metric("bleu")
-    bleu_1 = jury.load_metric("bleu", resulting_name="bleu_1", params={"max_order": 1})
-    # metrics not available in `jury` but in `datasets`
-    wer = jury.load_metric("wer") # It falls back to `datasets` package with a warning
+```python
+import jury
 
+bleu = jury.load_metric("bleu")
+bleu_1 = jury.load_metric("bleu", resulting_name="bleu_1", params={"max_order": 1})
+# metrics not available in `jury` but in `datasets`
+wer = jury.load_metric("wer") # It falls back to `datasets` package with a warning
+```
 
 ### CLI Usage
 
@@ -127,6 +138,7 @@ Jury itself uses `datasets.Metric` as a base class to drive its own base class a
 
 As a custom metric both base classes can be used; however, we strongly recommend using `jury.metrics.Metric` as it has several advantages such as supporting computations for the input types above or unifying the type of the input.
 
+```python
     from jury.metrics import Metric
     
     class CustomMetric(Metric):
@@ -143,6 +155,7 @@ As a custom metric both base classes can be used; however, we strongly recommend
     def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs
     ):
         raise NotImplementedError
+```
 
 For more details, have a look at base metric implementation [jury.metrics.Metric](./jury/metrics/_base.py)
 
