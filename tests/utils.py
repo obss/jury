@@ -46,8 +46,8 @@ def print_console_centered(text: str, fill_char="="):
     print(f" {text} ".center(w, fill_char))
 
 
-def assert_almost_equal_dict(actual: Dict, desired: Dict, decimal=5):
-    assert DeepDiff(actual, desired, significant_digits=decimal) == {}
+def assert_almost_equal_dict(actual: Dict, desired: Dict, decimal=5, exclude_paths=None):
+    assert DeepDiff(actual, desired, significant_digits=decimal, exclude_paths=exclude_paths) == {}
 
 
 def shell_capture(command, out_json=True):

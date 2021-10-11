@@ -1,14 +1,14 @@
 import pytest
 
 from jury import Jury
-from jury.metrics.bleu import Bleu
+from jury.metrics import Accuracy
 from tests.jury.conftest import get_expected_output
 from tests.utils import assert_almost_equal_dict
 
 
 @pytest.fixture(scope="module")
 def jury():
-    return Jury(metrics=[Bleu()])
+    return Jury(metrics=[Accuracy()])
 
 
 @pytest.fixture

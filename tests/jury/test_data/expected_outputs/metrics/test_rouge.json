@@ -1,0 +1,32 @@
+{
+  "basic": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "rouge": {
+      "rouge1": 0.6904761904761905,
+      "rouge2": 0.45238095238095244,
+      "rougeL": 0.619047619047619,
+      "rougeLsum": 0.619047619047619
+    }
+  },
+  "multiple_ref": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "rouge": {
+      "rouge1": 0.6904761904761905,
+      "rouge2": 0.4675324675324676,
+      "rougeL": 0.641025641025641,
+      "rougeLsum": 0.641025641025641
+    }
+  },
+  "multiple_pred_multiple_ref": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "rouge": {
+      "rouge1": 0.7783882783882783,
+      "rouge2": 0.5925324675324675,
+      "rougeL": 0.7426739926739926,
+      "rougeLsum": 0.7426739926739926
+    }
+  }
+}

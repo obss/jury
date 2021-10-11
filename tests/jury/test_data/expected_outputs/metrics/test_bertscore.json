@@ -1,0 +1,53 @@
+{
+  "basic": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "bertscore": {
+      "score": 0.7350329756736755,
+      "precision": [
+        0.832823634147644,
+        0.6074944734573364
+      ],
+      "recall": [
+        0.8258962631225586,
+        0.6777912378311157
+      ],
+      "f1": [
+        0.8293454647064209,
+        0.6407204866409302
+      ],
+      "hashcode": "albert-base-v1_L10_no-idf_version=0.3.9(hug_trans=4.9.1)"
+    }
+  },
+  "multiple_ref": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "bertscore": {
+      "score": 0.7350329756736755,
+      "precision": [
+        0.832823634147644,
+        0.6074944734573364
+      ],
+      "recall": [
+        0.8300701379776001,
+        0.6777912378311157
+      ],
+      "f1": [
+        0.8293454647064209,
+        0.6407204866409302
+      ],
+      "hashcode": "albert-base-v1_L10_no-idf_version=0.3.9(hug_trans=4.9.1)"
+    }
+  },
+  "multiple_pred_multiple_ref": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "bertscore": {
+      "score": 0.7485644221305847,
+      "precision": 0.7493639290332794,
+      "recall": 0.7577464580535889,
+      "f1": 0.7485644221305847,
+      "hashcode": "albert-base-v1_L10_no-idf_version=0.3.9(hug_trans=4.9.1)"
+    }
+  }
+}

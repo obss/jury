@@ -1,0 +1,53 @@
+{
+  "basic": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "bleu": {
+      "score": 0.0,
+      "precisions": [
+        0.7272727272727273,
+        0.4444444444444444,
+        0.2857142857142857,
+        0.0
+      ],
+      "brevity_penalty": 0.9131007162822622,
+      "length_ratio": 0.9166666666666666,
+      "translation_length": 11,
+      "reference_length": 12
+    }
+  },
+  "multiple_ref": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "bleu": {
+      "score": 0.0,
+      "precisions": [
+        0.7272727272727273,
+        0.4444444444444444,
+        0.2857142857142857,
+        0.0
+      ],
+      "brevity_penalty": 1.0,
+      "length_ratio": 1.0,
+      "translation_length": 11,
+      "reference_length": 11
+    }
+  },
+  "multiple_pred_multiple_ref": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "bleu": {
+      "score": 0.42370250917168295,
+      "precisions": [
+        0.8823529411764706,
+        0.6428571428571429,
+        0.45454545454545453,
+        0.125
+      ],
+      "brevity_penalty": 1.0,
+      "length_ratio": 1.0,
+      "translation_length": 11,
+      "reference_length": 11
+    }
+  }
+}

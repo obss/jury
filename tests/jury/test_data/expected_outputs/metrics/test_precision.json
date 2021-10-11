@@ -1,0 +1,23 @@
+{
+  "basic": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "precision": {
+      "score": 0.7321428571428572
+    }
+  },
+  "multiple_ref": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "precision": {
+      "score": 0.7321428571428572
+    }
+  },
+  "multiple_pred_multiple_ref": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "precision": {
+      "score": 0.875
+    }
+  }
+}

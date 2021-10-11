@@ -1,17 +1,18 @@
 import numpy as np
 import pytest
 
-from jury.utils import bulk_remove_keys, is_reduce_fn, remove_punctuations
+from jury.metrics._utils import is_reduce_fn
+from jury.utils import bulk_remove_keys, remove_punctuations
 
 
 @pytest.fixture
 def raw_text():
-    return '!*This, a (test); text. Testing: 123 alpha123.  Multiple    spaces     "uneven sizes", and-also-this.'
+    return '!*This\'s, a (test); text. Testing: 123 alpha123.  Multiple    spaces     "uneven sizes", and-also-this.'
 
 
 @pytest.fixture
 def preprocessed_text():
-    return "This a test text Testing 123 alpha123 Multiple spaces uneven sizes and also this"
+    return "This s a test text Testing 123 alpha123 Multiple spaces uneven sizes and also this"
 
 
 def test_remove_punctuations(raw_text, preprocessed_text):

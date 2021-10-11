@@ -1,15 +1,25 @@
-import importlib
-from typing import Dict
+from jury.metrics._base import Metric, load_metric
+from jury.metrics.accuracy import Accuracy
+from jury.metrics.bertscore import Bertscore
+from jury.metrics.bleu import Bleu
+from jury.metrics.f1 import F1
+from jury.metrics.meteor import Meteor
+from jury.metrics.precision import Precision
+from jury.metrics.recall import Recall
+from jury.metrics.rouge import Rouge
+from jury.metrics.sacrebleu import Sacrebleu
+from jury.metrics.squad import Squad
 
-from jury.metrics._base import Metric
-
-
-def load_metric(metric_name: str, resulting_name: str = None, params: Dict = None):
-    # load the module, will raise ImportError if module cannot be loaded
-    metric_name = metric_name.lower()
-    base_name = metric_name.split("_")[0]
-    module_name = f"jury.metrics.{base_name}"
-    m = importlib.import_module(module_name)
-    # get the class, will raise AttributeError if class cannot be found
-    c = getattr(m, m.__class_names__.get(metric_name))
-    return c(resulting_name=resulting_name, params=params)
+__all__ = [
+    "Accuracy",
+    "Bertscore",
+    "Bleu",
+    "F1",
+    "Meteor",
+    "Metric",
+    "Precision",
+    "Recall",
+    "Rouge",
+    "Sacrebleu",
+    "Squad",
+]

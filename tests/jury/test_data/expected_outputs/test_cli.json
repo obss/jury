@@ -1,0 +1,67 @@
+{
+  "cli": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "bleu_1": {
+      "score": 0.29689669509442307,
+      "precisions": [
+        0.6666666666666666,
+        0.38461538461538464,
+        0.2727272727272727,
+        0.1111111111111111
+      ],
+      "brevity_penalty": 1.0,
+      "length_ratio": 1.0714285714285714,
+      "translation_length": 15,
+      "reference_length": 14
+    },
+    "bleu_2": {
+      "score": 0.29689669509442307,
+      "precisions": [
+        0.6666666666666666,
+        0.38461538461538464,
+        0.2727272727272727,
+        0.1111111111111111
+      ],
+      "brevity_penalty": 1.0,
+      "length_ratio": 1.0714285714285714,
+      "translation_length": 15,
+      "reference_length": 14
+    },
+    "bleu_3": {
+      "score": 0.29689669509442307,
+      "precisions": [
+        0.6666666666666666,
+        0.38461538461538464,
+        0.2727272727272727,
+        0.1111111111111111
+      ],
+      "brevity_penalty": 1.0,
+      "length_ratio": 1.0714285714285714,
+      "translation_length": 15,
+      "reference_length": 14
+    },
+    "bleu_4": {
+      "score": 0.29689669509442307,
+      "precisions": [
+        0.6666666666666666,
+        0.38461538461538464,
+        0.2727272727272727,
+        0.1111111111111111
+      ],
+      "brevity_penalty": 1.0,
+      "length_ratio": 1.0714285714285714,
+      "translation_length": 15,
+      "reference_length": 14
+    },
+    "meteor": {
+      "score": 0.6594164989939638
+    },
+    "rouge": {
+      "rouge1": 0.6904761904761905,
+      "rouge2": 0.3974358974358974,
+      "rougeL": 0.6190476190476191,
+      "rougeLsum": 0.6190476190476191
+    }
+  }
+}
