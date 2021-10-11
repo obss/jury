@@ -20,7 +20,7 @@ https://github.com/huggingface/datasets/blob/master/src/datasets/metric.py
 
 import importlib
 import warnings
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import datasets
@@ -30,7 +30,6 @@ from datasets.utils.logging import get_logger
 
 from jury.collator import Collator
 from jury.metrics._utils import import_module, is_reduce_fn
-from jury.utils import NestedSingleType
 
 logger = get_logger(__name__)
 
@@ -112,6 +111,7 @@ class Metric(datasets.Metric, ABC):
         result = self.evaluate(predictions=predictions, references=references, reduce_fn=reduce_fn, **eval_params)
         return {self.resulting_name: result}
 
+    @abstractmethod
     def _compute_single_pred_single_ref(
         self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
     ):
@@ -126,8 +126,9 @@ class Metric(datasets.Metric, ABC):
 
         Returns: score
         """
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def _compute_single_pred_multi_ref(
         self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs
     ):
@@ -142,8 +143,9 @@ class Metric(datasets.Metric, ABC):
 
         Returns: score
         """
-        raise NotImplementedError
+        pass
 
+    @abstractmethod
     def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs):
         """
         Computes the metric score(s) for single prediction and multiple references case.
@@ -156,7 +158,7 @@ class Metric(datasets.Metric, ABC):
 
         Returns: score
         """
-        raise NotImplementedError
+        pass
 
     def _download_and_prepare(self, dl_manager):
         """Downloads and prepares resources for the metric.

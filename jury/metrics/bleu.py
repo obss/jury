@@ -107,6 +107,7 @@ Examples:
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class Bleu(Metric):
     def __init__(self, resulting_name: str = None, params: Dict = None):
+        self.should_change_resulting_name = True if resulting_name is None else False
         tokenizer = params.get("tokenizer", None) if params is not None else None
         self.tokenizer = BLEUDefaultTokenizer() if tokenizer is None else tokenizer
         super().__init__(resulting_name=resulting_name, params=params)
@@ -225,7 +226,7 @@ class Bleu(Metric):
 
     def evaluate(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs) -> Dict[str, float]:
         max_order = kwargs.get("max_order")
-        if max_order is not None and "_" not in self.resulting_name:
+        if max_order is not None and self.should_change_resulting_name:
             self.resulting_name += f"_{max_order}"
         if predictions.can_collapse() and references.can_collapse():
             eval_fn = self._compute_single_pred_single_ref

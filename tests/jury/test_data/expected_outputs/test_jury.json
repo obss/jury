@@ -1,0 +1,608 @@
+{
+  "evaluate": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "accuracy": {
+      "score": 0.6571428571428571
+    },
+    "bertscore": {
+      "score": 0.7350330352783203,
+      "precision": [
+        0.8328237533569336,
+        0.6074944734573364
+      ],
+      "recall": [
+        0.8258965015411377,
+        0.6777911186218262
+      ],
+      "f1": [
+        0.8293456435203552,
+        0.6407204270362854
+      ],
+      "hashcode": "albert-base-v1_L10_no-idf_version=0.3.10(hug_trans=4.9.1)"
+    },
+    "bleu": {
+      "score": 0.0,
+      "precisions": [
+        0.7272727272727273,
+        0.4444444444444444,
+        0.2857142857142857,
+        0.0
+      ],
+      "brevity_penalty": 0.9131007162822622,
+      "length_ratio": 0.9166666666666666,
+      "translation_length": 11,
+      "reference_length": 12
+    },
+    "f1": {
+      "score": 0.6926184355490269
+    },
+    "meteor": {
+      "score": 0.5098979591836734
+    },
+    "precision": {
+      "score": 0.7321428571428572
+    },
+    "recall": {
+      "score": 0.6571428571428571
+    },
+    "rouge": {
+      "rouge1": 0.6904761904761905,
+      "rouge2": 0.45238095238095244,
+      "rougeL": 0.619047619047619,
+      "rougeLsum": 0.619047619047619
+    },
+    "sacrebleu": {
+      "score": 0.42728700639623396,
+      "counts": [
+        7,
+        4,
+        2,
+        1
+      ],
+      "totals": [
+        8,
+        7,
+        6,
+        5
+      ],
+      "precisions": [
+        0.875,
+        0.5714285714285715,
+        0.33333333333333337,
+        0.2
+      ],
+      "bp": 1.0,
+      "sys_len": 8,
+      "ref_len": 8
+    },
+    "squad": {
+      "exact_match": 0.0,
+      "f1": 0.6857142857142858
+    }
+  },
+  "evaluate_concurrent": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "accuracy": {
+      "score": 0.6571428571428571
+    },
+    "bertscore": {
+      "score": 0.7350330352783203,
+      "precision": [
+        0.8328237533569336,
+        0.6074944734573364
+      ],
+      "recall": [
+        0.8258965015411377,
+        0.6777911186218262
+      ],
+      "f1": [
+        0.8293456435203552,
+        0.6407204270362854
+      ],
+      "hashcode": "albert-base-v1_L10_no-idf_version=0.3.10(hug_trans=4.9.1)"
+    },
+    "bleu": {
+      "score": 0.0,
+      "precisions": [
+        0.7272727272727273,
+        0.4444444444444444,
+        0.2857142857142857,
+        0.0
+      ],
+      "brevity_penalty": 0.9131007162822622,
+      "length_ratio": 0.9166666666666666,
+      "translation_length": 11,
+      "reference_length": 12
+    },
+    "f1": {
+      "score": 0.6926184355490269
+    },
+    "meteor": {
+      "score": 0.5098979591836734
+    },
+    "precision": {
+      "score": 0.7321428571428572
+    },
+    "recall": {
+      "score": 0.6571428571428571
+    },
+    "rouge": {
+      "rouge1": 0.6904761904761905,
+      "rouge2": 0.45238095238095244,
+      "rougeL": 0.619047619047619,
+      "rougeLsum": 0.619047619047619
+    },
+    "sacrebleu": {
+      "score": 0.42728700639623396,
+      "counts": [
+        7,
+        4,
+        2,
+        1
+      ],
+      "totals": [
+        8,
+        7,
+        6,
+        5
+      ],
+      "precisions": [
+        0.875,
+        0.5714285714285715,
+        0.33333333333333337,
+        0.2
+      ],
+      "bp": 1.0,
+      "sys_len": 8,
+      "ref_len": 8
+    },
+    "squad": {
+      "exact_match": 0.0,
+      "f1": 0.6857142857142858
+    }
+  },
+  "evaluate_str_input": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "bleu": {
+      "score": 0.0,
+      "precisions": [
+        0.7272727272727273,
+        0.4444444444444444,
+        0.2857142857142857,
+        0.0
+      ],
+      "brevity_penalty": 0.9131007162822622,
+      "length_ratio": 0.9166666666666666,
+      "translation_length": 11,
+      "reference_length": 12
+    }
+  },
+  "evaluate_list_str_input": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "accuracy": {
+      "score": 0.6571428571428571
+    },
+    "bertscore": {
+      "score": 0.9396075010299683,
+      "precision": [
+        0.9543163180351257,
+        0.9277863502502441
+      ],
+      "recall": [
+        0.9502041935920715,
+        0.9261335134506226
+      ],
+      "f1": [
+        0.9522558450698853,
+        0.9269591569900513
+      ],
+      "hashcode": "roberta-large_L17_no-idf_version=0.3.10(hug_trans=4.9.1)"
+    },
+    "bleu": {
+      "score": 0.0,
+      "precisions": [
+        0.7272727272727273,
+        0.4444444444444444,
+        0.2857142857142857,
+        0.0
+      ],
+      "brevity_penalty": 0.9131007162822622,
+      "length_ratio": 0.9166666666666666,
+      "translation_length": 11,
+      "reference_length": 12
+    },
+    "f1": {
+      "score": 0.6926184355490269
+    },
+    "meteor": {
+      "score": 0.5098979591836734
+    },
+    "precision": {
+      "score": 0.7321428571428572
+    },
+    "recall": {
+      "score": 0.6571428571428571
+    },
+    "rouge": {
+      "rouge1": 0.6904761904761905,
+      "rouge2": 0.45238095238095244,
+      "rougeL": 0.619047619047619,
+      "rougeLsum": 0.619047619047619
+    },
+    "sacrebleu": {
+      "score": 0.42728700639623396,
+      "counts": [
+        7,
+        4,
+        2,
+        1
+      ],
+      "totals": [
+        8,
+        7,
+        6,
+        5
+      ],
+      "precisions": [
+        0.875,
+        0.5714285714285715,
+        0.33333333333333337,
+        0.2
+      ],
+      "bp": 1.0,
+      "sys_len": 8,
+      "ref_len": 8
+    },
+    "squad": {
+      "exact_match": 0.0,
+      "f1": 0.6857142857142858
+    }
+  },
+  "evaluate_list_dict_input": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "accuracy": {
+      "score": 0.6571428571428571
+    },
+    "bertscore": {
+      "score": 0.7350329756736755,
+      "precision": [
+        0.832823634147644,
+        0.6074944734573364
+      ],
+      "recall": [
+        0.8258962631225586,
+        0.6777912378311157
+      ],
+      "f1": [
+        0.8293454647064209,
+        0.6407204866409302
+      ],
+      "hashcode": "albert-base-v1_L10_no-idf_version=0.3.10(hug_trans=4.9.1)"
+    },
+    "bleu-1": {
+      "score": 0.0,
+      "precisions": [
+        0.7272727272727273,
+        0.4444444444444444,
+        0.2857142857142857,
+        0.0
+      ],
+      "brevity_penalty": 0.9131007162822622,
+      "length_ratio": 0.9166666666666666,
+      "translation_length": 11,
+      "reference_length": 12
+    },
+    "bleu-2": {
+      "score": 0.0,
+      "precisions": [
+        0.7272727272727273,
+        0.4444444444444444,
+        0.2857142857142857,
+        0.0
+      ],
+      "brevity_penalty": 0.9131007162822622,
+      "length_ratio": 0.9166666666666666,
+      "translation_length": 11,
+      "reference_length": 12
+    },
+    "F1": {
+      "score": 0.6926184355490269
+    },
+    "METEOR": {
+      "score": 0.5098979591836734
+    },
+    "precision": {
+      "score": 0.7321428571428572
+    },
+    "recall": {
+      "score": 0.6571428571428571
+    },
+    "rouge": {
+      "rouge1": 0.6904761904761905,
+      "rouge2": 0.45238095238095244,
+      "rougeL": 0.619047619047619,
+      "rougeLsum": 0.619047619047619
+    },
+    "sacrebleu": {
+      "score": 0.42728700639623396,
+      "counts": [
+        7,
+        4,
+        2,
+        1
+      ],
+      "totals": [
+        8,
+        7,
+        6,
+        5
+      ],
+      "precisions": [
+        0.875,
+        0.5714285714285715,
+        0.33333333333333337,
+        0.2
+      ],
+      "bp": 1.0,
+      "sys_len": 8,
+      "ref_len": 8
+    },
+    "squad": {
+      "exact_match": 0.0,
+      "f1": 0.6857142857142858
+    }
+  },
+  "evaluate_list_mixed_input": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "accuracy": {
+      "score": 0.6571428571428571
+    },
+    "bertscore": {
+      "score": 0.9396075010299683,
+      "precision": [
+        0.9543163180351257,
+        0.9277863502502441
+      ],
+      "recall": [
+        0.9502041935920715,
+        0.9261335134506226
+      ],
+      "f1": [
+        0.9522558450698853,
+        0.9269591569900513
+      ],
+      "hashcode": "roberta-large_L17_no-idf_version=0.3.10(hug_trans=4.9.1)"
+    },
+    "bleu": {
+      "score": 0.0,
+      "precisions": [
+        0.7272727272727273,
+        0.4444444444444444,
+        0.2857142857142857,
+        0.0
+      ],
+      "brevity_penalty": 0.9131007162822622,
+      "length_ratio": 0.9166666666666666,
+      "translation_length": 11,
+      "reference_length": 12
+    },
+    "f1": {
+      "score": 0.6926184355490269
+    },
+    "meteor": {
+      "score": 0.5098979591836734
+    },
+    "precision": {
+      "score": 0.7321428571428572
+    },
+    "recall": {
+      "score": 0.6571428571428571
+    },
+    "rouge": {
+      "rouge1": 0.6904761904761905,
+      "rouge2": 0.45238095238095244,
+      "rougeL": 0.619047619047619,
+      "rougeLsum": 0.619047619047619
+    },
+    "sacrebleu": {
+      "score": 0.42728700639623396,
+      "counts": [
+        7,
+        4,
+        2,
+        1
+      ],
+      "totals": [
+        8,
+        7,
+        6,
+        5
+      ],
+      "precisions": [
+        0.875,
+        0.5714285714285715,
+        0.33333333333333337,
+        0.2
+      ],
+      "bp": 1.0,
+      "sys_len": 8,
+      "ref_len": 8
+    },
+    "squad": {
+      "exact_match": 0.0,
+      "f1": 0.6857142857142858
+    }
+  },
+  "evaluate_datasets_metric": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "wer": 0.5833333333333334
+  },
+  "evaluate_corpus": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "accuracy": {
+      "score": 0.7285714285714285
+    },
+    "bertscore": {
+      "score": 0.7485643923282623,
+      "precision": [
+        0.8912334442138672,
+        0.6074945330619812
+      ],
+      "recall": [
+        0.837701678276062,
+        0.6777911186218262
+      ],
+      "f1": [
+        0.8564083576202393,
+        0.6407204270362854
+      ],
+      "hashcode": "albert-base-v1_L10_no-idf_version=0.3.10(hug_trans=4.9.1)"
+    },
+    "bleu": {
+      "score": 0.0,
+      "precisions": [
+        0.9,
+        0.75,
+        0.5,
+        0.0
+      ],
+      "brevity_penalty": 0.9048374180359595,
+      "length_ratio": 0.9090909090909091,
+      "translation_length": 10,
+      "reference_length": 11
+    },
+    "f1": {
+      "score": 0.7948717948717947
+    },
+    "meteor": {
+      "score": 0.5420511682934044
+    },
+    "precision": {
+      "score": 0.875
+    },
+    "recall": {
+      "score": 0.7285714285714285
+    },
+    "rouge": {
+      "rouge1": 0.7948717948717947,
+      "rouge2": 0.6493506493506493,
+      "rougeL": 0.7948717948717947,
+      "rougeLsum": 0.7948717948717947
+    },
+    "sacrebleu": {
+      "score": 0.2730120862709067,
+      "counts": [
+        8,
+        4,
+        2,
+        0
+      ],
+      "totals": [
+        12,
+        10,
+        8,
+        6
+      ],
+      "precisions": [
+        0.6666666666666667,
+        0.4,
+        0.25,
+        0.08333333333333334
+      ],
+      "bp": 1.0,
+      "sys_len": 12,
+      "ref_len": 11
+    },
+    "squad": {
+      "exact_match": 0.0,
+      "f1": 0.7301587301587302
+    }
+  },
+  "evaluate_multiple_predictions": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "accuracy": {
+      "score": 0.7285714285714285
+    },
+    "bertscore": {
+      "score": 0.7485643923282623,
+      "precision": 0.7493639886379242,
+      "recall": 0.7577463984489441,
+      "f1": 0.7485643923282623,
+      "hashcode": "albert-base-v1_L10_no-idf_version=0.3.10(hug_trans=4.9.1)"
+    },
+    "bleu": {
+      "score": 0.42370250917168295,
+      "precisions": [
+        0.8823529411764706,
+        0.6428571428571429,
+        0.45454545454545453,
+        0.125
+      ],
+      "brevity_penalty": 1.0,
+      "length_ratio": 1.0,
+      "translation_length": 11,
+      "reference_length": 11
+    },
+    "f1": {
+      "score": 0.7948717948717947
+    },
+    "meteor": {
+      "score": 0.5420511682934044
+    },
+    "precision": {
+      "score": 0.875
+    },
+    "recall": {
+      "score": 0.7285714285714285
+    },
+    "rouge": {
+      "rouge1": 0.7783882783882783,
+      "rouge2": 0.5925324675324675,
+      "rougeL": 0.7426739926739926,
+      "rougeLsum": 0.7426739926739926
+    },
+    "sacrebleu": {
+      "score": 0.32377227131456443,
+      "counts": [
+        11,
+        6,
+        3,
+        0
+      ],
+      "totals": [
+        13,
+        11,
+        9,
+        7
+      ],
+      "precisions": [
+        0.8461538461538461,
+        0.5454545454545454,
+        0.33333333333333337,
+        0.07142857142857144
+      ],
+      "bp": 1.0,
+      "sys_len": 11,
+      "ref_len": 12,
+      "adjusted_precisions": [
+        0.8461538461538461,
+        0.5454545454545454,
+        0.33333333333333337,
+        0.07142857142857144
+      ]
+    },
+    "squad": {
+      "exact_match": 0.0,
+      "f1": 0.7402597402597403
+    }
+  }
+}

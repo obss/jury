@@ -77,27 +77,28 @@ class Jury:
 
         return scores
 
-    def _load_single_metric(self, metric_name: Union[str, Metric]) -> List[Metric]:
-        metric = load_metric(metric_name)
+    def _load_single_metric(self, metric: Union[str, Metric]) -> List[Metric]:
+        if isinstance(metric, str):
+            metric = load_metric(metric)
         return [metric]
 
     def _load_multiple_metrics(
-        self, metric_params: Union[List[str], List[Dict[str, Any]], List[Metric]]
+        self, metrics: Union[List[str], List[Dict[str, Any]], List[Metric]]
     ) -> List[Metric]:
-        for i, metric_param in enumerate(metric_params):
+        for i, metric_param in enumerate(metrics):
             if isinstance(metric_param, str):
                 metric_name = metric_param
-                metric_params = replace(metric_params, load_metric(metric_name.lower()), i)
+                metrics = replace(metrics, load_metric(metric_name.lower()), i)
             elif isinstance(metric_param, dict):
                 metric_name = metric_param.pop("metric_name")  # must be given
                 resulting_name = metric_param.pop("resulting_name") if "resulting_name" in metric_param else None
                 params = metric_param
-                metric_params = replace(
-                    metric_params, load_metric(metric_name=metric_name, resulting_name=resulting_name, params=params), i
+                metrics = replace(
+                    metrics, load_metric(metric_name=metric_name, resulting_name=resulting_name, params=params), i
                 )
             elif isinstance(metric_param, Metric):
                 continue
-        return metric_params
+        return metrics
 
     def _load_metrics(self, metrics: Union[MetricParam, List[MetricParam]]) -> List[Metric]:
         if metrics is None:
