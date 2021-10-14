@@ -15,9 +15,8 @@
 """ SQuAD metric. The part of this file is adapted from SacreBLEU implementation
 of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/squad/squad.py"""
-import copyreg
+
 import os
-import types
 from typing import Callable, Dict, List
 
 import datasets
@@ -25,8 +24,8 @@ import numpy as np
 import pandas as pd
 
 from jury.collator import Collator
-from jury.metrics._base import Metric
-from jury.metrics._utils import download, import_module
+from jury.metrics._core import MetricForLanguageGeneration
+from jury.metrics._core.utils import download
 from jury.utils import NestedSingleType
 
 __class_names__ = {"squad": "Squad"}
@@ -85,7 +84,7 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Squad(Metric):
+class Squad(MetricForLanguageGeneration):
     def _download_and_prepare(self, dl_manager) -> None:
         """
         Downloads and import the computation of squad score from the implementation
@@ -153,10 +152,14 @@ class Squad(Metric):
             score[metric_] = score_ / 100
         return score
 
-    def _compute_single_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn=None, **kwargs):
+    def _compute_single_pred_multi_ref(
+        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
+    ):
         return self._compute_single_pred_single_ref(predictions=predictions, references=references, reduce_fn=reduce_fn)
 
-    def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs):
+    def _compute_multi_pred_multi_ref(
+        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
+    ):
         scores = []
         for preds, refs in zip(predictions, references):
             pred_scores = []

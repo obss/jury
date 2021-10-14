@@ -26,8 +26,8 @@ import pandas as pd
 from packaging import version
 
 from jury.collator import Collator
-from jury.metrics._base import Metric
-from jury.metrics._utils import PackagePlaceholder, requirement_message
+from jury.metrics._core import MetricForLanguageGeneration
+from jury.metrics._core.utils import PackagePlaceholder, requirement_message
 
 # `import bert_score` placeholder
 bert_score = PackagePlaceholder(version="0.3.10")
@@ -117,7 +117,7 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Bertscore(Metric):
+class Bertscore(MetricForLanguageGeneration):
     def _download_and_prepare(self, dl_manager):
         global bert_score
 

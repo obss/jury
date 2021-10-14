@@ -23,8 +23,9 @@ import datasets
 import numpy as np
 
 from jury.collator import Collator
-from jury.metrics import Metric
-from jury.metrics._utils import normalize_text
+from jury.metrics._core import MetricForLanguageGeneration
+from jury.metrics._core.base import LanguageGenerationInstance
+from jury.metrics._core.utils import normalize_text
 from jury.metrics.precision import Precision
 from jury.metrics.recall import Recall
 
@@ -68,7 +69,7 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class F1(Metric):
+class F1(MetricForLanguageGeneration):
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,
@@ -83,7 +84,7 @@ class F1(Metric):
             reference_urls=["https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html"],
         )
 
-    def _tokenize(self, predictions: Collator, references: Collator):
+    def _tokenize(self, predictions: LanguageGenerationInstance, references: LanguageGenerationInstance):
         predictions = [normalize_text(p).split() for p in predictions]
         references = [normalize_text(r).split() for r in references]
         return predictions, references
@@ -103,7 +104,11 @@ class F1(Metric):
         return {"score": f1}
 
     def _compute_single_pred_multi_ref(
-        self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs
+        self,
+        predictions: LanguageGenerationInstance,
+        references: LanguageGenerationInstance,
+        reduce_fn: Callable = None,
+        **kwargs
     ):
         scores = []
         for pred, refs in zip(predictions, references):
@@ -116,7 +121,9 @@ class F1(Metric):
 
         return self._reduce_scores(scores, reduce_fn=np.mean)
 
-    def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs):
+    def _compute_multi_pred_multi_ref(
+        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
+    ):
         scores = []
         for preds, refs in zip(predictions, references):
             pred_scores = []

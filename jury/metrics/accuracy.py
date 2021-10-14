@@ -18,14 +18,14 @@ datasets package implementation of Accuracy metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/accuracy/accuracy.py
 """
 from collections import Counter
-from typing import Callable, Dict
+from typing import Callable
 
 import datasets
 import numpy as np
 
 from jury.collator import Collator
-from jury.metrics import Metric
-from jury.metrics._utils import normalize_text
+from jury.metrics._core import MetricForLanguageGeneration
+from jury.metrics._core.utils import normalize_text
 
 __class_names__ = {"accuracy": "Accuracy"}
 
@@ -72,13 +72,13 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Accuracy(Metric):
+class Accuracy(MetricForLanguageGeneration):
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,
             citation=_CITATION,
             inputs_description=_KWARGS_DESCRIPTION,
-            features=self.default_features,
+            features=self._default_features,
             reference_urls=["https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html"],
         )
 

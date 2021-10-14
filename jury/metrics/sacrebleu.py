@@ -24,8 +24,8 @@ import datasets
 from packaging import version
 
 from jury.collator import Collator
-from jury.metrics._base import Metric
-from jury.metrics._utils import PackagePlaceholder, get_token_lengths, requirement_message
+from jury.metrics._core import MetricForLanguageGeneration
+from jury.metrics._core.utils import PackagePlaceholder, get_token_lengths, requirement_message
 from jury.tokenizer import BLEUDefaultTokenizer
 
 # `import sacrebleu as scb` placeholder
@@ -100,7 +100,7 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Sacrebleu(Metric):
+class Sacrebleu(MetricForLanguageGeneration):
     def _download_and_prepare(self, dl_manager):
         global scb
         try:
@@ -181,7 +181,7 @@ class Sacrebleu(Metric):
         self,
         predictions: Collator,
         references: Collator,
-        reduce_fn: Callable,
+        reduce_fn: Callable = None,
         smooth_method="exp",
         smooth_value=None,
         force=False,
@@ -206,7 +206,7 @@ class Sacrebleu(Metric):
         self,
         predictions: Collator,
         references: Collator,
-        reduce_fn: Callable,
+        reduce_fn: Callable = None,
         smooth_method="exp",
         smooth_value=None,
         force=False,

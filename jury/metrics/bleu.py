@@ -25,8 +25,8 @@ from typing import Callable, Dict, Tuple
 import datasets
 
 from jury.collator import Collator
-from jury.metrics._base import Metric
-from jury.metrics._utils import download, get_token_lengths
+from jury.metrics._core import MetricForLanguageGeneration
+from jury.metrics._core.utils import download, get_token_lengths
 from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
 
 __class_names__ = {"bleu": "Bleu"}
@@ -105,12 +105,12 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Bleu(Metric):
-    def __init__(self, resulting_name: str = None, params: Dict = None):
+class Bleu(MetricForLanguageGeneration):
+    def __init__(self, resulting_name: str = None, compute_kwargs: Dict = None):
         self.should_change_resulting_name = True if resulting_name is None else False
-        tokenizer = params.get("tokenizer", None) if params is not None else None
+        tokenizer = compute_kwargs.get("tokenizer", None) if compute_kwargs is not None else None
         self.tokenizer = BLEUDefaultTokenizer() if tokenizer is None else tokenizer
-        super().__init__(resulting_name=resulting_name, params=params)
+        super().__init__(resulting_name=resulting_name, compute_kwargs=compute_kwargs)
 
     def _info(self):
         return datasets.MetricInfo(
@@ -224,7 +224,9 @@ class Bleu(Metric):
 
         return score
 
-    def evaluate(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs) -> Dict[str, float]:
+    def evaluate(
+        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
+    ) -> Dict[str, float]:
         max_order = kwargs.get("max_order")
         if max_order is not None and self.should_change_resulting_name:
             self.resulting_name += f"_{max_order}"

@@ -18,17 +18,17 @@ datasets package implementation of ROUGE metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/rouge/rouge.py
 """
 
-from typing import Dict, List, Optional, Union
+from typing import Callable, Dict, List, Optional, Union
 
 import datasets
 import pandas as pd
 from rouge_score import rouge_scorer, scoring
 
 from jury.collator import Collator
-from jury.metrics._base import Metric
 
 __class_names__ = {"rouge": "Rouge"}
 
+from jury.metrics._core import MetricForLanguageGeneration
 
 _CITATION = """\
 @inproceedings{lin-2004-rouge,
@@ -92,7 +92,7 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Rouge(Metric):
+class Rouge(MetricForLanguageGeneration):
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,
@@ -162,7 +162,7 @@ class Rouge(Metric):
         *,
         predictions: Collator = None,
         references: Collator = None,
-        reduce_fn: callable = None,
+        reduce_fn: Callable = None,
         rouge_types: List[str] = None,
         use_aggregator: bool = True,
         use_stemmer: bool = False,
@@ -205,7 +205,7 @@ class Rouge(Metric):
         return result
 
     def _compute_single_pred_single_ref(
-        self, predictions, references, reduce_fn=None, scorer=None, aggregator=None, metric_to_select=None
+        self, predictions, references, reduce_fn: Callable = None, scorer=None, aggregator=None, metric_to_select=None
     ):
         for ref, pred in zip(references, predictions):
             score = scorer.score(target=ref, prediction=pred)
@@ -215,7 +215,7 @@ class Rouge(Metric):
         return aggregator
 
     def _compute_single_pred_multi_ref(
-        self, predictions, references, reduce_fn, scorer=None, aggregator=None, metric_to_select=None
+        self, predictions, references, reduce_fn: Callable = None, scorer=None, aggregator=None, metric_to_select=None
     ):
         for pred, refs in zip(predictions, references):
             pred_scores = [scorer.score(target=ref, prediction=pred) for ref in refs]
@@ -225,7 +225,7 @@ class Rouge(Metric):
         return aggregator
 
     def _compute_multi_pred_multi_ref(
-        self, predictions, references, reduce_fn, scorer=None, aggregator=None, metric_to_select=None
+        self, predictions, references, reduce_fn: Callable = None, scorer=None, aggregator=None, metric_to_select=None
     ):
         for preds, refs in zip(predictions, references):
             multi_aggregator = self._get_aggregator(use_aggregator=True)

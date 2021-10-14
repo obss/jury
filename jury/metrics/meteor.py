@@ -22,9 +22,9 @@ import datasets
 import numpy as np
 from nltk.translate import meteor_score
 
-from jury.metrics._base import Metric
-
 __class_names__ = {"meteor": "Meteor"}
+
+from jury.metrics._core import MetricForLanguageGeneration
 
 _CITATION = """\
 @inproceedings{banarjee2005,
@@ -86,7 +86,7 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Meteor(Metric):
+class Meteor(MetricForLanguageGeneration):
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,

@@ -18,14 +18,14 @@ datasets package implementation of Accuracy metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/recall/recall.py
 """
 from collections import Counter
-from typing import Callable, Dict
+from typing import Callable
 
 import datasets
 import numpy as np
 
 from jury.collator import Collator
-from jury.metrics import Metric
-from jury.metrics._utils import normalize_text
+from jury.metrics._core import MetricForLanguageGeneration
+from jury.metrics._core.utils import normalize_text
 
 __class_names__ = {"recall": "Recall"}
 
@@ -71,13 +71,13 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Recall(Metric):
+class Recall(MetricForLanguageGeneration):
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,
             citation=_CITATION,
             inputs_description=_KWARGS_DESCRIPTION,
-            features=self.default_features,
+            features=self._default_features,
             reference_urls=["https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html"],
         )
 
@@ -103,7 +103,7 @@ class Recall(Metric):
         return {"score": avg_score}
 
     def _compute_single_pred_multi_ref(
-        self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs
+        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
     ):
         scores = []
         for pred, refs in zip(predictions, references):
@@ -116,7 +116,9 @@ class Recall(Metric):
 
         return self._reduce_scores(scores, reduce_fn=np.mean)
 
-    def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs):
+    def _compute_multi_pred_multi_ref(
+        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
+    ):
         scores = []
         for preds, refs in zip(predictions, references):
             pred_scores = []

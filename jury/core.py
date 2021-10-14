@@ -37,6 +37,7 @@ class Jury:
         >>> print(results)
         {'bleu_1': 0.6111111111111112, ..., 'rougeL': 0.6470588235294118, ...}
     """
+    # TODO: Sanity check for `metrics` to be same task.
 
     def __init__(
         self,
@@ -108,6 +109,9 @@ class Jury:
         else:
             raise ValueError(f"Unknown input type {type(metrics)}")
 
+        # Sanity check
+        self._validate_metrics(metrics)
+
         return metrics
 
     def _score_to_dict(self, score, name: str) -> Dict[str, float]:
@@ -122,9 +126,9 @@ class Jury:
             predictions, references = Collator(predictions), Collator(references)
             score = metric.compute(predictions=predictions, references=references, reduce_fn=reduce_fn)
         else:
-            metric.resulting_name = metric.name
+            metric.resulting_name = metric.path
             score = metric.compute(predictions=predictions, references=references)
-            score = self._score_to_dict(score, name=metric.name)
+            score = self._score_to_dict(score, name=metric.path)
         return score
 
     def _prepare_concurrent_inputs(self, predictions, references, reduce_fn):
@@ -132,6 +136,11 @@ class Jury:
         for metric in self.metrics:
             inputs.append((metric, predictions, references, reduce_fn))
         return inputs
+
+    def _validate_metrics(self, metrics: List[Metric]):
+        task = metrics[0].task
+
+        assert all([metric.task == task for metric in metrics])
 
     def add_metric(self, metric_name: str, resulting_name: str = None, params: Dict = None) -> None:
         metric = load_metric(metric_name, resulting_name=resulting_name, params=params)
