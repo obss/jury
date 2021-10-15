@@ -1,13 +1,13 @@
-from jury.metrics._core.auto import AutoMetric
+from jury.metrics._core.auto import AutoMetric, load_metric
 from jury.metrics._core.base import (
-    EvaluationInstance,
-    LanguageGenerationInstance,
-    Metric,
-    MetricForLanguageGeneration,
-    MetricForSequenceClassification,
-    MetricForSequenceLabeling,
-    MetricOutput,
-    SequenceClassificationInstance,
-    SequenceLabelingInstance,
-    load_metric,
+	EvaluationInstance,
+	LanguageGenerationInstance,
+	Metric,
+	TaskMapper,
+	MetricForLanguageGeneration,
+	MetricForSequenceClassification,
+	MetricForSequenceLabeling,
+	MetricOutput,
+	SequenceClassificationInstance,
+	SequenceLabelingInstance,
 )

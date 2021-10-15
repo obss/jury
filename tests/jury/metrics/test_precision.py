@@ -8,7 +8,7 @@ from tests.utils import assert_almost_equal_dict
 
 @pytest.fixture(scope="module")
 def jury():
-    return Jury(metrics=[Precision()])
+    return Jury(metrics=[Precision.by_task("language-generation")])
 
 
 @pytest.fixture

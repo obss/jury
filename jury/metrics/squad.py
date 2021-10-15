@@ -17,15 +17,16 @@ of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/squad/squad.py"""
 
 import os
-from typing import Callable, Dict, List
+from typing import Callable, Dict, List, Optional, Any
 
 import datasets
 import numpy as np
 import pandas as pd
 
 from jury.collator import Collator
-from jury.metrics._core import MetricForLanguageGeneration
-from jury.metrics._core.utils import download
+from jury.metrics._core import TaskMapper, MetricForLanguageGeneration
+from jury.metrics._core.base import MetricAlias, Metric
+from jury.metrics._core.utils import TaskNotAvailable, download
 from jury.utils import NestedSingleType
 
 __class_names__ = {"squad": "Squad"}
@@ -84,7 +85,7 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Squad(MetricForLanguageGeneration):
+class SquadForLanguageGeneration(MetricForLanguageGeneration):
     def _download_and_prepare(self, dl_manager) -> None:
         """
         Downloads and import the computation of squad score from the implementation
@@ -180,3 +181,15 @@ class Squad(MetricForLanguageGeneration):
     def _reduce_multi_pred_scores(self, results: List[Dict], reduce_fn) -> Dict:
         df = pd.DataFrame(results)
         return df.apply(reduce_fn, axis=0).to_dict()
+
+
+class Squad(MetricAlias):
+    @classmethod
+    def by_task(
+        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
+    ) -> Metric:
+        return SquadForLanguageGeneration.construct(
+                resulting_name=resulting_name,
+                compute_kwargs=compute_kwargs,
+                **kwargs
+        )

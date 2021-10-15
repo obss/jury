@@ -20,13 +20,14 @@ https://github.com/huggingface/datasets/blob/master/metrics/bleu/bleu.py
 
 import math
 import os
-from typing import Callable, Dict, Tuple
+from typing import Callable, Dict, Tuple, Optional, Any
 
 import datasets
 
 from jury.collator import Collator
-from jury.metrics._core import MetricForLanguageGeneration
-from jury.metrics._core.utils import download, get_token_lengths
+from jury.metrics._core import TaskMapper, MetricForLanguageGeneration
+from jury.metrics._core.base import MetricAlias, Metric
+from jury.metrics._core.utils import TaskNotAvailable, download, get_token_lengths
 from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
 
 __class_names__ = {"bleu": "Bleu"}
@@ -105,7 +106,7 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Bleu(MetricForLanguageGeneration):
+class BleuForLanguageGeneration(MetricForLanguageGeneration):
     def __init__(self, resulting_name: str = None, compute_kwargs: Dict = None):
         self.should_change_resulting_name = True if resulting_name is None else False
         tokenizer = compute_kwargs.get("tokenizer", None) if compute_kwargs is not None else None
@@ -238,3 +239,15 @@ class Bleu(MetricForLanguageGeneration):
             eval_fn = self._compute_multi_pred_multi_ref
         predictions, references = self._tokenize(predictions=predictions, references=references)
         return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)
+
+
+class Bleu(MetricAlias):
+    @classmethod
+    def by_task(
+        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
+    ) -> Metric:
+        return BleuForLanguageGeneration.construct(
+                resulting_name=resulting_name,
+                compute_kwargs=compute_kwargs,
+                **kwargs
+        )

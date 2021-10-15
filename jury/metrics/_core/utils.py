@@ -14,6 +14,13 @@ class PackagePlaceholder:
         self.__version__ = version
 
 
+class TaskNotAvailable(KeyError):
+    def __init__(self, metric_name: str, task: str):
+        message = f"Task '{task}' is not available for metric '{metric_name}'."
+        self.message = message
+        super(TaskNotAvailable, self).__init__(message)
+
+
 def requirement_message(metric_name: str, package_name: str) -> str:
     return (
         f"In order to use metric '{metric_name}', '{package_name}' is required. "

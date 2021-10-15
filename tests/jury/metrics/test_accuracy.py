@@ -1,14 +1,14 @@
 import pytest
 
 from jury import Jury
-from jury.metrics import Accuracy
+from jury.metrics import AccuracyForLanguageGeneration
 from tests.jury.conftest import get_expected_output
 from tests.utils import assert_almost_equal_dict
 
 
 @pytest.fixture(scope="module")
 def jury():
-    return Jury(metrics=[Accuracy()])
+    return Jury(metrics=[AccuracyForLanguageGeneration()])
 
 
 @pytest.fixture

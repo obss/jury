@@ -24,10 +24,10 @@ import numpy as np
 
 from jury.collator import Collator
 from jury.metrics._core import MetricForLanguageGeneration
-from jury.metrics._core.base import LanguageGenerationInstance
-from jury.metrics._core.utils import normalize_text
+from jury.metrics._core.base import LanguageGenerationInstance, TaskMapper
+from jury.metrics._core.utils import TaskNotAvailable, normalize_text
 from jury.metrics.precision import Precision
-from jury.metrics.recall import Recall
+from jury.metrics.recall import RecallForLanguageGeneration
 
 __class_names__ = {"f1": "F1"}
 
@@ -69,7 +69,7 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class F1(MetricForLanguageGeneration):
+class F1ForLanguageGeneration(MetricForLanguageGeneration):
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,
@@ -92,7 +92,7 @@ class F1(MetricForLanguageGeneration):
     def _compute_single_pred_single_ref(
         self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
     ):
-        recall = Recall()
+        recall = RecallForLanguageGeneration()
         precision = Precision()
         predictions, references = predictions.nested(), references.nested()
         recall_score = recall.compute(predictions=predictions, references=references)["recall"]["score"]
@@ -136,3 +136,16 @@ class F1(MetricForLanguageGeneration):
             scores.append(reduced_score)
 
         return self._reduce_scores(scores, reduce_fn=np.mean)
+
+
+class F1(TaskMapper):
+    _TASKS = {"language-generation": F1ForLanguageGeneration}
+    _METRIC_NAME = list(__class_names__.keys())[0]
+
+    @classmethod
+    def _get_subclass(cls, task: str):
+        metric_name = cls._METRIC_NAME
+        subclass = cls._TASKS.get(task)
+        if subclass is None:
+            raise TaskNotAvailable(metric_name=metric_name, task=task)
+        return subclass

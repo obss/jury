@@ -4,54 +4,54 @@ import warnings
 from typing import Any, Dict, NamedTuple, Optional
 
 import datasets
-from datasets import MetricInfo
 
-from jury.metrics._core.base import EvaluationInstance, Metric, MetricOutput
+from jury.metrics._core.base import Metric
 from jury.metrics._core.utils import import_module
 
 
-class AutoMetric(Metric):
-    def _info(self) -> MetricInfo:
-        raise NotImplementedError
+def load_metric(
+    metric_name: str,
+    resulting_name: str = None,
+    task: Optional[str] = "language-generation",
+    compute_kwargs: Dict[str, Any] = None,
+    **kwargs,
+) -> Metric:
+    return AutoMetric.from_params(
+        metric_name=metric_name, resulting_name=resulting_name, task=task, compute_kwargs=compute_kwargs, **kwargs
+    )
 
+
+class AutoMetric:
     def __init__(
         self,
+        *args,
+        **kwargs,
+    ):
+        raise EnvironmentError("This class is designed to be instantiated by using 'from_params()' method.")
+
+    @classmethod
+    def from_params(
+        cls,
         metric_name: str,
+        task: Optional[str] = "language-generation",
         resulting_name: Optional[str] = None,
-        task: Optional[str] = None,
         compute_kwargs: Optional[Dict[str, Any]] = None,
         use_jury_only: bool = True,
         **kwargs,
-    ):
-        super().__init__(task=task, resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
-        self.metric_name = metric_name
-        self.use_jury_only = use_jury_only
-        self.construction_kwargs = kwargs
-
-    def _compute(
-        self,
-        *,
-        predictions: EvaluationInstance = None,
-        references: EvaluationInstance = None,
-        **kwargs,
-    ) -> MetricOutput:
-        metric = self.construct_metric()
-        return metric.compute()
-
-    def construct_metric(self):
-        resolved_metric_name = self.resolve_metric_name()
+    ) -> Metric:
+        resolved_metric_name = cls.resolve_metric_name(metric_name)
 
         # load the module, will raise ImportError if module cannot be loaded
         try:
             module_path = resolved_metric_name.path
-            if resolved_metric_name.resolution == "external-module" and not self.use_jury_only:
+            if resolved_metric_name.resolution == "external-module" and not use_jury_only:
                 module_name = module_path.split("/")[-1].replace(".py", "")
                 module = import_module(module_name=module_name, filepath=module_path)
             else:
                 module = importlib.import_module(module_path)
         except ModuleNotFoundError:
             # Metric not in Jury
-            if self.use_jury_only:
+            if use_jury_only:
                 raise ValueError(
                     f"Metric {resolved_metric_name.path} is not available on jury, set use_jury_only=False to use"
                     f"additional metrics (e.g datasets metrics)."
@@ -64,45 +64,21 @@ class AutoMetric(Metric):
             metric = datasets.load_metric(resolved_metric_name.path)
         else:
             # get the class, will raise AttributeError if class cannot be found
-            klass = getattr(module, module.__class_names__.get(resolved_metric_name.path))
-            metric = klass(
-                resulting_name=self.resulting_name, compute_kwargs=self.compute_kwargs, **self.construction_kwargs
-            )
+            factory_class = module.__class_names__.get(metric_name)
+            klass = getattr(module, factory_class)
+            metric = klass.by_task(task=task, resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
         return metric
 
-    def resolve_metric_name(self):
+    @staticmethod
+    def resolve_metric_name(metric_name: str):
         class ResolvedName(NamedTuple):
             path: str
             resolution: str
 
-        metric_name = self.metric_name
+        metric_name = metric_name
         if os.path.exists(metric_name):
             return ResolvedName(path=metric_name, resolution="external-module")
         else:
             metric_name = metric_name.lower()
             module_name = f"jury.metrics.{metric_name}"
             return ResolvedName(path=module_name, resolution="internal-module")
-
-    def _compute_single_pred_single_ref(
-        self,
-        predictions: EvaluationInstance,
-        references: EvaluationInstance,
-        **kwargs,
-    ):
-        raise NotImplementedError
-
-    def _compute_multi_pred_multi_ref(
-        self,
-        predictions: EvaluationInstance,
-        references: EvaluationInstance,
-        **kwargs,
-    ):
-        raise NotImplementedError
-
-    def _compute_single_pred_multi_ref(
-        self,
-        predictions: EvaluationInstance,
-        references: EvaluationInstance,
-        **kwargs,
-    ):
-        raise NotImplementedError

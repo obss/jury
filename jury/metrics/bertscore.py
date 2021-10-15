@@ -18,7 +18,7 @@ https://github.com/huggingface/datasets/blob/master/metrics/bertscore/bertscore.
 
 import functools
 from contextlib import contextmanager
-from typing import Dict, List
+from typing import Dict, List, Optional, Any
 
 import datasets
 import numpy as np
@@ -27,6 +27,7 @@ from packaging import version
 
 from jury.collator import Collator
 from jury.metrics._core import MetricForLanguageGeneration
+from jury.metrics._core.base import MetricAlias, Metric
 from jury.metrics._core.utils import PackagePlaceholder, requirement_message
 
 # `import bert_score` placeholder
@@ -117,7 +118,7 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Bertscore(MetricForLanguageGeneration):
+class BertscoreForLanguageGeneration(MetricForLanguageGeneration):
     def _download_and_prepare(self, dl_manager):
         global bert_score
 
@@ -126,7 +127,7 @@ class Bertscore(MetricForLanguageGeneration):
         except ModuleNotFoundError:
             raise ModuleNotFoundError(requirement_message(metric_name="Bertscore", package_name="bert-score"))
         else:
-            super(Bertscore, self)._download_and_prepare(dl_manager)
+            super(BertscoreForLanguageGeneration, self)._download_and_prepare(dl_manager)
 
     def _info(self):
         return datasets.MetricInfo(
@@ -344,3 +345,15 @@ class Bertscore(MetricForLanguageGeneration):
         if isinstance(reference, str):
             reference = [reference]
         super().add(prediction=prediction, reference=reference, **kwargs)
+
+
+class Bertscore(MetricAlias):
+    @classmethod
+    def by_task(
+        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
+    ) -> Metric:
+        return BertscoreForLanguageGeneration.construct(
+                resulting_name=resulting_name,
+                compute_kwargs=compute_kwargs,
+                **kwargs
+        )

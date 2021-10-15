@@ -18,17 +18,16 @@ datasets package implementation of Accuracy metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/precision/precision.py
 """
 from collections import Counter
-from typing import Any, Callable, Dict, Optional
+from typing import Callable
 
 import datasets
 import numpy as np
 
 from jury.collator import Collator
-from jury.metrics import AutoMetric
-from jury.metrics._core import MetricForLanguageGeneration
-from jury.metrics._core.utils import normalize_text
+from jury.metrics._core import TaskMapper, MetricForLanguageGeneration
+from jury.metrics._core.utils import TaskNotAvailable, normalize_text
 
-__class_names__ = {"precision": "PrecisionForLanguageGeneration"}
+__class_names__ = {"precision": "Precision"}
 
 _CITATION = """\
 @inproceedings{papineni2002bleu,
@@ -131,14 +130,14 @@ class PrecisionForLanguageGeneration(MetricForLanguageGeneration):
         return self._reduce_scores(scores, reduce_fn=np.mean)
 
 
-class Precision(AutoMetric):
-    _subclasses = {"language-generation": PrecisionForLanguageGeneration}
+class Precision(TaskMapper):
+    _TASKS = {"language-generation": PrecisionForLanguageGeneration}
+    _METRIC_NAME = list(__class_names__.keys())[0]
 
-    def __init__(self, task: str, compute_kwargs: Optional[Dict[str, Any]], **kwargs):
-        self._task = task
-        self._compute_kwargs = compute_kwargs
-        self._construction_kwargs = kwargs
-        self._constructor = self._subclasses[task]
-
-    def __call__(self):
-        pass
+    @classmethod
+    def _get_subclass(cls, task: str):
+        metric_name = cls._METRIC_NAME
+        subclass = cls._TASKS.get(task)
+        if subclass is None:
+            raise TaskNotAvailable(metric_name=metric_name, task=task)
+        return subclass

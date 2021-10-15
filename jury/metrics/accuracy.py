@@ -24,8 +24,8 @@ import datasets
 import numpy as np
 
 from jury.collator import Collator
-from jury.metrics._core import MetricForLanguageGeneration
-from jury.metrics._core.utils import normalize_text
+from jury.metrics._core import TaskMapper, MetricForLanguageGeneration
+from jury.metrics._core.utils import TaskNotAvailable, normalize_text
 
 __class_names__ = {"accuracy": "Accuracy"}
 
@@ -72,7 +72,7 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Accuracy(MetricForLanguageGeneration):
+class AccuracyForLanguageGeneration(MetricForLanguageGeneration):
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,
@@ -104,7 +104,7 @@ class Accuracy(MetricForLanguageGeneration):
         return {"score": avg_score}
 
     def _compute_single_pred_multi_ref(
-        self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs
+        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
     ):
         scores = []
         for pred, refs in zip(predictions, references):
@@ -117,7 +117,9 @@ class Accuracy(MetricForLanguageGeneration):
 
         return self._reduce_scores(scores, reduce_fn=np.mean)
 
-    def _compute_multi_pred_multi_ref(self, predictions: Collator, references: Collator, reduce_fn: Callable, **kwargs):
+    def _compute_multi_pred_multi_ref(
+        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
+    ):
         scores = []
         for preds, refs in zip(predictions, references):
             pred_scores = []
@@ -130,3 +132,16 @@ class Accuracy(MetricForLanguageGeneration):
             scores.append(reduced_score)
 
         return self._reduce_scores(scores, reduce_fn=np.mean)
+
+
+class Accuracy(TaskMapper):
+    _TASKS = {"language-generation": AccuracyForLanguageGeneration}
+    _METRIC_NAME = list(__class_names__.keys())[0]
+
+    @classmethod
+    def _get_subclass(cls, task: str):
+        metric_name = cls._METRIC_NAME
+        subclass = cls._TASKS.get(task)
+        if subclass is None:
+            raise TaskNotAvailable(metric_name=metric_name, task=task)
+        return subclass

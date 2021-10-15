@@ -16,15 +16,17 @@
 datasets package implementation of METEOR metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/meteor/meteor.py
 """
-from typing import Dict, Optional
+from typing import Callable, Dict, Optional, Any
 
 import datasets
 import numpy as np
 from nltk.translate import meteor_score
 
-__class_names__ = {"meteor": "Meteor"}
-
+from jury.collator import Collator
 from jury.metrics._core import MetricForLanguageGeneration
+from jury.metrics._core.base import MetricAlias, Metric
+
+__class_names__ = {"meteor": "Meteor"}
 
 _CITATION = """\
 @inproceedings{banarjee2005,
@@ -86,7 +88,7 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Meteor(MetricForLanguageGeneration):
+class MeteorForLanguageGeneration(MetricForLanguageGeneration):
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,
@@ -110,21 +112,27 @@ class Meteor(MetricForLanguageGeneration):
 
         nltk.download("wordnet")
 
-    def _compute_single_pred_single_ref(self, predictions, references, reduce_fn=None, alpha=0.9, beta=3, gamma=0.5):
+    def _compute_single_pred_single_ref(
+        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, alpha=0.9, beta=3, gamma=0.5
+    ):
         scores = [
             meteor_score.single_meteor_score(ref, pred, alpha=alpha, beta=beta, gamma=gamma)
             for ref, pred in zip(references, predictions)
         ]
         return {"score": self._reduce_scores(scores, reduce_fn=np.mean)}
 
-    def _compute_single_pred_multi_ref(self, predictions, references, reduce_fn=None, alpha=0.9, beta=3, gamma=0.5):
+    def _compute_single_pred_multi_ref(
+        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, alpha=0.9, beta=3, gamma=0.5
+    ):
         scores = [
             meteor_score.meteor_score(references=ref, hypothesis=pred, alpha=alpha, beta=beta, gamma=gamma)
             for ref, pred in zip(references, predictions)
         ]
         return {"score": self._reduce_scores(scores, reduce_fn=np.mean)}
 
-    def _compute_multi_pred_multi_ref(self, predictions, references, reduce_fn, alpha=0.9, beta=3, gamma=0.5):
+    def _compute_multi_pred_multi_ref(
+        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, alpha=0.9, beta=3, gamma=0.5
+    ):
         scores = []
         for pred, ref in zip(predictions, references):
             score = [
@@ -134,3 +142,15 @@ class Meteor(MetricForLanguageGeneration):
             reduced_score = reduce_fn(score)
             scores.append(reduce_fn(reduced_score))
         return {"score": self._reduce_scores(scores, reduce_fn=np.mean)}
+
+
+class Meteor(MetricAlias):
+    @classmethod
+    def by_task(
+        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
+    ) -> Metric:
+        return MeteorForLanguageGeneration.construct(
+                resulting_name=resulting_name,
+                compute_kwargs=compute_kwargs,
+                **kwargs
+        )

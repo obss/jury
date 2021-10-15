@@ -24,8 +24,8 @@ import datasets
 import numpy as np
 
 from jury.collator import Collator
-from jury.metrics._core import MetricForLanguageGeneration
-from jury.metrics._core.utils import normalize_text
+from jury.metrics._core import TaskMapper, MetricForLanguageGeneration
+from jury.metrics._core.utils import TaskNotAvailable, normalize_text
 
 __class_names__ = {"recall": "Recall"}
 
@@ -71,7 +71,7 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Recall(MetricForLanguageGeneration):
+class RecallForLanguageGeneration(MetricForLanguageGeneration):
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,
@@ -131,3 +131,16 @@ class Recall(MetricForLanguageGeneration):
             scores.append(reduced_score)
 
         return self._reduce_scores(scores, reduce_fn=np.mean)
+
+
+class Recall(TaskMapper):
+    _TASKS = {"language-generation": RecallForLanguageGeneration}
+    _METRIC_NAME = list(__class_names__.keys())[0]
+
+    @classmethod
+    def _get_subclass(cls, task: str):
+        metric_name = cls._METRIC_NAME
+        subclass = cls._TASKS.get(task)
+        if subclass is None:
+            raise TaskNotAvailable(metric_name=metric_name, task=task)
+        return subclass

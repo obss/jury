@@ -18,7 +18,7 @@ datasets package implementation of ROUGE metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/rouge/rouge.py
 """
 
-from typing import Callable, Dict, List, Optional, Union
+from typing import Callable, Dict, List, Optional, Union, Any
 
 import datasets
 import pandas as pd
@@ -28,7 +28,9 @@ from jury.collator import Collator
 
 __class_names__ = {"rouge": "Rouge"}
 
-from jury.metrics._core import MetricForLanguageGeneration
+from jury.metrics._core import TaskMapper, MetricForLanguageGeneration
+from jury.metrics._core.base import MetricAlias, Metric
+from jury.metrics._core.utils import TaskNotAvailable
 
 _CITATION = """\
 @inproceedings{lin-2004-rouge,
@@ -92,7 +94,7 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Rouge(MetricForLanguageGeneration):
+class RougeForLanguageGeneration(MetricForLanguageGeneration):
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,
@@ -238,3 +240,15 @@ class Rouge(MetricForLanguageGeneration):
             score = self._select_mid_from_aggregation(self._aggregate(multi_aggregator))
             aggregator = self._add_score(aggregator, score)
         return aggregator
+
+
+class Rouge(MetricAlias):
+    @classmethod
+    def by_task(
+        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
+    ) -> Metric:
+        return RougeForLanguageGeneration.construct(
+                resulting_name=resulting_name,
+                compute_kwargs=compute_kwargs,
+                **kwargs
+        )

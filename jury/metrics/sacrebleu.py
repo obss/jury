@@ -18,14 +18,15 @@ of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/sacrebleu/sacrebleu.py
 """
 import math
-from typing import Callable, Dict, Sequence
+from typing import Callable, Dict, Sequence, Optional, Any
 
 import datasets
 from packaging import version
 
 from jury.collator import Collator
-from jury.metrics._core import MetricForLanguageGeneration
-from jury.metrics._core.utils import PackagePlaceholder, get_token_lengths, requirement_message
+from jury.metrics._core import TaskMapper, MetricForLanguageGeneration
+from jury.metrics._core.base import MetricAlias, Metric
+from jury.metrics._core.utils import PackagePlaceholder, TaskNotAvailable, get_token_lengths, requirement_message
 from jury.tokenizer import BLEUDefaultTokenizer
 
 # `import sacrebleu as scb` placeholder
@@ -100,7 +101,7 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Sacrebleu(MetricForLanguageGeneration):
+class SacrebleuForLanguageGeneration(MetricForLanguageGeneration):
     def _download_and_prepare(self, dl_manager):
         global scb
         try:
@@ -108,7 +109,7 @@ class Sacrebleu(MetricForLanguageGeneration):
         except ModuleNotFoundError:
             raise ModuleNotFoundError(requirement_message(metric_name="Sacrebleu", package_name="sacrebleu"))
         else:
-            super(Sacrebleu, self)._download_and_prepare(dl_manager)
+            super(SacrebleuForLanguageGeneration, self)._download_and_prepare(dl_manager)
 
     def _info(self):
         if version.parse(scb.__version__) < version.parse("1.4.12"):
@@ -274,3 +275,16 @@ class Sacrebleu(MetricForLanguageGeneration):
             eval_fn = self._compute_multi_pred_multi_ref
         self._validate_references(references)
         return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)
+
+
+class Sacrebleu(MetricAlias):
+    @classmethod
+    def by_task(
+        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
+    ) -> Metric:
+        return SacrebleuForLanguageGeneration.construct(
+                resulting_name=resulting_name,
+                compute_kwargs=compute_kwargs,
+                **kwargs
+        )
+

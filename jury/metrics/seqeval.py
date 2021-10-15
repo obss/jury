@@ -18,12 +18,13 @@ of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/seqeval/seqeval.py
 """
 import importlib
-from typing import List, Optional, Union
+from typing import List, Optional, Union, Any, Dict
 
 import datasets
 
-from jury.metrics._core import MetricForSequenceLabeling, SequenceClassificationInstance
-from jury.metrics._core.utils import PackagePlaceholder, requirement_message
+from jury.metrics._core import TaskMapper, MetricForSequenceLabeling, SequenceClassificationInstance
+from jury.metrics._core.base import MetricAlias, Metric
+from jury.metrics._core.utils import PackagePlaceholder, TaskNotAvailable, requirement_message
 
 # `import seqeval` placeholder
 seqeval = PackagePlaceholder(version="1.2.2")
@@ -109,7 +110,7 @@ Examples:
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class Seqeval(MetricForSequenceLabeling):
+class SeqevalForLanguageGeneration(MetricForSequenceLabeling):
     def _download_and_prepare(self, dl_manager):
         global seqeval
         try:
@@ -117,7 +118,7 @@ class Seqeval(MetricForSequenceLabeling):
         except ModuleNotFoundError:
             raise ModuleNotFoundError(requirement_message(metric_name="Seqeval", package_name="seqeval"))
         else:
-            super(Seqeval, self)._download_and_prepare(dl_manager)
+            super(SeqevalForLanguageGeneration, self)._download_and_prepare(dl_manager)
 
     def _info(self):
         return datasets.MetricInfo(
@@ -175,3 +176,15 @@ class Seqeval(MetricForSequenceLabeling):
         scores["overall_accuracy"] = float(seqeval.metrics.accuracy_score(y_true=references, y_pred=predictions))
 
         return scores
+
+
+class Seqeval(MetricAlias):
+    @classmethod
+    def by_task(
+        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
+    ) -> Metric:
+        return SeqevalForLanguageGeneration.construct(
+                resulting_name=resulting_name,
+                compute_kwargs=compute_kwargs,
+                **kwargs
+        )

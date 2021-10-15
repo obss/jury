@@ -27,8 +27,7 @@ import pandas as pd
 from datasets.utils.logging import get_logger
 
 from jury.collator import Collator
-from jury.metrics import AutoMetric
-from jury.metrics._core.utils import import_module, is_reduce_fn
+from jury.metrics._core.utils import TaskNotAvailable, import_module, is_reduce_fn
 
 LanguageGenerationInstance = Union[List[str], List[List[str]]]
 SequenceClassificationInstance = List[int]
@@ -37,18 +36,6 @@ EvaluationInstance = Union[LanguageGenerationInstance, SequenceClassificationIns
 MetricOutput = Dict[str, Union[str, int, float]]
 
 logger = get_logger(__name__)
-
-
-def load_metric(
-    metric_name: str,
-    resulting_name: str = None,
-    task: Optional[str] = None,
-    compute_kwargs: Dict[str, Any] = None,
-    **kwargs,
-) -> "Metric":
-    return AutoMetric(
-        metric_name=metric_name, resulting_name=resulting_name, task=task, compute_kwargs=compute_kwargs, **kwargs
-    )
 
 
 class Metric(datasets.Metric, ABC):
@@ -187,6 +174,66 @@ class Metric(datasets.Metric, ABC):
         return self._task
 
 
+class TaskMapper(ABC):
+    """
+    Base metric factory class which will be used as mapper for any metric class. This class is used by Autometric.
+    """
+
+    _METRIC_NAME = None
+
+    def __init__(self, *args, **kwargs):
+        raise EnvironmentError("This class is designed to be instantiated by using 'by_task()' method.")
+
+    @classmethod
+    def by_task(
+        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
+    ) -> Metric:
+        cls.metric_name = cls.__class__.__name__
+        subclass = cls._get_subclass(task=task)
+        resulting_name = resulting_name or cls._get_metric_name()
+        return subclass.construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
+
+    @staticmethod
+    def _get_subclass(task: str) -> Metric:
+        """
+        All metric modules must implement this method as it is used to call metrics by default. Should raise
+        proper exception (``TaskNotAvailable``) if the task is not supported by the metric.
+
+        Args:
+            task: (``str``) Task name for the desired metric.
+
+        Raises: TaskNotAvailable if given task does not match for desired metric.
+
+        Returns: Metric for proper task.
+        """
+        raise NotImplementedError
+
+    @classmethod
+    def _get_metric_name(cls) -> str:
+        """
+        All metric modules must implement this method as it is used to form MetricOutput properly.
+
+        Returns: Metric name.
+        """
+        return cls._METRIC_NAME
+
+
+class MetricAlias(TaskMapper):
+    @classmethod
+    def by_task(
+        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
+    ) -> Metric:
+        raise NotImplementedError
+
+    @staticmethod
+    def _get_subclass(task: str) -> Metric:
+        raise NotImplemented
+
+    @classmethod
+    def _get_metric_name(cls) -> str:
+        raise NotImplemented
+
+
 class MetricForLanguageGeneration(Metric):
     _default_features = datasets.Features(
         {
@@ -201,6 +248,10 @@ class MetricForLanguageGeneration(Metric):
         )
         if "reduce_fn" not in self.compute_kwargs:
             self.compute_kwargs.update({"reduce_fn": "max"})
+
+    @classmethod
+    def construct(cls, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs):
+        return cls(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
     def _compute(
         self,
