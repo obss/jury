@@ -23,8 +23,7 @@ import datasets
 import numpy as np
 
 from jury.collator import Collator
-from jury.metrics._core import MetricForLanguageGeneration
-from jury.metrics._core.base import LanguageGenerationInstance, TaskMapper
+from jury.metrics._core import LanguageGenerationInstance, MetricForLanguageGeneration, TaskMapper
 from jury.metrics._core.utils import TaskNotAvailable, normalize_text
 from jury.metrics.precision import Precision
 from jury.metrics.recall import RecallForLanguageGeneration

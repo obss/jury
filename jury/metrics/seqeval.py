@@ -18,13 +18,12 @@ of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/seqeval/seqeval.py
 """
 import importlib
-from typing import List, Optional, Union, Any, Dict
+from typing import Any, Dict, List, Optional, Union
 
 import datasets
 
-from jury.metrics._core import TaskMapper, MetricForSequenceLabeling, SequenceClassificationInstance
-from jury.metrics._core.base import MetricAlias, Metric
-from jury.metrics._core.utils import PackagePlaceholder, TaskNotAvailable, requirement_message
+from jury.metrics._core import Metric, MetricAlias, MetricForSequenceLabeling, SequenceClassificationInstance
+from jury.metrics._core.utils import PackagePlaceholder, requirement_message
 
 # `import seqeval` placeholder
 seqeval = PackagePlaceholder(version="1.2.2")
@@ -184,7 +183,5 @@ class Seqeval(MetricAlias):
         cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
     ) -> Metric:
         return SeqevalForLanguageGeneration.construct(
-                resulting_name=resulting_name,
-                compute_kwargs=compute_kwargs,
-                **kwargs
+            resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs
         )

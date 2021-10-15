@@ -20,13 +20,12 @@ https://github.com/huggingface/datasets/blob/master/metrics/bleu/bleu.py
 
 import math
 import os
-from typing import Callable, Dict, Tuple, Optional, Any
+from typing import Any, Callable, Dict, Optional, Tuple
 
 import datasets
 
 from jury.collator import Collator
-from jury.metrics._core import TaskMapper, MetricForLanguageGeneration
-from jury.metrics._core.base import MetricAlias, Metric
+from jury.metrics._core import Metric, MetricAlias, MetricForLanguageGeneration, TaskMapper
 from jury.metrics._core.utils import TaskNotAvailable, download, get_token_lengths
 from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
 
@@ -247,7 +246,5 @@ class Bleu(MetricAlias):
         cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
     ) -> Metric:
         return BleuForLanguageGeneration.construct(
-                resulting_name=resulting_name,
-                compute_kwargs=compute_kwargs,
-                **kwargs
+            resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs
         )

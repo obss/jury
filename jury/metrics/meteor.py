@@ -16,15 +16,14 @@
 datasets package implementation of METEOR metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/meteor/meteor.py
 """
-from typing import Callable, Dict, Optional, Any
+from typing import Any, Callable, Dict, Optional
 
 import datasets
 import numpy as np
 from nltk.translate import meteor_score
 
 from jury.collator import Collator
-from jury.metrics._core import MetricForLanguageGeneration
-from jury.metrics._core.base import MetricAlias, Metric
+from jury.metrics._core import Metric, MetricAlias, MetricForLanguageGeneration
 
 __class_names__ = {"meteor": "Meteor"}
 
@@ -150,7 +149,5 @@ class Meteor(MetricAlias):
         cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
     ) -> Metric:
         return MeteorForLanguageGeneration.construct(
-                resulting_name=resulting_name,
-                compute_kwargs=compute_kwargs,
-                **kwargs
+            resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs
         )

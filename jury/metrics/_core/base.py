@@ -24,10 +24,11 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 import datasets
 import numpy
 import pandas as pd
+from datasets import MetricInfo
 from datasets.utils.logging import get_logger
 
 from jury.collator import Collator
-from jury.metrics._core.utils import TaskNotAvailable, import_module, is_reduce_fn
+from jury.metrics._core.utils import import_module, is_reduce_fn
 
 LanguageGenerationInstance = Union[List[str], List[List[str]]]
 SequenceClassificationInstance = List[int]
@@ -174,84 +175,63 @@ class Metric(datasets.Metric, ABC):
         return self._task
 
 
-class TaskMapper(ABC):
-    """
-    Base metric factory class which will be used as mapper for any metric class. This class is used by Autometric.
-    """
+class MetricForTask(Metric, ABC):
+    _default_features = None
+    _task = None
 
-    _METRIC_NAME = None
+    def __init__(self, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs):
+        compute_kwargs = self._validate_compute_kwargs(compute_kwargs)
+        super().__init__(task=self._task, resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
-    def __init__(self, *args, **kwargs):
-        raise EnvironmentError("This class is designed to be instantiated by using 'by_task()' method.")
+    def _validate_compute_kwargs(self, compute_kwargs: Dict[str, Any]) -> Dict[str, Any]:
+        if compute_kwargs is not None and "reduce_fn" in compute_kwargs:
+            compute_kwargs.pop("reduce_fn")
+        return compute_kwargs
 
-    @classmethod
-    def by_task(
-        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
-    ) -> Metric:
-        cls.metric_name = cls.__class__.__name__
-        subclass = cls._get_subclass(task=task)
-        resulting_name = resulting_name or cls._get_metric_name()
-        return subclass.construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
+    @abstractmethod
+    def _compute_single_pred_single_ref(
+        self, predictions: EvaluationInstance, references: EvaluationInstance, **kwargs
+    ):
+        pass
 
-    @staticmethod
-    def _get_subclass(task: str) -> Metric:
-        """
-        All metric modules must implement this method as it is used to call metrics by default. Should raise
-        proper exception (``TaskNotAvailable``) if the task is not supported by the metric.
+    @abstractmethod
+    def _compute_single_pred_multi_ref(self, predictions: EvaluationInstance, references: EvaluationInstance, **kwargs):
+        pass
 
-        Args:
-            task: (``str``) Task name for the desired metric.
+    @abstractmethod
+    def _compute_multi_pred_multi_ref(self, predictions: EvaluationInstance, references: EvaluationInstance, **kwargs):
+        pass
 
-        Raises: TaskNotAvailable if given task does not match for desired metric.
+    @abstractmethod
+    def _info(self) -> MetricInfo:
+        pass
 
-        Returns: Metric for proper task.
-        """
-        raise NotImplementedError
-
-    @classmethod
-    def _get_metric_name(cls) -> str:
-        """
-        All metric modules must implement this method as it is used to form MetricOutput properly.
-
-        Returns: Metric name.
-        """
-        return cls._METRIC_NAME
-
-
-class MetricAlias(TaskMapper):
-    @classmethod
-    def by_task(
-        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
-    ) -> Metric:
-        raise NotImplementedError
-
-    @staticmethod
-    def _get_subclass(task: str) -> Metric:
-        raise NotImplemented
+    @abstractmethod
+    def _compute(
+        self, *, predictions: EvaluationInstance = None, references: EvaluationInstance = None, **kwargs
+    ) -> MetricOutput:
+        pass
 
     @classmethod
-    def _get_metric_name(cls) -> str:
-        raise NotImplemented
+    def construct(cls, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs):
+        return cls(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
 
-class MetricForLanguageGeneration(Metric):
+class MetricForLanguageGeneration(MetricForTask):
     _default_features = datasets.Features(
         {
             "predictions": datasets.Sequence(datasets.Value("string", id="sequence")),
             "references": datasets.Sequence(datasets.Value("string", id="sequence")),
         }
     )
+    _task = "langueage-generation"
 
-    def __init__(self, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs):
-        super().__init__(
-            task="language-generation", resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs
-        )
-        if "reduce_fn" not in self.compute_kwargs:
-            self.compute_kwargs.update({"reduce_fn": "max"})
-
-    @classmethod
-    def construct(cls, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs):
-        return cls(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
+    def _validate_compute_kwargs(self, compute_kwargs: Dict[str, Any]) -> Dict[str, Any]:
+        if compute_kwargs is None:
+            compute_kwargs = {}
+        if "reduce_fn" not in compute_kwargs:
+            compute_kwargs.update({"reduce_fn": "max"})
+        return compute_kwargs
 
     def _compute(
         self,
@@ -366,20 +346,14 @@ class MetricForLanguageGeneration(Metric):
         return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)
 
 
-class MetricForSequenceClassification(Metric):
+class MetricForSequenceClassification(MetricForTask):
     _default_features = datasets.Features(
         {
             "predictions": datasets.Value("int32", id="sequence"),
             "references": datasets.Value("int32", id="sequence"),
         }
     )
-
-    def __init__(self, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs):
-        super().__init__(
-            task="sequence-classification", resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs
-        )
-        if "reduce_fn" in self.compute_kwargs:
-            self.compute_kwargs.pop("reduce_fn")
+    _task = "sequence-classification"
 
     def _compute(
         self,
@@ -429,18 +403,14 @@ class MetricForSequenceClassification(Metric):
         raise NotImplementedError(f"Task {self._task} does not support multiple predictions or multiple" "references.")
 
 
-class MetricForSequenceLabeling(Metric):
+class MetricForSequenceLabeling(MetricForTask):
     _default_features = datasets.Features(
         {
             "predictions": datasets.Sequence(datasets.Value("string", id="sequence")),
             "references": datasets.Sequence(datasets.Value("string", id="sequence")),
         }
     )
-
-    def __init__(self, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs):
-        super().__init__(
-            task="sequence-labeling", resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs
-        )
+    _task = "sequence-labeling"
 
     def _compute(
         self,

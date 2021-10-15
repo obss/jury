@@ -18,7 +18,7 @@ https://github.com/huggingface/datasets/blob/master/metrics/bertscore/bertscore.
 
 import functools
 from contextlib import contextmanager
-from typing import Dict, List, Optional, Any
+from typing import Any, Dict, List, Optional
 
 import datasets
 import numpy as np
@@ -26,8 +26,7 @@ import pandas as pd
 from packaging import version
 
 from jury.collator import Collator
-from jury.metrics._core import MetricForLanguageGeneration
-from jury.metrics._core.base import MetricAlias, Metric
+from jury.metrics._core import Metric, MetricAlias, MetricForLanguageGeneration
 from jury.metrics._core.utils import PackagePlaceholder, requirement_message
 
 # `import bert_score` placeholder
@@ -353,7 +352,5 @@ class Bertscore(MetricAlias):
         cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
     ) -> Metric:
         return BertscoreForLanguageGeneration.construct(
-                resulting_name=resulting_name,
-                compute_kwargs=compute_kwargs,
-                **kwargs
+            resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs
         )

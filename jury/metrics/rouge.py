@@ -18,7 +18,7 @@ datasets package implementation of ROUGE metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/rouge/rouge.py
 """
 
-from typing import Callable, Dict, List, Optional, Union, Any
+from typing import Any, Callable, Dict, List, Optional, Union
 
 import datasets
 import pandas as pd
@@ -28,8 +28,7 @@ from jury.collator import Collator
 
 __class_names__ = {"rouge": "Rouge"}
 
-from jury.metrics._core import TaskMapper, MetricForLanguageGeneration
-from jury.metrics._core.base import MetricAlias, Metric
+from jury.metrics._core import Metric, MetricAlias, MetricForLanguageGeneration
 from jury.metrics._core.utils import TaskNotAvailable
 
 _CITATION = """\
@@ -248,7 +247,5 @@ class Rouge(MetricAlias):
         cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
     ) -> Metric:
         return RougeForLanguageGeneration.construct(
-                resulting_name=resulting_name,
-                compute_kwargs=compute_kwargs,
-                **kwargs
+            resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs
         )

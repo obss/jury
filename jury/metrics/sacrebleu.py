@@ -18,15 +18,14 @@ of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/sacrebleu/sacrebleu.py
 """
 import math
-from typing import Callable, Dict, Sequence, Optional, Any
+from typing import Any, Callable, Dict, Optional, Sequence
 
 import datasets
 from packaging import version
 
 from jury.collator import Collator
-from jury.metrics._core import TaskMapper, MetricForLanguageGeneration
-from jury.metrics._core.base import MetricAlias, Metric
-from jury.metrics._core.utils import PackagePlaceholder, TaskNotAvailable, get_token_lengths, requirement_message
+from jury.metrics._core import Metric, MetricAlias, MetricForLanguageGeneration
+from jury.metrics._core.utils import PackagePlaceholder, get_token_lengths, requirement_message
 from jury.tokenizer import BLEUDefaultTokenizer
 
 # `import sacrebleu as scb` placeholder
@@ -283,8 +282,5 @@ class Sacrebleu(MetricAlias):
         cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
     ) -> Metric:
         return SacrebleuForLanguageGeneration.construct(
-                resulting_name=resulting_name,
-                compute_kwargs=compute_kwargs,
-                **kwargs
+            resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs
         )
-

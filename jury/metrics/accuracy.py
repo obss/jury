@@ -24,7 +24,7 @@ import datasets
 import numpy as np
 
 from jury.collator import Collator
-from jury.metrics._core import TaskMapper, MetricForLanguageGeneration
+from jury.metrics._core import MetricForLanguageGeneration, TaskMapper
 from jury.metrics._core.utils import TaskNotAvailable, normalize_text
 
 __class_names__ = {"accuracy": "Accuracy"}

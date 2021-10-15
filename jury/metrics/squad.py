@@ -17,16 +17,15 @@ of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/squad/squad.py"""
 
 import os
-from typing import Callable, Dict, List, Optional, Any
+from typing import Any, Callable, Dict, List, Optional
 
 import datasets
 import numpy as np
 import pandas as pd
 
 from jury.collator import Collator
-from jury.metrics._core import TaskMapper, MetricForLanguageGeneration
-from jury.metrics._core.base import MetricAlias, Metric
-from jury.metrics._core.utils import TaskNotAvailable, download
+from jury.metrics._core import Metric, MetricAlias, MetricForLanguageGeneration
+from jury.metrics._core.utils import download
 from jury.utils import NestedSingleType
 
 __class_names__ = {"squad": "Squad"}
@@ -189,7 +188,5 @@ class Squad(MetricAlias):
         cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
     ) -> Metric:
         return SquadForLanguageGeneration.construct(
-                resulting_name=resulting_name,
-                compute_kwargs=compute_kwargs,
-                **kwargs
+            resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs
         )

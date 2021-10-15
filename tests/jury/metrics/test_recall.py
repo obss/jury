@@ -1,7 +1,7 @@
 import pytest
 
 from jury import Jury
-from jury.metrics import RecallForLanguageGeneration
+from jury.metrics.recall import RecallForLanguageGeneration
 from tests.jury.conftest import get_expected_output
 from tests.utils import assert_almost_equal_dict
 

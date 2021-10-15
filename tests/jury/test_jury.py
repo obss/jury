@@ -145,7 +145,7 @@ def test_reduce_fn(predictions, references, jury):
 
 def test_load_metric():
     from jury import load_metric
-    from jury.metrics import Metric as JuryMetric
+    from jury.metrics._core import Metric as JuryMetric
 
     assert isinstance(load_metric("squad"), JuryMetric)
     assert isinstance(load_metric("squad_v2"), datasets.Metric)

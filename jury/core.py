@@ -3,7 +3,8 @@ from typing import Any, Callable, Dict, List, Mapping, Optional, Union
 
 from jury.collator import Collator
 from jury.definitions import DEFAULT_METRICS
-from jury.metrics import Metric, load_metric
+from jury.metrics import load_metric
+from jury.metrics._core import Metric
 from jury.utils import replace, set_env
 
 MetricParam = Union[str, Metric, Dict[str, Any]]
