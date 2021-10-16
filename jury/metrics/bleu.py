@@ -241,10 +241,5 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
 
 
 class Bleu(MetricAlias):
-    @classmethod
-    def by_task(
-        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
-    ) -> Metric:
-        return BleuForLanguageGeneration.construct(
-            resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs
-        )
+    _METRIC_NAME = list(__class_names__.keys())[0]
+    _SUBCLASS = BleuForLanguageGeneration

@@ -347,6 +347,8 @@ class BertscoreForLanguageGeneration(MetricForLanguageGeneration):
 
 
 class Bertscore(MetricAlias):
+    _METRIC_NAME = list(__class_names__.keys())[0]
+
     @classmethod
     def by_task(
         cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs

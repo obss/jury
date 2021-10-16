@@ -1,7 +1,9 @@
 from abc import ABC
 from typing import Any, Dict, Optional
 
-from jury.metrics._core.base import MetricForTask
+from datasets import MetricInfo
+
+from jury.metrics._core.base import MetricForTask, EvaluationInstance, MetricOutput
 
 
 class TaskMapper(ABC):
@@ -18,7 +20,6 @@ class TaskMapper(ABC):
     def by_task(
         cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
     ):
-        cls.metric_name = cls.__class__.__name__
         subclass = cls._get_subclass(task=task)
         resulting_name = resulting_name or cls._get_metric_name()
         return subclass.construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
@@ -48,17 +49,14 @@ class TaskMapper(ABC):
         return cls._METRIC_NAME
 
 
-class MetricAlias(MetricForTask, TaskMapper):
+class MetricAlias(TaskMapper):
+    _SUBCLASS = None
+
     @classmethod
     def by_task(
-        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
+            cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None,
+            **kwargs
     ):
-        raise NotImplementedError
-
-    @staticmethod
-    def _get_subclass(task: str):
-        raise NotImplemented
-
-    @classmethod
-    def _get_metric_name(cls) -> str:
-        raise NotImplemented
+        subclass = cls._SUBCLASS
+        resulting_name = resulting_name or cls._get_metric_name()
+        return subclass.construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)

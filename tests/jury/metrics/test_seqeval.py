@@ -1,14 +1,15 @@
 import pytest
 
 from jury import Jury
-from jury.metrics.seqeval import Seqeval
+from jury.metrics import AutoMetric
 from tests.jury.conftest import get_expected_output
 from tests.utils import assert_almost_equal_dict
 
 
 @pytest.fixture(scope="module")
 def jury():
-    return Jury(metrics=[Seqeval()])
+    metric = AutoMetric.from_params("seqeval")
+    return Jury(metrics=metric)
 
 
 @pytest.fixture
