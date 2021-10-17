@@ -1,12 +1,10 @@
-from jury.metrics.bleu import BleuForLanguageGeneration as Bleu
-from jury.metrics.meteor import MeteorForLanguageGeneration as Meteor
-from jury.metrics.rouge import RougeForLanguageGeneration as Rouge
+from jury.metrics import AutoMetric
 
 DEFAULT_METRICS = [
-    Bleu(compute_kwargs={"max_order": 1}),
-    Bleu(compute_kwargs={"max_order": 2}),
-    Bleu(compute_kwargs={"max_order": 3}),
-    Bleu(compute_kwargs={"max_order": 4}),
-    Meteor(),
-    Rouge(),
+    AutoMetric.from_params("bleu", compute_kwargs={"max_order": 1}),
+    AutoMetric.from_params("bleu", compute_kwargs={"max_order": 2}),
+    AutoMetric.from_params("bleu", compute_kwargs={"max_order": 3}),
+    AutoMetric.from_params("bleu", compute_kwargs={"max_order": 4}),
+    AutoMetric.from_params("meteor"),
+    AutoMetric.from_params("rouge"),
 ]

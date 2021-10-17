@@ -109,7 +109,7 @@ class MeteorForLanguageGeneration(MetricForLanguageGeneration):
     def _download_and_prepare(self, dl_manager):
         import nltk
 
-        nltk.download("wordnet")
+        nltk.download("wordnet", quiet=True)
 
     def _compute_single_pred_single_ref(
         self, predictions: Collator, references: Collator, reduce_fn: Callable = None, alpha=0.9, beta=3, gamma=0.5

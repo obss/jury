@@ -3,7 +3,7 @@ from typing import Any, Dict, Optional
 
 from datasets import MetricInfo
 
-from jury.metrics._core.base import MetricForTask, EvaluationInstance, MetricOutput
+from jury.metrics._core.base import EvaluationInstance, MetricForTask, MetricOutput
 
 
 class TaskMapper(ABC):
@@ -54,8 +54,7 @@ class MetricAlias(TaskMapper):
 
     @classmethod
     def by_task(
-            cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None,
-            **kwargs
+        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
     ):
         subclass = cls._SUBCLASS
         resulting_name = resulting_name or cls._get_metric_name()

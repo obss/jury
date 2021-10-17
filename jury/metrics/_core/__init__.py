@@ -11,3 +11,4 @@ from jury.metrics._core.base import (
     SequenceClassificationInstance,
     SequenceLabelingInstance,
 )
+from jury.metrics._core.utils import PROJECT_ROOT

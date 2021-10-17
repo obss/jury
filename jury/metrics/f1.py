@@ -23,10 +23,8 @@ import datasets
 import numpy as np
 
 from jury.collator import Collator
-from jury.metrics._core import LanguageGenerationInstance, MetricForLanguageGeneration, TaskMapper
+from jury.metrics._core import LanguageGenerationInstance, MetricForLanguageGeneration, TaskMapper, load_metric
 from jury.metrics._core.utils import TaskNotAvailable, normalize_text
-from jury.metrics.precision import Precision
-from jury.metrics.recall import RecallForLanguageGeneration
 
 __class_names__ = {"f1": "F1"}
 
@@ -91,8 +89,8 @@ class F1ForLanguageGeneration(MetricForLanguageGeneration):
     def _compute_single_pred_single_ref(
         self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
     ):
-        recall = RecallForLanguageGeneration()
-        precision = Precision()
+        recall = load_metric("recall", task="language-generation")
+        precision = load_metric("precision", task="language-generation")
         predictions, references = predictions.nested(), references.nested()
         recall_score = recall.compute(predictions=predictions, references=references)["recall"]["score"]
         precision_score = precision.compute(predictions=predictions, references=references)["precision"]["score"]

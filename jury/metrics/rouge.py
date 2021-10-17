@@ -244,4 +244,3 @@ class RougeForLanguageGeneration(MetricForLanguageGeneration):
 class Rouge(MetricAlias):
     _METRIC_NAME = list(__class_names__.keys())[0]
     _SUBCLASS = RougeForLanguageGeneration
-

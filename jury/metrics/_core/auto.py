@@ -6,7 +6,7 @@ from typing import Any, Dict, NamedTuple, Optional
 import datasets
 
 from jury.metrics._core.base import Metric
-from jury.metrics._core.utils import import_module
+from jury.metrics._core.utils import import_module, list_metric_modules
 
 
 def load_metric(
@@ -14,10 +14,16 @@ def load_metric(
     resulting_name: str = None,
     task: Optional[str] = "language-generation",
     compute_kwargs: Dict[str, Any] = None,
+    use_jury_only: bool = False,
     **kwargs,
 ) -> Metric:
     return AutoMetric.from_params(
-        metric_name=metric_name, resulting_name=resulting_name, task=task, compute_kwargs=compute_kwargs, **kwargs
+        metric_name=metric_name,
+        resulting_name=resulting_name,
+        task=task,
+        use_jury_only=use_jury_only,
+        compute_kwargs=compute_kwargs,
+        **kwargs,
     )
 
 
@@ -36,7 +42,7 @@ class AutoMetric:
         task: Optional[str] = "language-generation",
         resulting_name: Optional[str] = None,
         compute_kwargs: Optional[Dict[str, Any]] = None,
-        use_jury_only: bool = True,
+        use_jury_only: bool = False,
         **kwargs,
     ) -> Metric:
         resolved_metric_name = cls.resolve_metric_name(metric_name)
@@ -44,7 +50,7 @@ class AutoMetric:
         # load the module, will raise ImportError if module cannot be loaded
         try:
             module_path = resolved_metric_name.path
-            if resolved_metric_name.resolution == "external-module" and not use_jury_only:
+            if resolved_metric_name.resolution == "external-module":
                 module_name = module_path.split("/")[-1].replace(".py", "")
                 module = import_module(module_name=module_name, filepath=module_path)
             else:
@@ -75,10 +81,11 @@ class AutoMetric:
             path: str
             resolution: str
 
-        metric_name = metric_name
-        if os.path.exists(metric_name):
-            return ResolvedName(path=metric_name, resolution="external-module")
-        else:
+        if metric_name in list_metric_modules():
             metric_name = metric_name.lower()
             module_name = f"jury.metrics.{metric_name}"
             return ResolvedName(path=module_name, resolution="internal-module")
+        elif os.path.exists(metric_name):
+            return ResolvedName(path=metric_name, resolution="external-module")
+        else:
+            return ResolvedName(path=metric_name, resolution="datasets")

@@ -3,10 +3,16 @@ import os
 import re
 import string
 import warnings
+from pathlib import Path
 from typing import Callable, Sequence, Union
 
 import numpy as np
 import requests
+
+PACKAGE_CORE = Path(os.path.abspath(os.path.dirname(__file__)))
+METRICS_ROOT = PACKAGE_CORE.parent
+PACKAGE_SOURCE = METRICS_ROOT.parent
+PROJECT_ROOT = PACKAGE_SOURCE.parent
 
 
 class PackagePlaceholder:
@@ -67,3 +73,9 @@ def normalize_text(text: str) -> str:
 def is_reduce_fn(fun: Callable) -> bool:
     result = np.array(fun([1, 2]))
     return result.size == 1
+
+
+def list_metric_modules():
+    _internal_metrics_path = METRICS_ROOT
+    metric_modules = list(_internal_metrics_path.glob("[!_]*"))
+    return [module_name.name.replace(".py", "") for module_name in metric_modules]

@@ -243,3 +243,25 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
 class Bleu(MetricAlias):
     _METRIC_NAME = list(__class_names__.keys())[0]
     _SUBCLASS = BleuForLanguageGeneration
+
+    @classmethod
+    def by_task(
+        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
+    ):
+        subclass = cls._SUBCLASS
+        resulting_name = resulting_name or cls._get_metric_name(compute_kwargs=compute_kwargs)
+        return subclass.construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
+
+    @classmethod
+    def _get_metric_name(cls, compute_kwargs: Dict[str, Any] = None) -> str:
+        """
+        All metric modules must implement this method as it is used to form MetricOutput properly.
+
+        Returns: Metric name.
+        """
+        if compute_kwargs is None:
+            return cls._METRIC_NAME
+
+        max_order = compute_kwargs.get("max_order")
+        if max_order is not None:
+            return f"{cls._METRIC_NAME}_{max_order}"

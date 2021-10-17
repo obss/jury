@@ -10,7 +10,7 @@ from tests.jury import EXPECTED_OUTPUTS
 
 _TEST_METRICS = [
     load_metric("accuracy"),
-    load_metric("bertscore", params={"model_type": "albert-base-v1", "device": "cpu"}),
+    load_metric("bertscore", compute_kwargs={"model_type": "albert-base-v1", "device": "cpu"}),
     load_metric("bleu"),
     load_metric("f1"),
     load_metric("meteor"),
@@ -38,9 +38,9 @@ _LIST_STR_TEST_METRICS = [
 
 _LIST_DICT_TEST_METRICS = [
     {"metric_name": "accuracy"},
-    {"metric_name": "bertscore", "model_type": "albert-base-v1"},
-    {"metric_name": "bleu", "resulting_name": "bleu-1", "max_order": 1},
-    {"metric_name": "bleu", "resulting_name": "bleu-2", "max_order": 2},
+    {"metric_name": "bertscore", "compute_kwargs": {"model_type": "albert-base-v1"}},
+    {"metric_name": "bleu", "resulting_name": "bleu-1", "compute_kwargs": {"max_order": 1}},
+    {"metric_name": "bleu", "resulting_name": "bleu-2", "compute_kwargs": {"max_order": 2}},
     {"metric_name": "f1", "resulting_name": "F1"},
     {"metric_name": "meteor", "resulting_name": "METEOR"},
     {"metric_name": "precision"},
