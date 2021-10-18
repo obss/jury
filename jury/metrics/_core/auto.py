@@ -70,7 +70,7 @@ class AutoMetric:
             metric = datasets.load_metric(resolved_metric_name.path)
         else:
             # get the class, will raise AttributeError if class cannot be found
-            factory_class = module.__class_names__.get(metric_name)
+            factory_class = module.__main_class__
             klass = getattr(module, factory_class)
             metric = klass.construct(task=task, resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
         return metric
@@ -83,7 +83,7 @@ class AutoMetric:
 
         if metric_name in list_metric_modules():
             metric_name = metric_name.lower()
-            module_name = f"jury.metrics.{metric_name}"
+            module_name = f"jury.metrics.{metric_name}.{metric_name}"
             return ResolvedName(path=module_name, resolution="internal-module")
         elif os.path.exists(metric_name):
             return ResolvedName(path=metric_name, resolution="external-module")

@@ -18,18 +18,14 @@ datasets package implementation of ROUGE metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/rouge/rouge.py
 """
 
-from typing import Any, Callable, Dict, List, Optional, Union
+from typing import Callable, Dict, List, Optional, Union
 
 import datasets
 import pandas as pd
 from rouge_score import rouge_scorer, scoring
 
 from jury.collator import Collator
-
-__class_names__ = {"rouge": "Rouge"}
-
-from jury.metrics._core import Metric, MetricAlias, MetricForLanguageGeneration
-from jury.metrics._core.utils import TaskNotAvailable
+from jury.metrics._core import MetricForLanguageGeneration
 
 _CITATION = """\
 @inproceedings{lin-2004-rouge,
@@ -99,12 +95,7 @@ class RougeForLanguageGeneration(MetricForLanguageGeneration):
             description=_DESCRIPTION,
             citation=_CITATION,
             inputs_description=_KWARGS_DESCRIPTION,
-            features=datasets.Features(
-                {
-                    "predictions": datasets.Sequence(datasets.Value("string", id="sequence")),
-                    "references": datasets.Sequence(datasets.Value("string", id="sequence")),
-                }
-            ),
+            features=self._default_features,
             codebase_urls=["https://github.com/google-research/google-research/tree/master/rouge"],
             reference_urls=[
                 "https://en.wikipedia.org/wiki/ROUGE_(metric)",
@@ -239,8 +230,3 @@ class RougeForLanguageGeneration(MetricForLanguageGeneration):
             score = self._select_mid_from_aggregation(self._aggregate(multi_aggregator))
             aggregator = self._add_score(aggregator, score)
         return aggregator
-
-
-class Rouge(MetricAlias):
-    _METRIC_NAME = list(__class_names__.keys())[0]
-    _SUBCLASS = RougeForLanguageGeneration

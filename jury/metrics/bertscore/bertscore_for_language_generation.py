@@ -18,7 +18,7 @@ https://github.com/huggingface/datasets/blob/master/metrics/bertscore/bertscore.
 
 import functools
 from contextlib import contextmanager
-from typing import Any, Dict, List, Optional
+from typing import Dict, List
 
 import datasets
 import numpy as np
@@ -26,13 +26,11 @@ import pandas as pd
 from packaging import version
 
 from jury.collator import Collator
-from jury.metrics._core import Metric, MetricAlias, MetricForLanguageGeneration
+from jury.metrics._core import MetricForLanguageGeneration
 from jury.metrics._core.utils import PackagePlaceholder, requirement_message
 
 # `import bert_score` placeholder
 bert_score = PackagePlaceholder(version="0.3.10")
-
-__class_names__ = {"bertscore": "Bertscore"}
 
 
 @contextmanager
@@ -134,12 +132,7 @@ class BertscoreForLanguageGeneration(MetricForLanguageGeneration):
             citation=_CITATION,
             homepage="https://github.com/Tiiiger/bert_score",
             inputs_description=_KWARGS_DESCRIPTION,
-            features=datasets.Features(
-                {
-                    "predictions": datasets.Sequence(datasets.Value("string", id="sequence")),
-                    "references": datasets.Sequence(datasets.Value("string", id="sequence"), id="references"),
-                }
-            ),
+            features=self._default_features,
             codebase_urls=["https://github.com/Tiiiger/bert_score"],
             reference_urls=[
                 "https://github.com/Tiiiger/bert_score",
@@ -344,8 +337,3 @@ class BertscoreForLanguageGeneration(MetricForLanguageGeneration):
         if isinstance(reference, str):
             reference = [reference]
         super().add(prediction=prediction, reference=reference, **kwargs)
-
-
-class Bertscore(MetricAlias):
-    _METRIC_NAME = list(__class_names__.keys())[0]
-    _SUBCLASS = BertscoreForLanguageGeneration

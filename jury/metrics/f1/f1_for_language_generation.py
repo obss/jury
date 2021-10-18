@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The HuggingFace Datasets Authors and the current dataset script contributor.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,21 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Modified Unigram Precision metric. The part of this file is adapted from HuggingFace's
-datasets package implementation of Accuracy metric. See
-https://github.com/huggingface/datasets/blob/master/metrics/precision/precision.py
+F1 metric. The part of this file is adapted from HuggingFace's
+datasets package implementation of F1 metric. See
+https://github.com/huggingface/datasets/blob/master/metrics/f1/f1.py
 """
-from collections import Counter
+
 from typing import Callable
 
 import datasets
 import numpy as np
 
 from jury.collator import Collator
-from jury.metrics._core import MetricForLanguageGeneration, TaskMapper
-from jury.metrics._core.utils import TaskNotAvailable, normalize_text
-
-__class_names__ = {"precision": "Precision"}
+from jury.metrics._core import LanguageGenerationInstance, MetricForLanguageGeneration, load_metric
+from jury.metrics._core.utils import normalize_text
 
 _CITATION = """\
 @inproceedings{papineni2002bleu,
@@ -40,9 +38,8 @@ _CITATION = """\
 """
 
 _DESCRIPTION = """
-Modified Unigram Precision is the fraction of the common unigrams between the prediction
-and the references among the prediction tokens. It can be computed with:
-Precision = # of matching tokens / # of prediction tokens
+Harmonic mean of precision and recall metrics. The precision and recall it uses 
+are the implementations of `jury.metrics.precision` and `jury.metrics.recall` respectively.
 """
 
 _KWARGS_DESCRIPTION = """
@@ -52,23 +49,23 @@ Args:
     references: list of reference for each prediction. Each
         reference should be a string with tokens separated by spaces.
 Returns:
-    'score': Precision score.
+    'score': F1 score.
 Examples:
 
-    >>> precision = jury.load_metric("precision")
+    >>> f1 = jury.load_metric("f1")
     >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
     >>> references = [
         ["the cat is playing on the mat.", "The cat plays on the mat."], 
         ["Today is a wonderful day", "The weather outside is wonderful."]
     ]
-    >>> results = precision.compute(predictions=predictions, references=references)
+    >>> results = f1.compute(predictions=predictions, references=references)
     >>> print(results)
-    {'precision': {'score': 0.875}}
+    {'f1': {'score': 0.7948717948717947}}
 """
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class PrecisionForLanguageGeneration(MetricForLanguageGeneration):
+class F1ForLanguageGeneration(MetricForLanguageGeneration):
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,
@@ -78,7 +75,7 @@ class PrecisionForLanguageGeneration(MetricForLanguageGeneration):
             reference_urls=["https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html"],
         )
 
-    def _tokenize(self, predictions: Collator, references: Collator):
+    def _tokenize(self, predictions: LanguageGenerationInstance, references: LanguageGenerationInstance):
         predictions = [normalize_text(p).split() for p in predictions]
         references = [normalize_text(r).split() for r in references]
         return predictions, references
@@ -86,21 +83,23 @@ class PrecisionForLanguageGeneration(MetricForLanguageGeneration):
     def _compute_single_pred_single_ref(
         self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
     ):
-        scores = []
-        predictions, references = self._tokenize(predictions, references)
-        for pred, ref in zip(predictions, references):
-            score = 0
-            pred_counts = Counter(pred)
-            ref_counts = Counter(ref)
-            for token, pred_count in pred_counts.items():
-                if token in ref_counts:
-                    score += min(pred_count, ref_counts[token])  # Intersection count
-            scores.append(score / len(pred))
-        avg_score = sum(scores) / len(scores)
-        return {"score": avg_score}
+        recall = load_metric("recall", task="language-generation")
+        precision = load_metric("precision", task="language-generation")
+        predictions, references = predictions.nested(), references.nested()
+        recall_score = recall.compute(predictions=predictions, references=references)["recall"]["score"]
+        precision_score = precision.compute(predictions=predictions, references=references)["precision"]["score"]
+        try:
+            f1 = (2 * recall_score * precision_score) / (recall_score + precision_score)
+        except ZeroDivisionError:
+            return {"score": 0.0}
+        return {"score": f1}
 
     def _compute_single_pred_multi_ref(
-        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
+        self,
+        predictions: LanguageGenerationInstance,
+        references: LanguageGenerationInstance,
+        reduce_fn: Callable = None,
+        **kwargs
     ):
         scores = []
         for pred, refs in zip(predictions, references):
@@ -128,16 +127,3 @@ class PrecisionForLanguageGeneration(MetricForLanguageGeneration):
             scores.append(reduced_score)
 
         return self._reduce_scores(scores, reduce_fn=np.mean)
-
-
-class Precision(TaskMapper):
-    _TASKS = {"language-generation": PrecisionForLanguageGeneration}
-    _METRIC_NAME = list(__class_names__.keys())[0]
-
-    @classmethod
-    def _get_subclass(cls, task: str):
-        metric_name = cls._METRIC_NAME
-        subclass = cls._TASKS.get(task)
-        if subclass is None:
-            raise TaskNotAvailable(metric_name=metric_name, task=task)
-        return subclass

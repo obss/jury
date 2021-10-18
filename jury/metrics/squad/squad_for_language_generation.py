@@ -15,21 +15,17 @@
 """ SQuAD metric. The part of this file is adapted from SacreBLEU implementation
 of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/squad/squad.py"""
-
 import os
-from typing import Any, Callable, Dict, List, Optional
+from typing import Callable, Dict, List
 
 import datasets
 import numpy as np
 import pandas as pd
 
 from jury.collator import Collator
-from jury.metrics._core import Metric, MetricAlias, MetricForLanguageGeneration
+from jury.metrics._core import MetricForLanguageGeneration
 from jury.metrics._core.utils import download
 from jury.utils import NestedSingleType
-
-__class_names__ = {"squad": "Squad"}
-
 
 _CITATION = """\
 @inproceedings{Rajpurkar2016SQuAD10,
@@ -104,12 +100,7 @@ class SquadForLanguageGeneration(MetricForLanguageGeneration):
             description=_DESCRIPTION,
             citation=_CITATION,
             inputs_description=_KWARGS_DESCRIPTION,
-            features=datasets.Features(
-                {
-                    "predictions": datasets.Sequence(datasets.Value("string")),
-                    "references": datasets.Sequence(datasets.Value("string")),
-                }
-            ),
+            features=self._default_features,
             codebase_urls=["https://rajpurkar.github.io/SQuAD-explorer/"],
             reference_urls=["https://rajpurkar.github.io/SQuAD-explorer/"],
         )
@@ -180,8 +171,3 @@ class SquadForLanguageGeneration(MetricForLanguageGeneration):
     def _reduce_multi_pred_scores(self, results: List[Dict], reduce_fn) -> Dict:
         df = pd.DataFrame(results)
         return df.apply(reduce_fn, axis=0).to_dict()
-
-
-class Squad(MetricAlias):
-    _METRIC_NAME = list(__class_names__.keys())[0]
-    _SUBCLASS = SquadForLanguageGeneration

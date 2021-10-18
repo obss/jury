@@ -20,17 +20,14 @@ https://github.com/huggingface/datasets/blob/master/metrics/bleu/bleu.py
 
 import math
 import os
-from typing import Any, Callable, Dict, Optional, Tuple
+from typing import Callable, Dict, Tuple
 
 import datasets
 
 from jury.collator import Collator
-from jury.metrics._core import MetricAlias, MetricForLanguageGeneration
+from jury.metrics._core import MetricForLanguageGeneration
 from jury.metrics._core.utils import download, get_token_lengths
 from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
-
-__class_names__ = {"bleu": "Bleu"}
-
 
 _CITATION = """\
 @INPROCEEDINGS{Papineni02bleu:a,
@@ -238,30 +235,3 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
             eval_fn = self._compute_multi_pred_multi_ref
         predictions, references = self._tokenize(predictions=predictions, references=references)
         return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)
-
-
-class Bleu(MetricAlias):
-    _METRIC_NAME = list(__class_names__.keys())[0]
-    _SUBCLASS = BleuForLanguageGeneration
-
-    @classmethod
-    def construct(
-        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
-    ):
-        subclass = cls._SUBCLASS
-        resulting_name = resulting_name or cls._get_metric_name(compute_kwargs=compute_kwargs)
-        return subclass._construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
-
-    @classmethod
-    def _get_metric_name(cls, compute_kwargs: Dict[str, Any] = None) -> str:
-        """
-        All metric modules must implement this method as it is used to form MetricOutput properly.
-
-        Returns: Metric name.
-        """
-        if compute_kwargs is None:
-            return cls._METRIC_NAME
-
-        max_order = compute_kwargs.get("max_order")
-        if max_order is not None:
-            return f"{cls._METRIC_NAME}_{max_order}"

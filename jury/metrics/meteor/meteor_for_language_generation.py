@@ -16,16 +16,15 @@
 datasets package implementation of METEOR metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/meteor/meteor.py
 """
-from typing import Any, Callable, Dict, Optional
+
+from typing import Callable
 
 import datasets
 import numpy as np
 from nltk.translate import meteor_score
 
 from jury.collator import Collator
-from jury.metrics._core import Metric, MetricAlias, MetricForLanguageGeneration
-
-__class_names__ = {"meteor": "Meteor"}
+from jury.metrics._core import MetricForLanguageGeneration
 
 _CITATION = """\
 @inproceedings{banarjee2005,
@@ -93,12 +92,7 @@ class MeteorForLanguageGeneration(MetricForLanguageGeneration):
             description=_DESCRIPTION,
             citation=_CITATION,
             inputs_description=_KWARGS_DESCRIPTION,
-            features=datasets.Features(
-                {
-                    "predictions": datasets.Sequence(datasets.Value("string", id="sequence")),
-                    "references": datasets.Sequence(datasets.Value("string", id="sequence")),
-                }
-            ),
+            features=self._default_features,
             codebase_urls=["https://github.com/nltk/nltk/blob/develop/nltk/translate/meteor_score.py"],
             reference_urls=[
                 "https://www.nltk.org/api/nltk.translate.html#module-nltk.translate.meteor_score",
@@ -141,8 +135,3 @@ class MeteorForLanguageGeneration(MetricForLanguageGeneration):
             reduced_score = reduce_fn(score)
             scores.append(reduce_fn(reduced_score))
         return {"score": self._reduce_scores(scores, reduce_fn=np.mean)}
-
-
-class Meteor(MetricAlias):
-    _METRIC_NAME = list(__class_names__.keys())[0]
-    _SUBCLASS = MeteorForLanguageGeneration

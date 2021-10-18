@@ -1,16 +1,15 @@
-from abc import ABC
 from typing import Any, Dict, Optional, Union
 
 from jury.metrics._core.base import MetricForTask
 from jury.metrics._core.utils import TaskNotAvailable
 
 
-class TaskMapper(ABC):
+class TaskMapper:
     """
     Base metric factory class which will be used as mapper for any metric class. This class is used by Autometric.
     """
 
-    _METRIC_NAME = None
+    _TASKS: Dict[str, MetricForTask] = None
 
     def __init__(self, *args, **kwargs):
         raise EnvironmentError("This class is designed to be instantiated by using 'by_task()' method.")
@@ -20,9 +19,10 @@ class TaskMapper(ABC):
         cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
     ):
         subclass = cls._get_subclass(task=task)
+        metric_name = cls._get_metric_name()
+        resulting_name = resulting_name or metric_name
         if subclass is None:
-            raise TaskNotAvailable(metric_name=cls._METRIC_NAME, task=task)
-        resulting_name = resulting_name or cls._METRIC_NAME
+            raise TaskNotAvailable(metric_name=metric_name, task=task)
         return subclass._construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
     @classmethod
@@ -36,7 +36,11 @@ class TaskMapper(ABC):
 
         Returns: Metric for proper task if available, None otherwise.
         """
-        raise NotImplementedError
+        return cls._TASKS.get(task, None)
+
+    @classmethod
+    def _get_metric_name(cls):
+        return cls.__name__.lower()
 
 
 class MetricAlias(TaskMapper):
@@ -51,7 +55,7 @@ class MetricAlias(TaskMapper):
         **kwargs
     ):
         subclass = cls._get_subclass()
-        resulting_name = resulting_name or cls._METRIC_NAME
+        resulting_name = resulting_name or cls._get_metric_name()
         return subclass._construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
     @classmethod

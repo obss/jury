@@ -176,7 +176,6 @@ class Metric(datasets.Metric, ABC):
 
 
 class MetricForTask(Metric, ABC):
-    _default_features = None
     _task = None
 
     def __init__(self, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs):
@@ -187,6 +186,10 @@ class MetricForTask(Metric, ABC):
         if compute_kwargs is not None and "reduce_fn" in compute_kwargs:
             compute_kwargs.pop("reduce_fn")
         return compute_kwargs
+
+    @property
+    def _default_features(self):
+        raise NotImplementedError
 
     @abstractmethod
     def _compute_single_pred_single_ref(
@@ -220,13 +223,16 @@ class MetricForTask(Metric, ABC):
 
 
 class MetricForLanguageGeneration(MetricForTask):
-    _default_features = datasets.Features(
-        {
-            "predictions": datasets.Sequence(datasets.Value("string", id="sequence")),
-            "references": datasets.Sequence(datasets.Value("string", id="sequence")),
-        }
-    )
     _task = "langueage-generation"
+
+    @property
+    def _default_features(self):
+        return datasets.Features(
+            {
+                "predictions": datasets.Sequence(datasets.Value("string", id="sequence")),
+                "references": datasets.Sequence(datasets.Value("string", id="sequence")),
+            }
+        )
 
     def _validate_compute_kwargs(self, compute_kwargs: Dict[str, Any]) -> Dict[str, Any]:
         if compute_kwargs is None:
@@ -349,13 +355,21 @@ class MetricForLanguageGeneration(MetricForTask):
 
 
 class MetricForSequenceClassification(MetricForTask):
-    _default_features = datasets.Features(
-        {
-            "predictions": datasets.Value("int32", id="sequence"),
-            "references": datasets.Value("int32", id="sequence"),
-        }
-    )
     _task = "sequence-classification"
+
+    @property
+    def _default_features(self):
+        return datasets.Features(
+            {
+                "predictions": datasets.Sequence(datasets.Value("int32")),
+                "references": datasets.Sequence(datasets.Value("int32")),
+            }
+            if self.config_name == "multilabel"
+            else {
+                "predictions": datasets.Value("int32"),
+                "references": datasets.Value("int32"),
+            }
+        )
 
     def _compute(
         self,
@@ -366,6 +380,7 @@ class MetricForSequenceClassification(MetricForTask):
     ) -> MetricOutput:
         assert len(predictions) == len(references), "Predictions and references length does not match."
         eval_params = {**self.compute_kwargs, **kwargs}
+        eval_params.pop("reduce_fn")
         result = self._compute_single_pred_single_ref(predictions=predictions, references=references, **eval_params)
         return {self.resulting_name: result}
 
@@ -406,13 +421,16 @@ class MetricForSequenceClassification(MetricForTask):
 
 
 class MetricForSequenceLabeling(MetricForTask):
-    _default_features = datasets.Features(
-        {
-            "predictions": datasets.Sequence(datasets.Value("string", id="sequence")),
-            "references": datasets.Sequence(datasets.Value("string", id="sequence")),
-        }
-    )
     _task = "sequence-labeling"
+
+    @property
+    def _default_features(self):
+        return datasets.Features(
+            {
+                "predictions": datasets.Sequence(datasets.Value("string", id="sequence")),
+                "references": datasets.Sequence(datasets.Value("string", id="sequence")),
+            }
+        )
 
     def _compute(
         self,

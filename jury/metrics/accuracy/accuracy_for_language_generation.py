@@ -17,6 +17,7 @@ Accuracy metric. The part of this file is adapted from HuggingFace's
 datasets package implementation of Accuracy metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/accuracy/accuracy.py
 """
+
 from collections import Counter
 from typing import Callable
 
@@ -24,10 +25,8 @@ import datasets
 import numpy as np
 
 from jury.collator import Collator
-from jury.metrics._core import MetricForLanguageGeneration, TaskMapper
-from jury.metrics._core.utils import TaskNotAvailable, normalize_text
-
-__class_names__ = {"accuracy": "Accuracy"}
+from jury.metrics._core import MetricForLanguageGeneration
+from jury.metrics._core.utils import normalize_text
 
 _CITATION = """\
 @inproceedings{papineni2002bleu,
@@ -132,16 +131,3 @@ class AccuracyForLanguageGeneration(MetricForLanguageGeneration):
             scores.append(reduced_score)
 
         return self._reduce_scores(scores, reduce_fn=np.mean)
-
-
-class Accuracy(TaskMapper):
-    _TASKS = {"language-generation": AccuracyForLanguageGeneration}
-    _METRIC_NAME = list(__class_names__.keys())[0]
-
-    @classmethod
-    def _get_subclass(cls, task: str):
-        metric_name = cls._METRIC_NAME
-        subclass = cls._TASKS.get(task)
-        if subclass is None:
-            raise TaskNotAvailable(metric_name=metric_name, task=task)
-        return subclass

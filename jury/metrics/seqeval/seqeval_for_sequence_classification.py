@@ -22,13 +22,11 @@ from typing import List, Optional, Union
 
 import datasets
 
-from jury.metrics._core import MetricAlias, MetricForSequenceLabeling, SequenceClassificationInstance
+from jury.metrics._core import MetricForSequenceLabeling, SequenceClassificationInstance
 from jury.metrics._core.utils import PackagePlaceholder, requirement_message
 
 # `import seqeval` placeholder
 seqeval = PackagePlaceholder(version="1.2.2")
-
-__class_names__ = {"seqeval": "Seqeval"}
 
 
 _CITATION = """\
@@ -175,8 +173,3 @@ class SeqevalForLanguageGeneration(MetricForSequenceLabeling):
         scores["overall_accuracy"] = float(seqeval.metrics.accuracy_score(y_true=references, y_pred=predictions))
 
         return scores
-
-
-class Seqeval(MetricAlias):
-    _METRIC_NAME = list(__class_names__.keys())[0]
-    _SUBCLASS = SeqevalForLanguageGeneration

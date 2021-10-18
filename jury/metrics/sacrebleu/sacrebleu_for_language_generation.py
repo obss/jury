@@ -17,14 +17,15 @@ SacreBLEU metric. The part of this file is adapted from SacreBLEU implementation
 of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/sacrebleu/sacrebleu.py
 """
+
 import math
-from typing import Any, Callable, Dict, Optional, Sequence
+from typing import Callable, Dict, Sequence
 
 import datasets
 from packaging import version
 
 from jury.collator import Collator
-from jury.metrics._core import Metric, MetricAlias, MetricForLanguageGeneration
+from jury.metrics._core import MetricForLanguageGeneration
 from jury.metrics._core.utils import PackagePlaceholder, get_token_lengths, requirement_message
 from jury.tokenizer import BLEUDefaultTokenizer
 
@@ -121,12 +122,7 @@ class SacrebleuForLanguageGeneration(MetricForLanguageGeneration):
             citation=_CITATION,
             homepage="https://github.com/mjpost/sacreBLEU",
             inputs_description=_KWARGS_DESCRIPTION,
-            features=datasets.Features(
-                {
-                    "predictions": datasets.Sequence(datasets.Value("string", id="sequence"), id="predictions"),
-                    "references": datasets.Sequence(datasets.Value("string", id="sequence"), id="references"),
-                }
-            ),
+            features=self._default_features,
             codebase_urls=["https://github.com/mjpost/sacreBLEU"],
             reference_urls=[
                 "https://github.com/mjpost/sacreBLEU",
@@ -274,8 +270,3 @@ class SacrebleuForLanguageGeneration(MetricForLanguageGeneration):
             eval_fn = self._compute_multi_pred_multi_ref
         self._validate_references(references)
         return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)
-
-
-class Sacrebleu(MetricAlias):
-    _METRIC_NAME = list(__class_names__.keys())[0]
-    _SUBCLASS = SacrebleuForLanguageGeneration
