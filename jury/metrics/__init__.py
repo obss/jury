@@ -1,4 +1,4 @@
-from jury.metrics._core import AutoMetric, load_metric
+from jury.metrics._core import AutoMetric, MetricForTask, load_metric
 from jury.metrics.accuracy import Accuracy
 from jury.metrics.bertscore import Bertscore
 from jury.metrics.bleu import Bleu

@@ -18,11 +18,11 @@ of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/seqeval/seqeval.py
 """
 import importlib
-from typing import Any, Dict, List, Optional, Union
+from typing import List, Optional, Union
 
 import datasets
 
-from jury.metrics._core import Metric, MetricAlias, MetricForSequenceLabeling, SequenceClassificationInstance
+from jury.metrics._core import MetricAlias, MetricForSequenceLabeling, SequenceClassificationInstance
 from jury.metrics._core.utils import PackagePlaceholder, requirement_message
 
 # `import seqeval` placeholder

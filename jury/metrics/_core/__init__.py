@@ -7,6 +7,7 @@ from jury.metrics._core.base import (
     MetricForLanguageGeneration,
     MetricForSequenceClassification,
     MetricForSequenceLabeling,
+    MetricForTask,
     MetricOutput,
     SequenceClassificationInstance,
     SequenceLabelingInstance,

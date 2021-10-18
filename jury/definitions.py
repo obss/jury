@@ -1,10 +1,10 @@
-from jury.metrics import AutoMetric
+from jury.metrics import load_metric
 
 DEFAULT_METRICS = [
-    AutoMetric.from_params("bleu", compute_kwargs={"max_order": 1}),
-    AutoMetric.from_params("bleu", compute_kwargs={"max_order": 2}),
-    AutoMetric.from_params("bleu", compute_kwargs={"max_order": 3}),
-    AutoMetric.from_params("bleu", compute_kwargs={"max_order": 4}),
-    AutoMetric.from_params("meteor"),
-    AutoMetric.from_params("rouge"),
+    load_metric("bleu", compute_kwargs={"max_order": 1}),
+    load_metric("bleu", compute_kwargs={"max_order": 2}),
+    load_metric("bleu", compute_kwargs={"max_order": 3}),
+    load_metric("bleu", compute_kwargs={"max_order": 4}),
+    load_metric("meteor"),
+    load_metric("rouge"),
 ]

@@ -25,8 +25,8 @@ from typing import Any, Callable, Dict, Optional, Tuple
 import datasets
 
 from jury.collator import Collator
-from jury.metrics._core import Metric, MetricAlias, MetricForLanguageGeneration, TaskMapper
-from jury.metrics._core.utils import TaskNotAvailable, download, get_token_lengths
+from jury.metrics._core import MetricAlias, MetricForLanguageGeneration
+from jury.metrics._core.utils import download, get_token_lengths
 from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
 
 __class_names__ = {"bleu": "Bleu"}
@@ -245,12 +245,12 @@ class Bleu(MetricAlias):
     _SUBCLASS = BleuForLanguageGeneration
 
     @classmethod
-    def by_task(
+    def construct(
         cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
     ):
         subclass = cls._SUBCLASS
         resulting_name = resulting_name or cls._get_metric_name(compute_kwargs=compute_kwargs)
-        return subclass.construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
+        return subclass._construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
     @classmethod
     def _get_metric_name(cls, compute_kwargs: Dict[str, Any] = None) -> str:

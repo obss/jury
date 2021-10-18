@@ -72,7 +72,7 @@ class AutoMetric:
             # get the class, will raise AttributeError if class cannot be found
             factory_class = module.__class_names__.get(metric_name)
             klass = getattr(module, factory_class)
-            metric = klass.by_task(task=task, resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
+            metric = klass.construct(task=task, resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
         return metric
 
     @staticmethod

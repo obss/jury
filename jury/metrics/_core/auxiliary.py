@@ -1,9 +1,8 @@
 from abc import ABC
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Union
 
-from datasets import MetricInfo
-
-from jury.metrics._core.base import EvaluationInstance, MetricForTask, MetricOutput
+from jury.metrics._core.base import MetricForTask
+from jury.metrics._core.utils import TaskNotAvailable
 
 
 class TaskMapper(ABC):
@@ -17,15 +16,17 @@ class TaskMapper(ABC):
         raise EnvironmentError("This class is designed to be instantiated by using 'by_task()' method.")
 
     @classmethod
-    def by_task(
+    def construct(
         cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
     ):
         subclass = cls._get_subclass(task=task)
-        resulting_name = resulting_name or cls._get_metric_name()
-        return subclass.construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
+        if subclass is None:
+            raise TaskNotAvailable(metric_name=cls._METRIC_NAME, task=task)
+        resulting_name = resulting_name or cls._METRIC_NAME
+        return subclass._construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
-    @staticmethod
-    def _get_subclass(task: str):
+    @classmethod
+    def _get_subclass(cls, task: str) -> Union[MetricForTask, None]:
         """
         All metric modules must implement this method as it is used to call metrics by default. Should raise
         proper exception (``TaskNotAvailable``) if the task is not supported by the metric.
@@ -33,29 +34,26 @@ class TaskMapper(ABC):
         Args:
             task: (``str``) Task name for the desired metric.
 
-        Raises: TaskNotAvailable if given task does not match for desired metric.
-
-        Returns: Metric for proper task.
+        Returns: Metric for proper task if available, None otherwise.
         """
         raise NotImplementedError
-
-    @classmethod
-    def _get_metric_name(cls) -> str:
-        """
-        All metric modules must implement this method as it is used to form MetricOutput properly.
-
-        Returns: Metric name.
-        """
-        return cls._METRIC_NAME
 
 
 class MetricAlias(TaskMapper):
     _SUBCLASS = None
 
     @classmethod
-    def by_task(
-        cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
+    def construct(
+        cls,
+        task: str = None,
+        resulting_name: Optional[str] = None,
+        compute_kwargs: Optional[Dict[str, Any]] = None,
+        **kwargs
     ):
-        subclass = cls._SUBCLASS
-        resulting_name = resulting_name or cls._get_metric_name()
-        return subclass.construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
+        subclass = cls._get_subclass()
+        resulting_name = resulting_name or cls._METRIC_NAME
+        return subclass._construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
+
+    @classmethod
+    def _get_subclass(cls, *args, **kwargs) -> MetricForTask:
+        return cls._SUBCLASS

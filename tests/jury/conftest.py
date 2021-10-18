@@ -64,7 +64,7 @@ _LIST_MIXED_TEST_METRICS = [
 ]
 
 
-_DATASETS_METRICS = ["wer"]
+_DATASETS_METRICS = "wer"
 
 
 @pytest.fixture(scope="package")
@@ -135,13 +135,12 @@ def jury_datasets():
     return Jury(metrics=_DATASETS_METRICS)
 
 
-def json_load(path: str):
-    with open(path, "r") as jf:
-        content = json.load(jf)
-    return content
-
-
 def get_expected_output(prefix: Optional[str] = None):
+    def json_load(path: str):
+        with open(path, "r") as jf:
+            content = json.load(jf)
+        return content
+
     def wrapper(fn, *args, **kwargs):
         module_name = os.path.basename(inspect.getfile(fn)).replace(".py", "")
         path = os.path.join(EXPECTED_OUTPUTS, prefix, f"{module_name}.json")

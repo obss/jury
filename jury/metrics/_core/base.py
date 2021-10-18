@@ -213,7 +213,9 @@ class MetricForTask(Metric, ABC):
         pass
 
     @classmethod
-    def construct(cls, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs):
+    def _construct(
+        cls, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
+    ):
         return cls(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
 

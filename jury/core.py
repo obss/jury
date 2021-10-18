@@ -48,6 +48,9 @@ class Jury:
         self.metrics = self._load_metrics(metrics)
         self._concurrent = run_concurrent
 
+        # Sanity check
+        self._validate_metrics()
+
     def __call__(
         self,
         *,
@@ -92,9 +95,14 @@ class Jury:
             elif isinstance(metric_param, dict):
                 metric_name = metric_param.pop("metric_name")  # must be given
                 resulting_name = metric_param.pop("resulting_name") if "resulting_name" in metric_param else None
-                params = metric_param
+                compute_kwargs = metric_param.pop("compute_kwargs") if "compute_kwargs" in metric_param else None
+                kwargs = metric_param
                 metrics = replace(
-                    metrics, load_metric(metric_name=metric_name, resulting_name=resulting_name, params=params), i
+                    metrics,
+                    load_metric(
+                        metric_name=metric_name, resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs
+                    ),
+                    i,
                 )
             elif isinstance(metric_param, Metric):
                 continue
@@ -110,9 +118,6 @@ class Jury:
         else:
             raise ValueError(f"Unknown input type {type(metrics)}")
 
-        # Sanity check
-        self._validate_metrics(metrics)
-
         return metrics
 
     def _score_to_dict(self, score, name: str) -> Dict[str, float]:
@@ -127,9 +132,9 @@ class Jury:
             predictions, references = Collator(predictions), Collator(references)
             score = metric.compute(predictions=predictions, references=references, reduce_fn=reduce_fn)
         else:
-            metric.resulting_name = metric.path
+            metric.resulting_name = metric.name
             score = metric.compute(predictions=predictions, references=references)
-            score = self._score_to_dict(score, name=metric.path)
+            score = self._score_to_dict(score, name=metric.name)
         return score
 
     def _prepare_concurrent_inputs(self, predictions, references, reduce_fn):
@@ -138,14 +143,20 @@ class Jury:
             inputs.append((metric, predictions, references, reduce_fn))
         return inputs
 
-    def _validate_metrics(self, metrics: List[Metric]):
-        task = metrics[0].task
-
-        assert all([metric.task == task for metric in metrics])
+    def _validate_metrics(self):
+        metrics = self.metrics
+        if all([isinstance(metric, Metric) for metric in metrics]):
+            task = metrics[0].task
+            if not all([metric.task == task for metric in metrics]):
+                raise ValueError(
+                    "Given metrics are not suitable to be used together, metrics must be of same the task."
+                )
+        return True
 
     def add_metric(self, metric_name: str, resulting_name: str = None, params: Dict = None) -> None:
         metric = load_metric(metric_name, resulting_name=resulting_name, params=params)
         self.metrics.append(metric)
+        self._validate_metrics()
 
     def remove_metric(self, resulting_name: str, error: bool = True) -> None:
         for i, metric in enumerate(self.metrics):
