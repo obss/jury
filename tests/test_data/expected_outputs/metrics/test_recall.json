@@ -1,0 +1,34 @@
+{
+  "basic_language_generation": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "recall": {
+      "score": 0.6571428571428571
+    }
+  },
+  "multiple_ref_language_generation": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "recall": {
+      "score": 0.6571428571428571
+    }
+  },
+  "multiple_pred_multiple_ref_language_generation": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "recall": {
+      "score": 0.7285714285714285
+    }
+  },
+  "basic_sequence_classification": {
+    "empty_predictions": 3,
+    "total_items": 6,
+    "recall": {
+      "recall": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    }
+  }
+}

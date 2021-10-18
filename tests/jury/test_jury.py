@@ -80,6 +80,12 @@ def test_evaluate_inconsistent_input(inconsistent_predictions, references, jury)
         jury(predictions=inconsistent_predictions, references=references)
 
 
+def test_evaluate_inconsistent_tasks(predictions, references, jury):
+    with pytest.raises(ValueError):
+        jury.add_metric("seqeval")
+    jury.remove_metric("seqeval")
+
+
 def test_evaluate(predictions, references, jury, output_evaluate):
     scores = jury(predictions=predictions, references=references)
     assert_almost_equal_dict(actual=scores, desired=output_evaluate, exclude_paths="root['bertscore']['hashcode']")
@@ -145,7 +151,7 @@ def test_reduce_fn(predictions, references, jury):
 
 def test_load_metric():
     from jury import load_metric
-    from jury.metrics import Metric as JuryMetric
+    from jury.metrics._core import Metric as JuryMetric
 
     assert isinstance(load_metric("squad"), JuryMetric)
     assert isinstance(load_metric("squad_v2"), datasets.Metric)

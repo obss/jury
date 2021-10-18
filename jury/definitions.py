@@ -1,10 +1,10 @@
-from jury.metrics import Bleu, Meteor, Rouge
+from jury.metrics import load_metric
 
 DEFAULT_METRICS = [
-    Bleu(params={"max_order": 1}),
-    Bleu(params={"max_order": 2}),
-    Bleu(params={"max_order": 3}),
-    Bleu(params={"max_order": 4}),
-    Meteor(),
-    Rouge(),
+    load_metric("bleu", compute_kwargs={"max_order": 1}),
+    load_metric("bleu", compute_kwargs={"max_order": 2}),
+    load_metric("bleu", compute_kwargs={"max_order": 3}),
+    load_metric("bleu", compute_kwargs={"max_order": 4}),
+    load_metric("meteor"),
+    load_metric("rouge"),
 ]

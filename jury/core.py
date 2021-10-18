@@ -3,7 +3,8 @@ from typing import Any, Callable, Dict, List, Mapping, Optional, Union
 
 from jury.collator import Collator
 from jury.definitions import DEFAULT_METRICS
-from jury.metrics import Metric, load_metric
+from jury.metrics import load_metric
+from jury.metrics._core import Metric
 from jury.utils import replace, set_env
 
 MetricParam = Union[str, Metric, Dict[str, Any]]
@@ -37,7 +38,6 @@ class Jury:
         >>> print(results)
         {'bleu_1': 0.6111111111111112, ..., 'rougeL': 0.6470588235294118, ...}
     """
-
     def __init__(
         self,
         metrics: Optional[Union[MetricParam, List[MetricParam]]] = None,
@@ -45,6 +45,9 @@ class Jury:
     ):
         self.metrics = self._load_metrics(metrics)
         self._concurrent = run_concurrent
+
+        # Sanity check
+        self._validate_metrics()
 
     def __call__(
         self,
@@ -90,9 +93,14 @@ class Jury:
             elif isinstance(metric_param, dict):
                 metric_name = metric_param.pop("metric_name")  # must be given
                 resulting_name = metric_param.pop("resulting_name") if "resulting_name" in metric_param else None
-                params = metric_param
+                compute_kwargs = metric_param.pop("compute_kwargs") if "compute_kwargs" in metric_param else None
+                kwargs = metric_param
                 metrics = replace(
-                    metrics, load_metric(metric_name=metric_name, resulting_name=resulting_name, params=params), i
+                    metrics,
+                    load_metric(
+                        metric_name=metric_name, resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs
+                    ),
+                    i,
                 )
             elif isinstance(metric_param, Metric):
                 continue
@@ -133,9 +141,20 @@ class Jury:
             inputs.append((metric, predictions, references, reduce_fn))
         return inputs
 
+    def _validate_metrics(self):
+        metrics = self.metrics
+        if all([isinstance(metric, Metric) for metric in metrics]):
+            task = metrics[0].task
+            if not all([metric.task == task for metric in metrics]):
+                raise ValueError(
+                    "Given metrics are not suitable to be used together, metrics must be of same the task."
+                )
+        return True
+
     def add_metric(self, metric_name: str, resulting_name: str = None, params: Dict = None) -> None:
         metric = load_metric(metric_name, resulting_name=resulting_name, params=params)
         self.metrics.append(metric)
+        self._validate_metrics()
 
     def remove_metric(self, resulting_name: str, error: bool = True) -> None:
         for i, metric in enumerate(self.metrics):
