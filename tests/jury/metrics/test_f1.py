@@ -19,16 +19,6 @@ def jury_sequence_classification():
 
 
 @pytest.fixture
-def predictions_sequence_classification():
-    return [0, 2, 1, 0, 0, 1]
-
-
-@pytest.fixture
-def references_sequence_classification():
-    return [0, 1, 2, 0, 1, 2]
-
-
-@pytest.fixture
 @get_expected_output(prefix="metrics")
 def output_basic_language_generation():
     return output_basic_language_generation.output

@@ -63,8 +63,14 @@ _LIST_MIXED_TEST_METRICS = [
     {"metric_name": "squad"},
 ]
 
-
 _DATASETS_METRICS = "wer"
+
+_TEST_METRICS_SEQUENCE_CLASSIFICATION = [
+    {"metric_name": "accuracy", "task": "sequence-classification"},
+    {"metric_name": "f1", "task": "sequence-classification"},
+    {"metric_name": "precision", "task": "sequence-classification"},
+    {"metric_name": "recall", "task": "sequence-classification"},
+]
 
 
 @pytest.fixture(scope="package")
@@ -75,6 +81,16 @@ def predictions():
 @pytest.fixture(scope="package")
 def references():
     return ["The cat is playing on the mat.", "Today is a wonderful day"]
+
+
+@pytest.fixture
+def predictions_sequence_classification():
+    return [0, 2, 1, 0, 0, 1]
+
+
+@pytest.fixture
+def references_sequence_classification():
+    return [0, 1, 2, 0, 1, 2]
 
 
 @pytest.fixture(scope="function")
@@ -133,6 +149,11 @@ def jury_list_mixed():
 @pytest.fixture(scope="function")
 def jury_datasets():
     return Jury(metrics=_DATASETS_METRICS)
+
+
+@pytest.fixture(scope="function")
+def jury_sequence_classification():
+    return Jury(metrics=_TEST_METRICS_SEQUENCE_CLASSIFICATION)
 
 
 def get_expected_output(prefix: Optional[str] = None):

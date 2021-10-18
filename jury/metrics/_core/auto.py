@@ -12,7 +12,7 @@ from jury.metrics._core.utils import import_module, list_metric_modules
 def load_metric(
     metric_name: str,
     resulting_name: str = None,
-    task: Optional[str] = "language-generation",
+    task: Optional[str] = None,
     compute_kwargs: Dict[str, Any] = None,
     use_jury_only: bool = False,
     **kwargs,
@@ -39,13 +39,15 @@ class AutoMetric:
     def from_params(
         cls,
         metric_name: str,
-        task: Optional[str] = "language-generation",
+        task: Optional[str] = None,
         resulting_name: Optional[str] = None,
         compute_kwargs: Optional[Dict[str, Any]] = None,
         use_jury_only: bool = False,
         **kwargs,
     ) -> Metric:
         resolved_metric_name = cls.resolve_metric_name(metric_name)
+        if task is None:
+            task = "language-generation"
 
         # load the module, will raise ImportError if module cannot be loaded
         try:

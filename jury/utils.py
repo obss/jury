@@ -1,7 +1,7 @@
 import os
 import re
 import string
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional
 
 
 class NestedSingleType:
@@ -58,3 +58,21 @@ def replace(a: List, obj: object, index=-1):
     del a[index]
     a.insert(index, obj)
     return a
+
+
+def pop_item_from_dict(d: Dict[str, Any], key: str, default: Any = None, must_exists: bool = False):
+    """
+    Pops key from dict d if key exists, returns d otherwise.
+
+    Args:
+        d: (``Dict``) Dictionary for key to be removed.
+        key: (``str``) Key name to remove from dictionary d.
+        default: (``Any``) Default value to return if key not found.
+        must_exists: (``bool``) Raises an exception if True when given key does not exists.
+
+    Returns: Popped value for key if found, None otherwise.
+    """
+    if key not in d and must_exists:
+        raise KeyError(f"'{key}' not found in '{d}'.")
+    val = d.pop(key) if key in d else default
+    return val

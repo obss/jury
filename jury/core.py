@@ -5,7 +5,7 @@ from jury.collator import Collator
 from jury.definitions import DEFAULT_METRICS
 from jury.metrics import load_metric
 from jury.metrics._core import Metric
-from jury.utils import replace, set_env
+from jury.utils import pop_item_from_dict, replace, set_env
 
 MetricParam = Union[str, Metric, Dict[str, Any]]
 
@@ -38,6 +38,7 @@ class Jury:
         >>> print(results)
         {'bleu_1': 0.6111111111111112, ..., 'rougeL': 0.6470588235294118, ...}
     """
+
     def __init__(
         self,
         metrics: Optional[Union[MetricParam, List[MetricParam]]] = None,
@@ -92,13 +93,18 @@ class Jury:
                 metrics = replace(metrics, load_metric(metric_name.lower()), i)
             elif isinstance(metric_param, dict):
                 metric_name = metric_param.pop("metric_name")  # must be given
-                resulting_name = metric_param.pop("resulting_name") if "resulting_name" in metric_param else None
-                compute_kwargs = metric_param.pop("compute_kwargs") if "compute_kwargs" in metric_param else None
+                task = pop_item_from_dict(metric_param, "task")
+                resulting_name = pop_item_from_dict(metric_param, "resulting_name")
+                compute_kwargs = pop_item_from_dict(metric_param, "compute_kwargs")
                 kwargs = metric_param
                 metrics = replace(
                     metrics,
                     load_metric(
-                        metric_name=metric_name, resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs
+                        metric_name=metric_name,
+                        task=task,
+                        resulting_name=resulting_name,
+                        compute_kwargs=compute_kwargs,
+                        **kwargs,
                     ),
                     i,
                 )

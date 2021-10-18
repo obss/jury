@@ -604,5 +604,33 @@
       "exact_match": 0.0,
       "f1": 0.7402597402597403
     }
+  },
+  "evaluate_sequence_classification": {
+    "empty_predictions": 3,
+    "total_items": 6,
+    "accuracy": {
+      "score": 0.3333333333333333
+    },
+    "f1": {
+      "score": [
+        0.8,
+        0.0,
+        0.0
+      ]
+    },
+    "precision": {
+      "score": [
+        0.6666666666666666,
+        0.0,
+        0.0
+      ]
+    },
+    "recall": {
+      "recall": [
+        1.0,
+        0.0,
+        0.0
+      ]
+    }
   }
 }
