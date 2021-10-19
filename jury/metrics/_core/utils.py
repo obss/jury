@@ -75,7 +75,7 @@ def is_reduce_fn(fun: Callable) -> bool:
     return result.size == 1
 
 
-def list_metric_modules():
+def list_metrics():
     _internal_metrics_path = METRICS_ROOT
     metric_modules = list(_internal_metrics_path.glob("[!_]*"))
     return [module_name.name.replace(".py", "") for module_name in metric_modules]

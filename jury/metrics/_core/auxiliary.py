@@ -6,7 +6,14 @@ from jury.metrics._core.utils import TaskNotAvailable
 
 class TaskMapper:
     """
-    Base metric factory class which will be used as mapper for any metric class. This class is used by Autometric.
+    Base metric factory class which will be used as mapper for any metric class. This class is used by
+    :py:class:`jury.AutoMetric` for loading specified metric. It maps the class to a specified metric class
+    if multiple tasks are available for the metric.
+
+    All metrics using TaskMapper must implement _TASKS attribute.
+
+    Note:
+        Use :py:class:`jury.metrics.TaskMapper` instead in case of metrics implementing a single task.
     """
 
     _TASKS: Dict[str, MetricForTask] = None
@@ -18,6 +25,20 @@ class TaskMapper:
     def construct(
         cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
     ):
+        """
+        Common interface for all metrics for specified MetricForTask to be constructed.
+
+        Args:
+            task: (``str``) Task name for the desired metric to obtain the subclass.
+            resulting_name (Optional ``str``): Resulting name of the computed score returned. If None,
+                `~._get_metric_name()` is used.
+            compute_kwargs (Optional ``Dict[str, Any]``): Arguments to be passed to `compute()` method of metric at
+                computation.
+
+        Raises: :py:class:`TaskNotAvailable`
+
+        Returns: Metric for proper task if available, None otherwise.
+        """
         subclass = cls._get_subclass(task=task)
         metric_name = cls._get_metric_name()
         resulting_name = resulting_name or metric_name
@@ -44,7 +65,14 @@ class TaskMapper:
 
 
 class MetricAlias(TaskMapper):
-    _SUBCLASS = None
+    """
+    Extension of TaskMapper which allows a single :py:class:`jury.metrics.MetricForTask` class to be aliased. If a
+    metric has a single task, use this class instead of :py:class:`jury.metrics._core.TaskMapper`.
+
+    All metrics using TaskMapper must implement _SUBCLASS attribute.
+    """
+
+    _SUBCLASS: MetricForTask = None
 
     @classmethod
     def construct(
@@ -54,6 +82,19 @@ class MetricAlias(TaskMapper):
         compute_kwargs: Optional[Dict[str, Any]] = None,
         **kwargs
     ):
+        """
+        Common interface for all metrics for specified MetricForTask to be constructed. Do not raise
+        :py:class:`TaskNotAvailable` unlike :py:class:`TaskMapper` as it directly uses _SUBCLASS defined.
+
+        Args:
+            task: (Ignored ``str``) Ignored. Preserved to provide a common interface.
+            resulting_name (Optional ``str``): Resulting name of the computed score returned. If None,
+                `~._get_metric_name()` is used.
+            compute_kwargs (Optional ``Dict[str, Any]``): Arguments to be passed to `compute()` method of metric at
+                computation.
+
+        Returns: Metric for proper task if available, None otherwise.
+        """
         subclass = cls._get_subclass()
         resulting_name = resulting_name or cls._get_metric_name()
         return subclass._construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)

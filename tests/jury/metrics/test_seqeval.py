@@ -8,7 +8,7 @@ from tests.utils import assert_almost_equal_dict
 
 @pytest.fixture(scope="module")
 def jury():
-    metric = AutoMetric.from_params("seqeval")
+    metric = AutoMetric.load("seqeval")
     return Jury(metrics=metric)
 
 

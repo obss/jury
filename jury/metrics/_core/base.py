@@ -44,15 +44,16 @@ class Metric(datasets.Metric, ABC):
     Base metric class and common API for all metrics.
 
     Args:
-        resulting_name (``Optional[str]``): Optional resulting name for :py:class:`jury.Jury` to use. By default, it
+        task (``str``): Task for the metric to be used. Tasks differ in inputs of predictions or references.
+        resulting_name (Optional ``[str]``): Optional resulting name for :py:class:`jury.Jury` to use. By default, it
             uses `metric.name` if not given. This is meant to prevent clashes for output dict of
             :py:method:`jury.Jury.evaluate` such as when bleu-1, and bleu-2 are used together.
-        compute_kwargs (``Optional[Dict[str, Any]]``): These are the parameters to be passed to compute function of the
+        compute_kwargs (Optional ``Dict[str, Any]``): These are the parameters to be passed to compute function of the
             metric. It is meant to ease the support of computation from a jury configuration file, etc.
-        config_name (``str``): This is used to define a hash specific to a metrics computation script and prevents the
+        config_name (Optional ``str``): This is used to define a hash specific to a metrics computation script and prevents the
             metric's data to be overridden when the metric loading script is modified.
         keep_in_memory (``bool``): keep all predictions and references in memory. Not possible in distributed settings.
-        cache_dir (``str``): Path to a directory in which temporary prediction/references data will be stored.
+        cache_dir (Optional ``str``): Path to a directory in which temporary prediction/references data will be stored.
             The data directory should be located on a shared file-system in distributed setups.
         num_process (``int``): specify the total number of nodes in a distributed settings.
             This is useful to compute metrics in distributed setups (in particular non-additive metrics like F1).
@@ -60,7 +61,7 @@ class Metric(datasets.Metric, ABC):
             This is useful to compute metrics in distributed setups (in particular non-additive metrics like F1).
         seed (Optional ``int``): If specified, this will temporarily set numpy's random seed when
         :func:`datasets.Metric.compute` is run.
-        experiment_id (``str``): A specific experiment id. This is used if several distributed evaluations share the
+        experiment_id (Optional ``str``): A specific experiment id. This is used if several distributed evaluations share the
             same file system. This is useful to compute metrics in distributed setups (in particular non-additive
             metrics like F1).
         max_concurrent_cache_files (``int``): Max number of concurrent metrics cache files (default 10000).
@@ -68,9 +69,33 @@ class Metric(datasets.Metric, ABC):
     """
 
     def __init__(
-        self, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
+        self,
+        task: str,
+        resulting_name: Optional[str] = None,
+        compute_kwargs: Optional[Dict[str, Any]] = None,
+        config_name: Optional[str] = None,
+        keep_in_memory: bool = False,
+        cache_dir: Optional[str] = None,
+        num_process: int = 1,
+        process_id: int = 0,
+        seed: Optional[int] = None,
+        experiment_id: Optional[str] = None,
+        max_concurrent_cache_files: int = 10000,
+        timeout: Union[int, float] = 100,
+        **kwargs,
     ):
-        super().__init__(**kwargs)
+        super().__init__(
+            config_name=config_name,
+            keep_in_memory=keep_in_memory,
+            cache_dir=cache_dir,
+            num_process=num_process,
+            process_id=process_id,
+            seed=seed,
+            experiment_id=experiment_id,
+            max_concurrent_cache_files=max_concurrent_cache_files,
+            timeout=timeout,
+            **kwargs,
+        )
         self._task = task
         self.resulting_name = resulting_name if resulting_name is not None else self.name
         self.compute_kwargs = compute_kwargs or {}
@@ -176,6 +201,23 @@ class Metric(datasets.Metric, ABC):
 
 
 class MetricForTask(Metric, ABC):
+    """
+    Base metric class for any task. All metrics must extend this class as metric is required to adopt a task
+    inherently. Default task will be language-generation for AutoMetric.
+
+    All metrics extending :py:class:`jury.metrics._core.base.MetricForTask` must implement the following:
+
+        - _task (``[str]``): Task name for the base task metric.
+        - _default_features() (``datasets.Features``): Task input as a :py:class:`datasets.Features`.
+
+     Args:
+        resulting_name (Optional ``[str]``): Optional resulting name for :py:class:`jury.Jury` to use. By default, it
+            uses `metric.name` if not given. This is meant to prevent clashes for output dict of
+            :py:method:`jury.Jury.evaluate` such as when bleu-1, and bleu-2 are used together.
+        compute_kwargs (Optional ``Dict[str, Any]``): These are the parameters to be passed to compute function of the
+            metric. It is meant to ease the support of computation from a jury configuration file, etc.
+    """
+
     _task = None
 
     def __init__(self, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs):
@@ -191,30 +233,6 @@ class MetricForTask(Metric, ABC):
     def _default_features(self):
         raise NotImplementedError
 
-    @abstractmethod
-    def _compute_single_pred_single_ref(
-        self, predictions: EvaluationInstance, references: EvaluationInstance, **kwargs
-    ):
-        pass
-
-    @abstractmethod
-    def _compute_single_pred_multi_ref(self, predictions: EvaluationInstance, references: EvaluationInstance, **kwargs):
-        pass
-
-    @abstractmethod
-    def _compute_multi_pred_multi_ref(self, predictions: EvaluationInstance, references: EvaluationInstance, **kwargs):
-        pass
-
-    @abstractmethod
-    def _info(self) -> MetricInfo:
-        pass
-
-    @abstractmethod
-    def _compute(
-        self, *, predictions: EvaluationInstance = None, references: EvaluationInstance = None, **kwargs
-    ) -> MetricOutput:
-        pass
-
     @classmethod
     def _construct(
         cls, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
@@ -223,6 +241,11 @@ class MetricForTask(Metric, ABC):
 
 
 class MetricForLanguageGeneration(MetricForTask):
+    """
+    Base metric class for language generation task. Many metrics on jury are language generation metrics which are
+    used by default by :py:class:`jury.metrics.AutoMetric`.
+    """
+
     _task = "langueage-generation"
 
     @property
@@ -355,6 +378,10 @@ class MetricForLanguageGeneration(MetricForTask):
 
 
 class MetricForSequenceClassification(MetricForTask):
+    """
+    Base metric class for sequence classification task.
+    """
+
     _task = "sequence-classification"
 
     @property
@@ -421,6 +448,10 @@ class MetricForSequenceClassification(MetricForTask):
 
 
 class MetricForSequenceLabeling(MetricForTask):
+    """
+    Base metric class for sequence labeling task.
+    """
+
     _task = "sequence-labeling"
 
     @property

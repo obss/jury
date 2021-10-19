@@ -115,7 +115,8 @@ class Jury:
     def _load_metrics(self, metrics: Union[MetricParam, List[MetricParam]]) -> List[Metric]:
         if metrics is None:
             metrics = DEFAULT_METRICS
-        elif isinstance(metrics, (str, Metric)):
+
+        if isinstance(metrics, (str, Metric)):
             metrics = self._load_single_metric(metrics)
         elif isinstance(metrics, list):
             metrics = self._load_multiple_metrics(metrics)

@@ -8,13 +8,13 @@ from tests.utils import assert_almost_equal_dict
 
 @pytest.fixture(scope="module")
 def jury_language_generation():
-    metric = AutoMetric.from_params("recall")
+    metric = AutoMetric.load("recall")
     return Jury(metrics=metric)
 
 
 @pytest.fixture(scope="module")
 def jury_sequence_classification():
-    metric = AutoMetric.from_params("recall", task="sequence-classification")
+    metric = AutoMetric.load("recall", task="sequence-classification")
     return Jury(metrics=metric)
 
 
