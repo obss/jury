@@ -1,10 +1,10 @@
 from concurrent.futures import ProcessPoolExecutor
-from typing import Any, Callable, Dict, List, Mapping, Optional, Union
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 from jury.collator import Collator
 from jury.definitions import DEFAULT_METRICS
 from jury.metrics import load_metric
-from jury.metrics._core import Metric
+from jury.metrics._core import EvaluationInstance, Metric
 from jury.utils import pop_item_from_dict, replace, set_env
 
 MetricParam = Union[str, Metric, Dict[str, Any]]
@@ -53,8 +53,8 @@ class Jury:
     def __call__(
         self,
         *,
-        predictions: Union[List[str], List[List[str]]] = None,
-        references: Union[List[str], List[List[str]]] = None,
+        predictions: EvaluationInstance = None,
+        references: EvaluationInstance = None,
         reduce_fn: Optional[Union[str, Callable]] = None,
     ) -> Dict[str, float]:
         """Restricts positional arguments to prevent potential inconsistency between predictions and references."""

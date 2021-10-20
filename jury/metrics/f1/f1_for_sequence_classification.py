@@ -17,10 +17,12 @@ F1 metric. The part of this file is adapted from HuggingFace's
 datasets package implementation of F1 metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/f1/f1.py
 """
+from typing import List, Union
+
 import datasets
 from sklearn.metrics import f1_score
 
-from jury.metrics._core import MetricForSequenceClassification, SequenceClassificationInstance
+from jury.metrics._core import MetricForSequenceClassification, SequenceClassificationInstance, load_metric
 
 _DESCRIPTION = """
 The F1 score is the harmonic mean of the precision and recall. It can be computed with:
@@ -96,6 +98,9 @@ _CITATION = """
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class F1ForSequenceClassification(MetricForSequenceClassification):
+    _precision = load_metric("precision", task="sequence-classification")
+    _recall = load_metric("recall", task="sequence-classification")
+
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,
@@ -118,3 +123,31 @@ class F1ForSequenceClassification(MetricForSequenceClassification):
             references, predictions, labels=labels, pos_label=pos_label, average=average, sample_weight=sample_weight
         )
         return {"score": float(score) if score.size == 1 else score.tolist()}
+
+    def _compute_single_pred_multi_ref(
+        self, predictions: SequenceClassificationInstance, references: SequenceClassificationInstance, **kwargs
+    ):
+        predictions = predictions.nested()
+        return self._compute_multi_pred_multi_ref(predictions=predictions, references=references, **kwargs)
+
+    def _compute_multi_pred_multi_ref(
+        self, predictions: SequenceClassificationInstance, references: SequenceClassificationInstance, **kwargs
+    ):
+        precision = self._precision.compute(predictions=predictions, references=references, **kwargs)
+        recall = self._recall.compute(predictions=predictions, references=references, **kwargs)
+        precision_scores = precision["precision"]["score"]
+        recall_scores = recall["recall"]["score"]
+        f1 = self._compute_f1(precision_scores, recall_scores)
+        return {"score": f1}
+
+    @staticmethod
+    def _harmonic_mean(p, r):
+        return 2 * p * r / (p + r)
+
+    def _compute_f1(
+        self, precision: Union[float, List[float]], recall: Union[float, List[float]]
+    ) -> Union[float, List[float]]:
+        if isinstance(precision, list) and isinstance(recall, list):
+            return [self._harmonic_mean(p, r) for p, r in zip(precision, recall)]
+
+        return self._harmonic_mean(precision, recall)

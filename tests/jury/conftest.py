@@ -93,6 +93,16 @@ def references_sequence_classification():
     return [0, 1, 2, 0, 1, 2]
 
 
+@pytest.fixture
+def multiple_predictions_sequence_classification():
+    return [[0], [1, 2], [0], [1], [0], [1, 2]]
+
+
+@pytest.fixture
+def multiple_references_sequence_classification():
+    return [[0, 2], [1, 0], [0, 1], [0], [0], [1, 2]]
+
+
 @pytest.fixture(scope="function")
 def inconsistent_predictions():
     return ["There is a cat on the mat."]

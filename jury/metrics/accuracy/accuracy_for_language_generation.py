@@ -81,7 +81,8 @@ class AccuracyForLanguageGeneration(MetricForLanguageGeneration):
             reference_urls=["https://scikit-learn.org/stable/modules/generated/sklearn.metrics.precision_score.html"],
         )
 
-    def _tokenize(self, predictions: Collator, references: Collator):
+    @staticmethod
+    def _tokenize(predictions: Collator, references: Collator):
         predictions = [normalize_text(p).split() for p in predictions]
         references = [normalize_text(r).split() for r in references]
         return predictions, references

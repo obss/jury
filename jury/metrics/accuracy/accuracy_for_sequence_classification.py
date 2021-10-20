@@ -17,6 +17,8 @@ Accuracy metric. The part of this file is adapted from HuggingFace's
 datasets package implementation of Accuracy metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/accuracy/accuracy.py
 """
+from typing import Callable
+
 import datasets
 from sklearn.metrics import accuracy_score
 
@@ -109,9 +111,46 @@ class AccuracyForSequenceClassification(MetricForSequenceClassification):
         self,
         predictions: SequenceClassificationInstance,
         references: SequenceClassificationInstance,
+        reduce_fn: Callable = None,
         normalize=True,
         sample_weight=None,
     ):
-        return {
-            "score": float(accuracy_score(references, predictions, normalize=normalize, sample_weight=sample_weight))
-        }
+        accuracy = float(
+            accuracy_score(y_pred=predictions, y_true=references, normalize=normalize, sample_weight=sample_weight)
+        )
+        return {"score": accuracy}
+
+    def _compute_single_pred_multi_ref(
+        self,
+        predictions: SequenceClassificationInstance,
+        references: SequenceClassificationInstance,
+        reduce_fn: Callable = None,
+        exact_match=True,
+    ):
+        n_samples = len(predictions)
+        match_sum = 0
+        for pred, ref in zip(predictions, references):
+            if exact_match and [pred] == ref:
+                match_sum += 1
+            elif not exact_match and pred in ref:
+                match_sum += 1
+        return {"score": match_sum / n_samples}
+
+    def _compute_multi_pred_multi_ref(
+        self,
+        predictions: SequenceClassificationInstance,
+        references: SequenceClassificationInstance,
+        reduce_fn: Callable = None,
+        exact_match=True,
+    ):
+        n_samples = len(predictions)
+        match_sum = 0
+        for preds, ref in zip(predictions, references):
+            if exact_match and preds == ref:
+                match_sum += 1
+            else:
+                for pred in preds:
+                    if pred in ref:
+                        match_sum += 1
+                        break
+        return {"score": match_sum / n_samples}

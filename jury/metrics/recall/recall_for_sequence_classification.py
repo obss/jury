@@ -17,6 +17,8 @@ Recall metric. The part of this file is adapted from HuggingFace's
 datasets package implementation of Recall metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/recall/recall.py
 """
+from typing import Callable
+
 import datasets
 from sklearn.metrics import recall_score
 
@@ -118,3 +120,41 @@ class RecallForSequenceClassification(MetricForSequenceClassification):
             references, predictions, labels=labels, pos_label=pos_label, average=average, sample_weight=sample_weight
         )
         return {"recall": float(score) if score.size == 1 else score.tolist()}
+
+    def _compute_single_pred_multi_ref(
+        self, predictions: SequenceClassificationInstance, references: SequenceClassificationInstance, **kwargs
+    ):
+        recalls = []
+        labels = self._get_class_ids(references)
+        for label in labels:
+            n_samples = len([1 for sample in references if label in sample])
+            match_sum = 0
+            for pred, refs in zip(predictions, references):
+                if label not in refs:
+                    continue
+                if pred in refs:
+                    match_sum += 1
+            label_precision = match_sum / n_samples
+            recalls.append(label_precision)
+        return {"score": recalls}
+
+    def _compute_multi_pred_multi_ref(
+        self,
+        predictions: SequenceClassificationInstance,
+        references: SequenceClassificationInstance,
+        reduce_fn: Callable = None,
+        exact_match=True,
+    ):
+        recalls = []
+        labels = self._get_class_ids(references)
+        for label in labels:
+            n_samples = len([1 for sample in references if label in sample])
+            match_sum = 0
+            for preds, refs in zip(predictions, references):
+                if label not in refs:
+                    continue
+                if set(refs).intersection(set(preds)):
+                    match_sum += 1
+            label_precision = match_sum / n_samples
+            recalls.append(label_precision)
+        return {"score": recalls}

@@ -62,10 +62,10 @@ def get_token_lengths(sequences: Sequence[Sequence[str]], reduce_fn: Callable = 
 
 
 def normalize_text(text: str) -> str:
-    def remove_punctuations_and_ws(text: str) -> str:
+    def remove_punctuations_and_ws(s: str) -> str:
         pattern = r"[%s]" % re.escape(string.punctuation)
-        text = re.sub(pattern, " ", text)
-        return " ".join(text.split())
+        s = re.sub(pattern, " ", s)
+        return " ".join(s.split())
 
     return remove_punctuations_and_ws(text).lower()
 

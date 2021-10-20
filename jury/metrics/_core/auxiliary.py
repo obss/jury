@@ -24,7 +24,7 @@ class TaskMapper:
     @classmethod
     def construct(
         cls, task: str, resulting_name: Optional[str] = None, compute_kwargs: Optional[Dict[str, Any]] = None, **kwargs
-    ):
+    ) -> MetricForTask:
         """
         Common interface for all metrics for specified MetricForTask to be constructed.
 
@@ -37,7 +37,7 @@ class TaskMapper:
 
         Raises: :py:class:`TaskNotAvailable`
 
-        Returns: Metric for proper task if available, None otherwise.
+        Returns: Metric for proper task if available.
         """
         subclass = cls._get_subclass(task=task)
         metric_name = cls._get_metric_name()
@@ -81,7 +81,7 @@ class MetricAlias(TaskMapper):
         resulting_name: Optional[str] = None,
         compute_kwargs: Optional[Dict[str, Any]] = None,
         **kwargs
-    ):
+    ) -> MetricForTask:
         """
         Common interface for all metrics for specified MetricForTask to be constructed. Do not raise
         :py:class:`TaskNotAvailable` unlike :py:class:`TaskMapper` as it directly uses _SUBCLASS defined.
@@ -93,7 +93,7 @@ class MetricAlias(TaskMapper):
             compute_kwargs (Optional ``Dict[str, Any]``): Arguments to be passed to `compute()` method of metric at
                 computation.
 
-        Returns: Metric for proper task if available, None otherwise.
+        Returns: Metric for proper task if available.
         """
         subclass = cls._get_subclass()
         resulting_name = resulting_name or cls._get_metric_name()

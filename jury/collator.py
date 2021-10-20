@@ -22,7 +22,7 @@ class Collator(list):
         return Collator(np.ravel(self).tolist(), keep=True)
 
     def nested(self):
-        return Collator(self.from_list_of_str(self))
+        return Collator(self.from_list(self))
 
     def reshape(self, *args):
         _seq = np.array(self, dtype=object)
@@ -53,16 +53,17 @@ class Collator(list):
         if keep:
             return sequence
 
-        _type = NestedSingleType.get_type(sequence)
-        if _type == "str":
+        _type_primary = NestedSingleType.get_type(sequence, order=0)
+        _type_secondary = NestedSingleType.get_type(sequence, order=1)
+        if _type_primary in ["str", "dict"]:
             sequence = self.from_str(sequence)
-        elif _type == "list<str>" or _type == "list<dict>":
-            sequence = self.from_list_of_str(sequence)
+        elif _type_primary == "list" and _type_secondary != "list":
+            sequence = self.from_list(sequence)
 
         return sequence
 
     @staticmethod
-    def from_list_of_str(seq: List[str]):
+    def from_list(seq: List[str]):
         return [[item] for item in seq]
 
     @classmethod

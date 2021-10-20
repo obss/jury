@@ -30,5 +30,27 @@
         0.0
       ]
     }
+  },
+  "multiple_ref_sequence_classification": {
+    "empty_predictions": 3,
+    "total_items": 6,
+    "f1": {
+      "score": [
+        0.888888888888889,
+        0.8,
+        0.0
+      ]
+    }
+  },
+  "multiple_pred_multiple_ref_sequence_classification": {
+    "empty_predictions": 0,
+    "total_items": 6,
+    "f1": {
+      "score": [
+        0.888888888888889,
+        0.8,
+        1.0
+      ]
+    }
   }
 }

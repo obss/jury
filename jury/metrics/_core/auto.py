@@ -16,10 +16,9 @@
 import importlib
 import os
 import warnings
-from typing import Any, Dict, NamedTuple, Optional, Union
+from typing import Any, Dict, NamedTuple, Optional
 
 import datasets
-from datasets import DownloadConfig, GenerateMode, Version
 
 from jury.metrics._core.base import Metric
 from jury.metrics._core.utils import import_module, list_metrics

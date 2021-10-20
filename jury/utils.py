@@ -32,8 +32,12 @@ class NestedSingleType:
             types.append(type(_obj).__name__)
             _obj = _obj[0]
         types.append(type(_obj).__name__)
+
         if order is not None:
-            return types[order]
+            try:
+                return types[order]
+            except IndexError:
+                return None
 
         return cls.join(types)
 

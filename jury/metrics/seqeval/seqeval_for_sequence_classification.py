@@ -22,7 +22,7 @@ from typing import List, Optional, Union
 
 import datasets
 
-from jury.metrics._core import MetricForSequenceLabeling, SequenceClassificationInstance
+from jury.metrics._core import MetricForSequenceLabeling, SequenceClassificationInstance, SequenceLabelingInstance
 from jury.metrics._core.utils import PackagePlaceholder, requirement_message
 
 # `import seqeval` placeholder
@@ -130,8 +130,8 @@ class SeqevalForLanguageGeneration(MetricForSequenceLabeling):
 
     def _compute_single_pred_single_ref(
         self,
-        predictions: SequenceClassificationInstance,
-        references: SequenceClassificationInstance,
+        predictions: SequenceLabelingInstance,
+        references: SequenceLabelingInstance,
         suffix: bool = False,
         scheme: Optional[str] = None,
         mode: Optional[str] = None,
@@ -173,3 +173,19 @@ class SeqevalForLanguageGeneration(MetricForSequenceLabeling):
         scores["overall_accuracy"] = float(seqeval.metrics.accuracy_score(y_true=references, y_pred=predictions))
 
         return scores
+
+    def _compute_single_pred_multi_ref(
+        self,
+        predictions: SequenceLabelingInstance,
+        references: SequenceLabelingInstance,
+        **kwargs,
+    ):
+        return self._compute_single_pred_single_ref(predictions=predictions, references=references, **kwargs)
+
+    def _compute_multi_pred_multi_ref(
+        self,
+        predictions: SequenceLabelingInstance,
+        references: SequenceLabelingInstance,
+        **kwargs,
+    ):
+        return self._compute_single_pred_single_ref(predictions=predictions, references=references, **kwargs)

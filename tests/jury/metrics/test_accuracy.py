@@ -18,6 +18,12 @@ def jury_sequence_classification():
     return Jury(metrics=metric)
 
 
+@pytest.fixture(scope="module")
+def jury_sequence_classification_loose_match():
+    metric = AutoMetric.load("accuracy", task="sequence-classification", compute_kwargs={"exact_match": False})
+    return Jury(metrics=metric)
+
+
 @pytest.fixture
 @get_expected_output(prefix="metrics")
 def output_basic_language_generation():
@@ -40,6 +46,30 @@ def output_multiple_pred_multiple_ref_language_generation():
 @get_expected_output(prefix="metrics")
 def output_basic_sequence_classification():
     return output_basic_sequence_classification.output
+
+
+@pytest.fixture
+@get_expected_output(prefix="metrics")
+def output_multiple_ref_sequence_classification():
+    return output_multiple_ref_sequence_classification.output
+
+
+@pytest.fixture
+@get_expected_output(prefix="metrics")
+def output_multiple_pred_multiple_ref_sequence_classification():
+    return output_multiple_pred_multiple_ref_sequence_classification.output
+
+
+@pytest.fixture
+@get_expected_output(prefix="metrics")
+def output_multiple_ref_sequence_classification_loose_match():
+    return output_multiple_ref_sequence_classification_loose_match.output
+
+
+@pytest.fixture
+@get_expected_output(prefix="metrics")
+def output_multiple_pred_multiple_ref_sequence_classification_loose_match():
+    return output_multiple_pred_multiple_ref_sequence_classification_loose_match.output
 
 
 def test_basic_language_generation(predictions, references, jury_language_generation, output_basic_language_generation):
@@ -74,3 +104,54 @@ def test_basic_sequence_classification(
         predictions=predictions_sequence_classification, references=references_sequence_classification
     )
     assert_almost_equal_dict(actual=scores, desired=output_basic_sequence_classification)
+
+
+def test_multiple_ref_sequence_classification(
+    predictions_sequence_classification,
+    multiple_references_sequence_classification,
+    jury_sequence_classification,
+    output_multiple_ref_sequence_classification,
+):
+    scores = jury_sequence_classification(
+        predictions=predictions_sequence_classification, references=multiple_references_sequence_classification
+    )
+    assert_almost_equal_dict(actual=scores, desired=output_multiple_ref_sequence_classification)
+
+
+def test_multiple_ref_sequence_classification_loose_match(
+    predictions_sequence_classification,
+    multiple_references_sequence_classification,
+    jury_sequence_classification_loose_match,
+    output_multiple_ref_sequence_classification_loose_match,
+):
+    scores = jury_sequence_classification_loose_match(
+        predictions=predictions_sequence_classification,
+        references=multiple_references_sequence_classification,
+    )
+    assert_almost_equal_dict(actual=scores, desired=output_multiple_ref_sequence_classification_loose_match)
+
+
+def test_multiple_pred_multiple_ref_sequence_classification(
+    multiple_predictions_sequence_classification,
+    multiple_references_sequence_classification,
+    jury_sequence_classification,
+    output_multiple_pred_multiple_ref_sequence_classification,
+):
+    scores = jury_sequence_classification(
+        predictions=multiple_predictions_sequence_classification, references=multiple_references_sequence_classification
+    )
+    assert_almost_equal_dict(actual=scores, desired=output_multiple_pred_multiple_ref_sequence_classification)
+
+
+def test_multiple_pred_multiple_ref_sequence_classification_loose_match(
+    multiple_predictions_sequence_classification,
+    multiple_references_sequence_classification,
+    jury_sequence_classification_loose_match,
+    output_multiple_pred_multiple_ref_sequence_classification_loose_match,
+):
+    scores = jury_sequence_classification_loose_match(
+        predictions=multiple_predictions_sequence_classification, references=multiple_references_sequence_classification
+    )
+    assert_almost_equal_dict(
+        actual=scores, desired=output_multiple_pred_multiple_ref_sequence_classification_loose_match
+    )

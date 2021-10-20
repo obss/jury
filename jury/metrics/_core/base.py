@@ -23,15 +23,15 @@ from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import datasets
 import numpy
+import numpy as np
 import pandas as pd
-from datasets import MetricInfo
 from datasets.utils.logging import get_logger
 
 from jury.collator import Collator
 from jury.metrics._core.utils import import_module, is_reduce_fn
 
 LanguageGenerationInstance = Union[List[str], List[List[str]]]
-SequenceClassificationInstance = List[int]
+SequenceClassificationInstance = Union[List[int], List[List[int]]]
 SequenceLabelingInstance = List[List[str]]
 EvaluationInstance = Union[LanguageGenerationInstance, SequenceClassificationInstance, SequenceLabelingInstance]
 MetricOutput = Dict[str, Union[str, int, float]]
@@ -50,8 +50,8 @@ class Metric(datasets.Metric, ABC):
             :py:method:`jury.Jury.evaluate` such as when bleu-1, and bleu-2 are used together.
         compute_kwargs (Optional ``Dict[str, Any]``): These are the parameters to be passed to compute function of the
             metric. It is meant to ease the support of computation from a jury configuration file, etc.
-        config_name (Optional ``str``): This is used to define a hash specific to a metrics computation script and prevents the
-            metric's data to be overridden when the metric loading script is modified.
+        config_name (Optional ``str``): This is used to define a hash specific to a metrics computation script and
+            prevents the metric's data to be overridden when the metric loading script is modified.
         keep_in_memory (``bool``): keep all predictions and references in memory. Not possible in distributed settings.
         cache_dir (Optional ``str``): Path to a directory in which temporary prediction/references data will be stored.
             The data directory should be located on a shared file-system in distributed setups.
@@ -61,9 +61,9 @@ class Metric(datasets.Metric, ABC):
             This is useful to compute metrics in distributed setups (in particular non-additive metrics like F1).
         seed (Optional ``int``): If specified, this will temporarily set numpy's random seed when
         :func:`datasets.Metric.compute` is run.
-        experiment_id (Optional ``str``): A specific experiment id. This is used if several distributed evaluations share the
-            same file system. This is useful to compute metrics in distributed setups (in particular non-additive
-            metrics like F1).
+        experiment_id (Optional ``str``): A specific experiment id. This is used if several distributed evaluations
+            share the same file system. This is useful to compute metrics in distributed setups (in particular
+            non-additive metrics like F1).
         max_concurrent_cache_files (``int``): Max number of concurrent metrics cache files (default 10000).
         timeout (``Union[int, float]``): Timeout in second for distributed setting synchronization.
     """
@@ -200,7 +200,7 @@ class Metric(datasets.Metric, ABC):
         return self._task
 
 
-class MetricForTask(Metric, ABC):
+class MetricForTask(Metric):
     """
     Base metric class for any task. All metrics must extend this class as metric is required to adopt a task
     inherently. Default task will be language-generation for AutoMetric.
@@ -239,6 +239,46 @@ class MetricForTask(Metric, ABC):
     ):
         return cls(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
+    @staticmethod
+    def _reduce_scores(scores: Union[List[Dict[str, float]], List[float]], reduce_fn: Callable):
+        if isinstance(scores[0], dict):
+            score = pd.DataFrame(scores).apply(reduce_fn, axis=0).to_dict()
+        else:
+            score = float(reduce_fn(scores))
+        return score
+
+    def _preprocess(self, predictions: List[List[str]], references: List[List[str]]) -> Tuple[Collator, Collator]:
+        return Collator(predictions, keep=True), Collator(references, keep=True)
+
+    def _compute(
+        self,
+        *,
+        predictions: EvaluationInstance = None,
+        references: EvaluationInstance = None,
+        **kwargs,
+    ) -> MetricOutput:
+        assert len(predictions) == len(references), "Predictions and references length does not match."
+        eval_params = {**self.compute_kwargs, **kwargs}
+        if "reduce_fn" in eval_params:
+            eval_params.pop("reduce_fn")
+        predictions, references = Collator(predictions), Collator(references)
+        result = self.evaluate(predictions=predictions, references=references, **eval_params)
+        return {self.resulting_name: result}
+
+    def evaluate(self, predictions: Collator, references: Collator, **kwargs) -> Dict[str, float]:
+        if predictions.can_collapse() and references.can_collapse():
+            predictions = predictions.collapse()
+            references = references.collapse()
+            eval_fn = self._compute_single_pred_single_ref
+        elif predictions.can_collapse() and not references.can_collapse():
+            predictions = predictions.collapse()
+            eval_fn = self._compute_single_pred_multi_ref
+        else:
+            eval_fn = self._compute_multi_pred_multi_ref
+
+        predictions, references = self._preprocess(predictions, references)
+        return eval_fn(predictions=predictions, references=references, **kwargs)
+
 
 class MetricForLanguageGeneration(MetricForTask):
     """
@@ -246,7 +286,7 @@ class MetricForLanguageGeneration(MetricForTask):
     used by default by :py:class:`jury.metrics.AutoMetric`.
     """
 
-    _task = "langueage-generation"
+    _task = "language-generation"
 
     @property
     def _default_features(self):
@@ -349,33 +389,6 @@ class MetricForLanguageGeneration(MetricForTask):
         """
         pass
 
-    @staticmethod
-    def _reduce_scores(scores: Union[List[Dict[str, float]], List[float]], reduce_fn: Callable):
-        if isinstance(scores[0], dict):
-            score = pd.DataFrame(scores).apply(reduce_fn, axis=0).to_dict()
-        else:
-            score = float(reduce_fn(scores))
-        return score
-
-    def _preprocess(self, predictions: List[List[str]], references: List[List[str]]) -> Tuple[Collator, Collator]:
-        return Collator(predictions, keep=True), Collator(references, keep=True)
-
-    def evaluate(
-        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
-    ) -> Dict[str, float]:
-        if predictions.can_collapse() and references.can_collapse():
-            predictions = predictions.collapse()
-            references = references.collapse()
-            eval_fn = self._compute_single_pred_single_ref
-        elif predictions.can_collapse() and not references.can_collapse():
-            predictions = predictions.collapse()
-            eval_fn = self._compute_single_pred_multi_ref
-        else:
-            eval_fn = self._compute_multi_pred_multi_ref
-
-        predictions, references = self._preprocess(predictions, references)
-        return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)
-
 
 class MetricForSequenceClassification(MetricForTask):
     """
@@ -391,31 +404,14 @@ class MetricForSequenceClassification(MetricForTask):
                 "predictions": datasets.Sequence(datasets.Value("int32")),
                 "references": datasets.Sequence(datasets.Value("int32")),
             }
-            if self.config_name == "multilabel"
-            else {
-                "predictions": datasets.Value("int32"),
-                "references": datasets.Value("int32"),
-            }
         )
-
-    def _compute(
-        self,
-        *,
-        predictions: SequenceClassificationInstance = None,
-        references: SequenceClassificationInstance = None,
-        **kwargs,
-    ) -> MetricOutput:
-        assert len(predictions) == len(references), "Predictions and references length does not match."
-        eval_params = {**self.compute_kwargs, **kwargs}
-        eval_params.pop("reduce_fn")
-        result = self._compute_single_pred_single_ref(predictions=predictions, references=references, **eval_params)
-        return {self.resulting_name: result}
 
     @abstractmethod
     def _compute_single_pred_single_ref(
         self,
         predictions: SequenceClassificationInstance,
         references: SequenceClassificationInstance,
+        reduce_fn: Callable = None,
         **kwargs,
     ):
         """
@@ -430,21 +426,32 @@ class MetricForSequenceClassification(MetricForTask):
         """
         pass
 
+    @abstractmethod
     def _compute_single_pred_multi_ref(
         self,
         predictions: SequenceClassificationInstance,
         references: SequenceClassificationInstance,
+        reduce_fn: Callable = None,
         **kwargs,
     ):
-        raise NotImplementedError(f"Task {self._task} does not support multiple predictions or multiple" "references.")
+        pass
 
+    @abstractmethod
     def _compute_multi_pred_multi_ref(
         self,
         predictions: SequenceClassificationInstance,
         references: SequenceClassificationInstance,
+        reduce_fn: Callable = None,
         **kwargs,
     ):
-        raise NotImplementedError(f"Task {self._task} does not support multiple predictions or multiple" "references.")
+        pass
+
+    @staticmethod
+    def _get_class_ids(references: List[List]):
+        stacked_references = []
+        for ref in references:
+            stacked_references.extend(ref)
+        return np.unique(stacked_references).tolist()
 
 
 class MetricForSequenceLabeling(MetricForTask):
@@ -463,25 +470,11 @@ class MetricForSequenceLabeling(MetricForTask):
             }
         )
 
-    def _compute(
-        self,
-        *,
-        predictions: SequenceClassificationInstance = None,
-        references: SequenceClassificationInstance = None,
-        **kwargs,
-    ) -> MetricOutput:
-        assert len(predictions) == len(references), "Predictions and references length does not match."
-        eval_params = {**self.compute_kwargs, **kwargs}
-        if "reduce_fn" in eval_params:
-            eval_params.pop("reduce_fn")
-        result = self._compute_single_pred_single_ref(predictions=predictions, references=references, **eval_params)
-        return {self.resulting_name: result}
-
     @abstractmethod
     def _compute_single_pred_single_ref(
         self,
-        predictions: SequenceClassificationInstance,
-        references: SequenceClassificationInstance,
+        predictions: SequenceLabelingInstance,
+        references: SequenceLabelingInstance,
         **kwargs,
     ):
         """
@@ -498,16 +491,16 @@ class MetricForSequenceLabeling(MetricForTask):
 
     def _compute_single_pred_multi_ref(
         self,
-        predictions: SequenceClassificationInstance,
-        references: SequenceClassificationInstance,
+        predictions: SequenceLabelingInstance,
+        references: SequenceLabelingInstance,
         **kwargs,
     ):
         raise NotImplementedError(f"Task {self._task} does not support multiple predictions or multiple" "references.")
 
     def _compute_multi_pred_multi_ref(
         self,
-        predictions: SequenceClassificationInstance,
-        references: SequenceClassificationInstance,
+        predictions: SequenceLabelingInstance,
+        references: SequenceLabelingInstance,
         **kwargs,
     ):
         raise NotImplementedError(f"Task {self._task} does not support multiple predictions or multiple" "references.")
