@@ -10,7 +10,7 @@ from tests.jury import EXPECTED_OUTPUTS
 
 _TEST_METRICS = [
     load_metric("accuracy"),
-    load_metric("bertscore", params={"model_type": "albert-base-v1", "device": "cpu"}),
+    load_metric("bertscore", compute_kwargs={"model_type": "albert-base-v1", "device": "cpu"}),
     load_metric("bleu"),
     load_metric("f1"),
     load_metric("meteor"),
@@ -38,9 +38,9 @@ _LIST_STR_TEST_METRICS = [
 
 _LIST_DICT_TEST_METRICS = [
     {"metric_name": "accuracy"},
-    {"metric_name": "bertscore", "model_type": "albert-base-v1"},
-    {"metric_name": "bleu", "resulting_name": "bleu-1", "max_order": 1},
-    {"metric_name": "bleu", "resulting_name": "bleu-2", "max_order": 2},
+    {"metric_name": "bertscore", "compute_kwargs": {"model_type": "albert-base-v1"}},
+    {"metric_name": "bleu", "resulting_name": "bleu-1", "compute_kwargs": {"max_order": 1}},
+    {"metric_name": "bleu", "resulting_name": "bleu-2", "compute_kwargs": {"max_order": 2}},
     {"metric_name": "f1", "resulting_name": "F1"},
     {"metric_name": "meteor", "resulting_name": "METEOR"},
     {"metric_name": "precision"},
@@ -63,8 +63,14 @@ _LIST_MIXED_TEST_METRICS = [
     {"metric_name": "squad"},
 ]
 
+_DATASETS_METRICS = "wer"
 
-_DATASETS_METRICS = ["wer"]
+_TEST_METRICS_SEQUENCE_CLASSIFICATION = [
+    {"metric_name": "accuracy", "task": "sequence-classification"},
+    {"metric_name": "f1", "task": "sequence-classification"},
+    {"metric_name": "precision", "task": "sequence-classification"},
+    {"metric_name": "recall", "task": "sequence-classification"},
+]
 
 
 @pytest.fixture(scope="package")
@@ -75,6 +81,26 @@ def predictions():
 @pytest.fixture(scope="package")
 def references():
     return ["The cat is playing on the mat.", "Today is a wonderful day"]
+
+
+@pytest.fixture
+def predictions_sequence_classification():
+    return [0, 2, 1, 0, 0, 1]
+
+
+@pytest.fixture
+def references_sequence_classification():
+    return [0, 1, 2, 0, 1, 2]
+
+
+@pytest.fixture
+def multiple_predictions_sequence_classification():
+    return [[0], [1, 2], [0], [1], [0], [1, 2]]
+
+
+@pytest.fixture
+def multiple_references_sequence_classification():
+    return [[0, 2], [1, 0], [0, 1], [0], [0], [1, 2]]
 
 
 @pytest.fixture(scope="function")
@@ -135,13 +161,17 @@ def jury_datasets():
     return Jury(metrics=_DATASETS_METRICS)
 
 
-def json_load(path: str):
-    with open(path, "r") as jf:
-        content = json.load(jf)
-    return content
+@pytest.fixture(scope="function")
+def jury_sequence_classification():
+    return Jury(metrics=_TEST_METRICS_SEQUENCE_CLASSIFICATION)
 
 
 def get_expected_output(prefix: Optional[str] = None):
+    def json_load(path: str):
+        with open(path, "r") as jf:
+            content = json.load(jf)
+        return content
+
     def wrapper(fn, *args, **kwargs):
         module_name = os.path.basename(inspect.getfile(fn)).replace(".py", "")
         path = os.path.join(EXPECTED_OUTPUTS, prefix, f"{module_name}.json")

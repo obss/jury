@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 
-from jury.metrics._utils import is_reduce_fn
+from jury.metrics._core.utils import is_reduce_fn
 from jury.utils import bulk_remove_keys, remove_punctuations
 
 

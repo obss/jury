@@ -1,10 +1,11 @@
 from concurrent.futures import ProcessPoolExecutor
-from typing import Any, Callable, Dict, List, Mapping, Optional, Union
+from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
 
 from jury.collator import Collator
 from jury.definitions import DEFAULT_METRICS
-from jury.metrics import Metric, load_metric
-from jury.utils import replace, set_env
+from jury.metrics import load_metric
+from jury.metrics._core import EvaluationInstance, Metric
+from jury.utils import pop_item_from_dict, replace, set_env
 
 MetricParam = Union[str, Metric, Dict[str, Any]]
 
@@ -46,11 +47,14 @@ class Jury:
         self.metrics = self._load_metrics(metrics)
         self._concurrent = run_concurrent
 
+        # Sanity check
+        self._validate_metrics()
+
     def __call__(
         self,
         *,
-        predictions: Union[List[str], List[List[str]]] = None,
-        references: Union[List[str], List[List[str]]] = None,
+        predictions: EvaluationInstance = None,
+        references: EvaluationInstance = None,
         reduce_fn: Optional[Union[str, Callable]] = None,
     ) -> Dict[str, float]:
         """Restricts positional arguments to prevent potential inconsistency between predictions and references."""
@@ -89,10 +93,20 @@ class Jury:
                 metrics = replace(metrics, load_metric(metric_name.lower()), i)
             elif isinstance(metric_param, dict):
                 metric_name = metric_param.pop("metric_name")  # must be given
-                resulting_name = metric_param.pop("resulting_name") if "resulting_name" in metric_param else None
-                params = metric_param
+                task = pop_item_from_dict(metric_param, "task")
+                resulting_name = pop_item_from_dict(metric_param, "resulting_name")
+                compute_kwargs = pop_item_from_dict(metric_param, "compute_kwargs")
+                kwargs = metric_param
                 metrics = replace(
-                    metrics, load_metric(metric_name=metric_name, resulting_name=resulting_name, params=params), i
+                    metrics,
+                    load_metric(
+                        metric_name=metric_name,
+                        task=task,
+                        resulting_name=resulting_name,
+                        compute_kwargs=compute_kwargs,
+                        **kwargs,
+                    ),
+                    i,
                 )
             elif isinstance(metric_param, Metric):
                 continue
@@ -101,7 +115,8 @@ class Jury:
     def _load_metrics(self, metrics: Union[MetricParam, List[MetricParam]]) -> List[Metric]:
         if metrics is None:
             metrics = DEFAULT_METRICS
-        elif isinstance(metrics, (str, Metric)):
+
+        if isinstance(metrics, (str, Metric)):
             metrics = self._load_single_metric(metrics)
         elif isinstance(metrics, list):
             metrics = self._load_multiple_metrics(metrics)
@@ -133,9 +148,20 @@ class Jury:
             inputs.append((metric, predictions, references, reduce_fn))
         return inputs
 
+    def _validate_metrics(self):
+        metrics = self.metrics
+        if all([isinstance(metric, Metric) for metric in metrics]):
+            task = metrics[0].task
+            if not all([metric.task == task for metric in metrics]):
+                raise ValueError(
+                    "Given metrics are not suitable to be used together, metrics must be of same the task."
+                )
+        return True
+
     def add_metric(self, metric_name: str, resulting_name: str = None, params: Dict = None) -> None:
         metric = load_metric(metric_name, resulting_name=resulting_name, params=params)
         self.metrics.append(metric)
+        self._validate_metrics()
 
     def remove_metric(self, resulting_name: str, error: bool = True) -> None:
         for i, metric in enumerate(self.metrics):

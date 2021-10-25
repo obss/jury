@@ -1,4 +1,4 @@
-from jury.metrics._base import Metric, load_metric
+from jury.metrics._core import AutoMetric, MetricForTask, list_metrics, load_metric
 from jury.metrics.accuracy import Accuracy
 from jury.metrics.bertscore import Bertscore
 from jury.metrics.bleu import Bleu
@@ -12,14 +12,16 @@ from jury.metrics.squad import Squad
 
 __all__ = [
     "Accuracy",
+    "AutoMetric",
     "Bertscore",
     "Bleu",
     "F1",
     "Meteor",
-    "Metric",
     "Precision",
     "Recall",
     "Rouge",
     "Sacrebleu",
     "Squad",
+    "load_metric",
+    "list_metrics",
 ]

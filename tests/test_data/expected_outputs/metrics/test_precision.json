@@ -1,0 +1,56 @@
+{
+  "basic_language_generation": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "precision": {
+      "score": 0.7321428571428572
+    }
+  },
+  "multiple_ref_language_generation": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "precision": {
+      "score": 0.7321428571428572
+    }
+  },
+  "multiple_pred_multiple_ref_language_generation": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "precision": {
+      "score": 0.875
+    }
+  },
+  "basic_sequence_classification": {
+    "empty_predictions": 3,
+    "total_items": 6,
+    "precision": {
+      "score": [
+        0.6666666666666666,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "multiple_ref_sequence_classification": {
+    "empty_predictions": 3,
+    "total_items": 6,
+    "precision": {
+      "score": [
+        1.0,
+        1.0,
+        0.0
+      ]
+    }
+  },
+  "multiple_pred_multiple_ref_sequence_classification": {
+    "empty_predictions": 0,
+    "total_items": 6,
+    "precision": {
+      "score": [
+        1.0,
+        0.6666666666666666,
+        1.0
+      ]
+    }
+  }
+}

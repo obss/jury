@@ -1,14 +1,15 @@
 import pytest
 
 from jury import Jury
-from jury.metrics.rouge import Rouge
+from jury.metrics import AutoMetric
 from tests.jury.conftest import get_expected_output
 from tests.utils import assert_almost_equal_dict
 
 
 @pytest.fixture(scope="module")
 def jury():
-    return Jury(metrics=[Rouge()])
+    metric = AutoMetric.load("rouge")
+    return Jury(metrics=metric)
 
 
 @pytest.fixture

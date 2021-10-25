@@ -1,0 +1,24 @@
+{
+  "basic": {
+    "empty_predictions": 0,
+    "total_items": 2,
+    "seqeval": {
+      "MISC": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "number": 1
+      },
+      "PER": {
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+        "number": 1
+      },
+      "overall_precision": 0.5,
+      "overall_recall": 0.5,
+      "overall_f1": 0.5,
+      "overall_accuracy": 0.8
+    }
+  }
+}

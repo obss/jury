@@ -60,6 +60,12 @@ def output_evaluate_multiple_predictions():
     return output_evaluate_multiple_predictions.output
 
 
+@pytest.fixture
+@get_expected_output(prefix=None)
+def output_evaluate_sequence_classification():
+    return output_evaluate_sequence_classification.output
+
+
 def test_evaluate_concurrent(predictions, references, jury_concurrent, output_evaluate_concurrent):
     scores = jury_concurrent(predictions=predictions, references=references)
     assert_almost_equal_dict(
@@ -78,6 +84,12 @@ def test_evaluate_inconsistent_input(inconsistent_predictions, references, jury)
     # Different length
     with pytest.raises(ValueError):
         jury(predictions=inconsistent_predictions, references=references)
+
+
+def test_evaluate_inconsistent_tasks(predictions, references, jury):
+    with pytest.raises(ValueError):
+        jury.add_metric("seqeval")
+    jury.remove_metric("seqeval")
 
 
 def test_evaluate(predictions, references, jury, output_evaluate):
@@ -132,6 +144,18 @@ def test_evaluate_multiple_predictions(
     )
 
 
+def test_evaluate_sequence_classification(
+    predictions_sequence_classification,
+    references_sequence_classification,
+    jury_sequence_classification,
+    output_evaluate_sequence_classification,
+):
+    scores = jury_sequence_classification(
+        predictions=predictions_sequence_classification, references=references_sequence_classification
+    )
+    assert_almost_equal_dict(actual=scores, desired=output_evaluate_sequence_classification)
+
+
 def test_reduce_fn(predictions, references, jury):
     _reduce_fn = np.mean
     _non_reduce_fn = np.exp
@@ -145,7 +169,7 @@ def test_reduce_fn(predictions, references, jury):
 
 def test_load_metric():
     from jury import load_metric
-    from jury.metrics import Metric as JuryMetric
+    from jury.metrics._core import Metric as JuryMetric
 
     assert isinstance(load_metric("squad"), JuryMetric)
     assert isinstance(load_metric("squad_v2"), datasets.Metric)
