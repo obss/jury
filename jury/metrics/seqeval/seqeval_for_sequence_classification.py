@@ -18,7 +18,7 @@ of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/seqeval/seqeval.py
 """
 import importlib
-from typing import List, Optional, Union, Dict
+from typing import Dict, List, Optional, Union
 
 import datasets
 
