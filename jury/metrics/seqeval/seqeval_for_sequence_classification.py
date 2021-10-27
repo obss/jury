@@ -18,7 +18,7 @@ of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/seqeval/seqeval.py
 """
 import importlib
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 import datasets
 
@@ -137,6 +137,7 @@ class SeqevalForLanguageGeneration(MetricForSequenceLabeling):
         mode: Optional[str] = None,
         sample_weight: Optional[List[int]] = None,
         zero_division: Union[str, int] = "warn",
+        json_normalized: bool = False,
     ):
         if scheme is not None:
             try:
@@ -167,6 +168,10 @@ class SeqevalForLanguageGeneration(MetricForSequenceLabeling):
             }
             for type_name, score in report.items()
         }
+
+        if json_normalized:
+            scores = self.json_normalize(scores)
+
         scores["overall_precision"] = float(overall_score["precision"])
         scores["overall_recall"] = float(overall_score["recall"])
         scores["overall_f1"] = float(overall_score["f1-score"])
@@ -189,3 +194,14 @@ class SeqevalForLanguageGeneration(MetricForSequenceLabeling):
         **kwargs,
     ):
         return self._compute_single_pred_single_ref(predictions=predictions, references=references, **kwargs)
+
+    @staticmethod
+    def json_normalize(scores: Dict) -> Dict[str, float]:
+        normalized = {}
+        for key, value in scores.items():
+            if isinstance(value, dict):
+                for name, val in value.items():
+                    normalized[f"{key}_{name}"] = val
+            else:
+                normalized[key] = value
+        return normalized
