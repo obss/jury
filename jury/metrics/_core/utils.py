@@ -1,7 +1,5 @@
 import importlib.util
 import os
-import re
-import string
 import warnings
 from pathlib import Path
 from typing import Callable, Sequence, Union
@@ -59,15 +57,6 @@ def get_token_lengths(sequences: Sequence[Sequence[str]], reduce_fn: Callable = 
     if reduce_fn is not None:
         return int(reduce_fn(token_lengths))
     return token_lengths
-
-
-def normalize_text(text: str) -> str:
-    def remove_punctuations_and_ws(s: str) -> str:
-        pattern = r"[%s]" % re.escape(string.punctuation)
-        s = re.sub(pattern, " ", s)
-        return " ".join(s.split())
-
-    return remove_punctuations_and_ws(text).lower()
 
 
 def is_reduce_fn(fun: Callable) -> bool:

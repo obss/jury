@@ -2,7 +2,7 @@ from typing import List, Union
 
 import numpy as np
 
-from jury.utils import NestedSingleType
+from jury.utils.common import NestedSingleType
 
 
 class Collator(list):

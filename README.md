@@ -14,14 +14,14 @@
 <a href="https://github.com/obss/jury/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/pypi/l/jury"></a>
 </p>
 
-Simple tool/toolkit for evaluating NLG (Natural Language Generation) offering various automated metrics. Jury offers a smooth and easy-to-use interface. It uses [datasets](https://github.com/huggingface/datasets/) for underlying metric computation, and hence adding custom metric is easy as adopting `datasets.Metric`. 
+Simple toolkit for evaluating NLP experiments offering various automated metrics. Jury offers a smooth and easy-to-use interface. It uses [datasets](https://github.com/huggingface/datasets/) for underlying metric computation, and hence adding custom metric is easy as extending proper class.
 
 Main advantages that Jury offers are:
 
 - Easy to use for any NLG system.
 - Calculate many metrics at once.
 - Metrics calculations are handled concurrently to save processing time.
-- It supports evaluating multiple predictions.
+- It supports evaluating multiple predictions seamlessly.
 
 To see more, check the [official Jury blog post](https://medium.com/codable/jury-evaluating-performance-of-nlg-models-730eb9c9999f).
 
@@ -88,7 +88,9 @@ score = bleu.compute(predictions=predictions, references=references, max_order=4
 , or alternatively on instantiation
 
 ```python
-bleu = Bleu._construct(compute_kwargs={"max_order": 1})
+from jury.metrics import Bleu
+bleu = Bleu.construct(compute_kwargs={"max_order": 1})
+score = bleu.compute(predictions=predictions, references=references)
 ```
 
 Note that you can seemlessly access both `jury` and `datasets` metrics through `jury.load_metric`. 
@@ -104,9 +106,13 @@ wer = jury.load_metric("wer") # It falls back to `datasets` package with a warni
 
 ### CLI Usage
 
-You can specify predictions file and references file paths and get the resulting scores. Each line should be paired in both files.
+You can specify predictions file and references file paths and get the resulting scores. Each line should be paired in both files. You can optionally provide reduce function and an export path for results to be written.
 
-    jury eval --predictions /path/to/predictions.txt --references /path/to/references.txt --reduce_fn max
+    jury eval --predictions /path/to/predictions.txt --references /path/to/references.txt --reduce_fn max --export /path/to/export.txt
+
+You can also provide prediction folders and reference folders to evaluate multiple experiments. In this set up, however, it is required that the prediction and references files you need to evaluate as a pair have the same file name. These common names are paired together for prediction and reference.
+
+    jury eval --predictions /path/to/predictions_folder --references /path/to/references_folder --reduce_fn max --export /path/to/export.txt
 
 If you want to specify metrics, and do not want to use default, specify it in config file (json) in `metrics` key.
 

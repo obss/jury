@@ -1,16 +1,12 @@
 from typing import List, Tuple
 
 from jury.collator import Collator
-from jury.utils import remove_punctuations
+from jury.utils.nlp import normalize_text
 
 
 class BLEUDefaultTokenizer:
-    @staticmethod
-    def _preprocess_text(text: str) -> str:
-        return remove_punctuations(text).lower()
-
     def tokenize(self, text: str) -> List[str]:
-        return self._preprocess_text(text).split()
+        return normalize_text(text).split()
 
 
 class TokenizerWrapper:

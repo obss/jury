@@ -25,7 +25,7 @@ import numpy as np
 
 from jury.collator import Collator
 from jury.metrics._core import MetricForLanguageGeneration
-from jury.metrics._core.utils import normalize_text
+from jury.utils.nlp import normalize_text
 
 _CITATION = """
     @inproceedings{papineni2002bleu,
