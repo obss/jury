@@ -1,11 +1,10 @@
 from concurrent.futures import ProcessPoolExecutor
-from typing import Any, Callable, Dict, List, Mapping, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Mapping, Optional, Union
 
 from jury.collator import Collator
 from jury.definitions import DEFAULT_METRICS
-from jury.metrics import load_metric
-from jury.metrics._core import EvaluationInstance, Metric
-from jury.utils import pop_item_from_dict, replace, set_env
+from jury.metrics import EvaluationInstance, Metric, load_metric
+from jury.utils.common import pop_item_from_dict, replace, set_env
 
 MetricParam = Union[str, Metric, Dict[str, Any]]
 
@@ -17,14 +16,14 @@ class Jury:
 
     Note:
 
-        If ``predictions`` and ``references`` are given as list of strings, the order is recieved
+        If ``predictions`` and ``references`` are given as list of instances, the order is recieved
         as prediction & reference pairs and evaluation is done by prioratizing the order.
 
     Examples:
 
     .. code-block:: python
 
-        >>> # Question-Generation Evaluation (default BMR)
+        >>> # Example Evaluation
         >>> predictions = [
             ["the cat is on the mat", "there is playing cat on the mat."],
             ["Look! a wonderful day."]
@@ -33,10 +32,10 @@ class Jury:
             ["the cat is playing on the mat.", "The cat plays on the mat."],
             ["Today is a wonderful day", "The weather outside is wonderful."]
         ]
-        >>> evaluation = Jury()
-        >>> results = evaluation(predictions=predictions, references=references)
+        >>> scorer = Jury()
+        >>> results = scorer(predictions=predictions, references=references)
         >>> print(results)
-        {'bleu_1': 0.6111111111111112, ..., 'rougeL': 0.6470588235294118, ...}
+        {'bleu_1': {"score": 0.6111111111111112, ...}, ..., 'meteor': {"score": 0.6470588235294118, ...}}
     """
 
     def __init__(
@@ -158,8 +157,8 @@ class Jury:
                 )
         return True
 
-    def add_metric(self, metric_name: str, resulting_name: str = None, params: Dict = None) -> None:
-        metric = load_metric(metric_name, resulting_name=resulting_name, params=params)
+    def add_metric(self, metric_name: str, resulting_name: str = None, compute_kwargs: Dict = None) -> None:
+        metric = load_metric(metric_name, resulting_name=resulting_name, compute_kwargs=compute_kwargs)
         self.metrics.append(metric)
         self._validate_metrics()
 

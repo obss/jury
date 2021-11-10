@@ -2,7 +2,8 @@ import numpy as np
 import pytest
 
 from jury.metrics._core.utils import is_reduce_fn
-from jury.utils import bulk_remove_keys, remove_punctuations
+from jury.utils.common import bulk_remove_keys
+from jury.utils.nlp import normalize_text
 
 
 @pytest.fixture
@@ -16,7 +17,7 @@ def preprocessed_text():
 
 
 def test_remove_punctuations(raw_text, preprocessed_text):
-    assert remove_punctuations(raw_text) == preprocessed_text
+    assert normalize_text(raw_text, uncased=False) == preprocessed_text
 
 
 def test_bulk_remove_keys():

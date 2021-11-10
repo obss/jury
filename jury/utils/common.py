@@ -1,6 +1,4 @@
 import os
-import re
-import string
 from typing import Any, Dict, List, Optional
 
 
@@ -42,26 +40,15 @@ class NestedSingleType:
         return cls.join(types)
 
 
-def remove_punctuations(text: str) -> str:
-    pattern = r"[%s]" % re.escape(string.punctuation)
-    text = re.sub(pattern, " ", text)
-    return " ".join(text.split())
-
-
 def bulk_remove_keys(obj: Dict, keys: List[str]) -> Dict:
     return {k: v for k, v in obj.items() if k not in keys}
 
 
-def set_env(name: str, value: str):
-    if not isinstance(value, str):
-        raise ValueError(f"Expected type str for 'value', got {type(value)}.")
-    os.environ[name] = value
+def get_common_keys(d1: Dict, d2: Dict) -> List[str]:
+    set1 = set(d1.keys())
+    set2 = set(d2.keys())
 
-
-def replace(a: List, obj: object, index=-1):
-    del a[index]
-    a.insert(index, obj)
-    return a
+    return list(set1.intersection(set2))
 
 
 def pop_item_from_dict(d: Dict[str, Any], key: str, default: Any = None, must_exists: bool = False):
@@ -80,3 +67,15 @@ def pop_item_from_dict(d: Dict[str, Any], key: str, default: Any = None, must_ex
         raise KeyError(f"'{key}' not found in '{d}'.")
     val = d.pop(key) if key in d else default
     return val
+
+
+def replace(a: List, obj: object, index=-1):
+    del a[index]
+    a.insert(index, obj)
+    return a
+
+
+def set_env(name: str, value: str):
+    if not isinstance(value, str):
+        raise ValueError(f"Expected type str for 'value', got {type(value)}.")
+    os.environ[name] = value

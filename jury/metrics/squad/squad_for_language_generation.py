@@ -25,7 +25,7 @@ import pandas as pd
 from jury.collator import Collator
 from jury.metrics._core import MetricForLanguageGeneration
 from jury.metrics._core.utils import download
-from jury.utils import NestedSingleType
+from jury.utils.common import NestedSingleType
 
 _CITATION = """\
 @inproceedings{Rajpurkar2016SQuAD10,
