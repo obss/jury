@@ -104,7 +104,7 @@ Examples:
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class BleuForLanguageGeneration(MetricForLanguageGeneration):
     def __init__(self, resulting_name: str = None, compute_kwargs: Dict = None):
-        self.should_change_resulting_name = True if resulting_name is None else False
+        self.should_change_resulting_name = resulting_name is None
         tokenizer = compute_kwargs.get("tokenizer", None) if compute_kwargs is not None else None
         self.tokenizer = BLEUDefaultTokenizer() if tokenizer is None else tokenizer
         super().__init__(resulting_name=resulting_name, compute_kwargs=compute_kwargs)
@@ -166,7 +166,9 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
         predictions = predictions.reshape(
             len(predictions),
         )
-        return self._compute_bleu_score(predictions=predictions, references=references)
+        return self._compute_bleu_score(
+            predictions=predictions, references=references, max_order=max_order, smooth=smooth
+        )
 
     def _compute_single_pred_multi_ref(
         self, predictions: Collator, references: Collator, reduce_fn: Callable = None, max_order=4, smooth=False
@@ -191,7 +193,9 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
 
         flattened_predictions = Collator(flattened_predictions, keep=True)
         matched_references = Collator(matched_references, keep=True)
-        score = self._compute_single_pred_multi_ref(predictions=flattened_predictions, references=matched_references)
+        score = self._compute_single_pred_multi_ref(
+            predictions=flattened_predictions, references=matched_references, max_order=max_order, smooth=smooth
+        )
 
         prediction_length, reference_length = score["translation_length"], score["reference_length"]
         ratio = prediction_length / reference_length
