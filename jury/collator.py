@@ -19,7 +19,9 @@ class Collator(list):
         return len(self.shape)
 
     def collapse(self):
-        return Collator(np.ravel(self).tolist(), keep=True)
+        if NestedSingleType.get_type(self, 1) != "list":
+            return Collator([item for item in self], keep=True)
+        return Collator([item for items in self for item in items], keep=True)
 
     def nested(self):
         return Collator(self.from_list(self))

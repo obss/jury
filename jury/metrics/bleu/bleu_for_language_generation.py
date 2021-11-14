@@ -27,7 +27,7 @@ import datasets
 from jury.collator import Collator
 from jury.metrics._core import MetricForLanguageGeneration
 from jury.metrics._core.utils import download, get_token_lengths
-from jury.tokenizer import BLEUDefaultTokenizer, TokenizerWrapper
+from jury.tokenizer import DefaultTokenizer, TokenizerWrapper
 
 _CITATION = """\
 @INPROCEEDINGS{Papineni02bleu:a,
@@ -103,11 +103,10 @@ Examples:
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class BleuForLanguageGeneration(MetricForLanguageGeneration):
-    def __init__(self, resulting_name: str = None, compute_kwargs: Dict = None):
+    def __init__(self, resulting_name: str = None, compute_kwargs: Dict = None, **kwargs):
         self.should_change_resulting_name = resulting_name is None
-        tokenizer = compute_kwargs.get("tokenizer", None) if compute_kwargs is not None else None
-        self.tokenizer = BLEUDefaultTokenizer() if tokenizer is None else tokenizer
-        super().__init__(resulting_name=resulting_name, compute_kwargs=compute_kwargs)
+        self.tokenizer = DefaultTokenizer()
+        super().__init__(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
     def _info(self):
         return datasets.MetricInfo(
@@ -141,7 +140,7 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
         )
         self.external_module_path = nmt_dest
 
-    def _tokenize(self, predictions: Collator, references: Collator) -> Tuple[Collator, Collator]:
+    def _preprocess(self, predictions: Collator, references: Collator) -> Tuple[Collator, Collator]:
         tokenizer_wrapper = TokenizerWrapper(self.tokenizer)
         return tokenizer_wrapper.tokenize(predictions, references)
 
@@ -231,11 +230,12 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
         max_order = kwargs.get("max_order")
         if max_order is not None and self.should_change_resulting_name:
             self.resulting_name += f"_{max_order}"
+
+        predictions, references = self._preprocess(predictions=predictions, references=references)
         if predictions.can_collapse() and references.can_collapse():
             eval_fn = self._compute_single_pred_single_ref
         elif predictions.can_collapse() and not references.can_collapse():
             eval_fn = self._compute_single_pred_multi_ref
         else:
             eval_fn = self._compute_multi_pred_multi_ref
-        predictions, references = self._tokenize(predictions=predictions, references=references)
         return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)

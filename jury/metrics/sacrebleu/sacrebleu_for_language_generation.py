@@ -27,7 +27,7 @@ from packaging import version
 from jury.collator import Collator
 from jury.metrics._core import MetricForLanguageGeneration
 from jury.metrics._core.utils import PackagePlaceholder, get_token_lengths, requirement_message
-from jury.tokenizer import BLEUDefaultTokenizer
+from jury.tokenizer import DefaultTokenizer
 
 # `import sacrebleu as scb` placeholder
 scb = PackagePlaceholder(version="2.0.0")
@@ -132,7 +132,7 @@ class SacrebleuForLanguageGeneration(MetricForLanguageGeneration):
         )
 
     def _tokenize(self, seq: Sequence[str]) -> Sequence[Sequence[str]]:
-        tokenizer = BLEUDefaultTokenizer()
+        tokenizer = DefaultTokenizer()
         return [tokenizer.tokenize(s) for s in seq]
 
     def _validate_references(self, references: Collator) -> None:

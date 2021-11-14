@@ -118,7 +118,7 @@ class SquadForLanguageGeneration(MetricForLanguageGeneration):
                 {"answers": {"answer_start": [-1], "text": Collator(ref).collapse()}, "id": str(i)}
                 for i, ref in enumerate(references)
             ]
-        return predictions, references
+        return Collator(predictions, keep=True), Collator(references, keep=True)
 
     def _compute_single_pred_single_ref(self, predictions: Collator, references: Collator, **kwargs):
         pred_dict = {prediction["id"]: prediction["prediction_text"] for prediction in predictions}

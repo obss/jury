@@ -4,7 +4,7 @@ from jury.collator import Collator
 from jury.utils.nlp import normalize_text
 
 
-class BLEUDefaultTokenizer:
+class DefaultTokenizer:
     def tokenize(self, text: str) -> List[str]:
         return normalize_text(text).split()
 
