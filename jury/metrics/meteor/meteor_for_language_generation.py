@@ -17,7 +17,7 @@ datasets package implementation of METEOR metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/meteor/meteor.py
 """
 
-from typing import Callable
+from typing import Callable, Dict, Tuple
 
 import datasets
 import numpy as np
@@ -25,6 +25,7 @@ from nltk.translate import meteor_score
 
 from jury.collator import Collator
 from jury.metrics._core import MetricForLanguageGeneration
+from jury.tokenizer import DefaultTokenizer, TokenizerWrapper
 
 _CITATION = """\
 @inproceedings{banarjee2005,
@@ -87,6 +88,11 @@ Examples:
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class MeteorForLanguageGeneration(MetricForLanguageGeneration):
+    def __init__(self, resulting_name: str = None, compute_kwargs: Dict = None, **kwargs):
+        self.should_change_resulting_name = resulting_name is None
+        self.tokenizer = DefaultTokenizer()
+        super().__init__(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
+
     def _info(self):
         return datasets.MetricInfo(
             description=_DESCRIPTION,
@@ -104,6 +110,10 @@ class MeteorForLanguageGeneration(MetricForLanguageGeneration):
         import nltk
 
         nltk.download("wordnet", quiet=True)
+
+    def _preprocess(self, predictions: Collator, references: Collator) -> Tuple[Collator, Collator]:
+        tokenizer_wrapper = TokenizerWrapper(self.tokenizer)
+        return tokenizer_wrapper.tokenize(predictions, references)
 
     def _compute_single_pred_single_ref(
         self, predictions: Collator, references: Collator, reduce_fn: Callable = None, alpha=0.9, beta=3, gamma=0.5

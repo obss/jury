@@ -266,6 +266,7 @@ class MetricForTask(Metric):
         return {self.resulting_name: result}
 
     def evaluate(self, predictions: Collator, references: Collator, **kwargs) -> Dict[str, float]:
+        predictions, references = self._preprocess(predictions, references)
         if predictions.can_collapse() and references.can_collapse():
             predictions = predictions.collapse()
             references = references.collapse()
@@ -275,8 +276,6 @@ class MetricForTask(Metric):
             eval_fn = self._compute_single_pred_multi_ref
         else:
             eval_fn = self._compute_multi_pred_multi_ref
-
-        predictions, references = self._preprocess(predictions, references)
         return eval_fn(predictions=predictions, references=references, **kwargs)
 
 

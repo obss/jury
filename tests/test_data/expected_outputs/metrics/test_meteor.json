@@ -3,21 +3,21 @@
     "empty_predictions": 0,
     "total_items": 2,
     "meteor": {
-      "score": 0.5098979591836734
+      "score": 0.6190249433106576
     }
   },
   "multiple_ref": {
     "empty_predictions": 0,
     "total_items": 2,
     "meteor": {
-      "score": 0.5098979591836734
+      "score": 0.6190249433106576
     }
   },
   "multiple_pred_multiple_ref": {
     "empty_predictions": 0,
     "total_items": 2,
     "meteor": {
-      "score": 0.5420511682934044
+      "score": 0.727184593644221
     }
   }
 }
