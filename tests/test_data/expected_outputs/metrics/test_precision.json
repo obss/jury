@@ -17,7 +17,7 @@
     "empty_predictions": 0,
     "total_items": 2,
     "precision": {
-      "score": 0.875
+      "score": 0.9166666666666667
     }
   },
   "basic_sequence_classification": {

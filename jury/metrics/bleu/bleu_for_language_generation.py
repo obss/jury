@@ -162,9 +162,6 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
     def _compute_single_pred_single_ref(
         self, predictions: Collator, references: Collator, reduce_fn: Callable = None, max_order=4, smooth=False
     ):
-        predictions = predictions.reshape(
-            len(predictions),
-        )
         return self._compute_bleu_score(
             predictions=predictions, references=references, max_order=max_order, smooth=smooth
         )
@@ -193,7 +190,11 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
         flattened_predictions = Collator(flattened_predictions, keep=True)
         matched_references = Collator(matched_references, keep=True)
         score = self._compute_single_pred_multi_ref(
-            predictions=flattened_predictions, references=matched_references, max_order=max_order, smooth=smooth
+            predictions=flattened_predictions,
+            references=matched_references,
+            reduce_fn=reduce_fn,
+            max_order=max_order,
+            smooth=smooth,
         )
 
         prediction_length, reference_length = score["translation_length"], score["reference_length"]
@@ -231,11 +232,4 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
         if max_order is not None and self.should_change_resulting_name:
             self.resulting_name += f"_{max_order}"
 
-        predictions, references = self._preprocess(predictions=predictions, references=references)
-        if predictions.can_collapse() and references.can_collapse():
-            eval_fn = self._compute_single_pred_single_ref
-        elif predictions.can_collapse() and not references.can_collapse():
-            eval_fn = self._compute_single_pred_multi_ref
-        else:
-            eval_fn = self._compute_multi_pred_multi_ref
-        return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)
+        return super().evaluate(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)

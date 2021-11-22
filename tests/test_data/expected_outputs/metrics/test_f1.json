@@ -17,7 +17,7 @@
     "empty_predictions": 0,
     "total_items": 2,
     "f1": {
-      "score": 0.7948717948717947
+      "score": 0.916083916083916
     }
   },
   "basic_sequence_classification": {
