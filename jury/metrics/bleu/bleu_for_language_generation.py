@@ -160,14 +160,24 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
         }
 
     def _compute_single_pred_single_ref(
-        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, max_order=4, smooth=False
+        self,
+        predictions: Collator,
+        references: Collator,
+        reduce_fn: Callable = None,
+        max_order: int = 4,
+        smooth: bool = False,
     ):
         return self._compute_bleu_score(
             predictions=predictions, references=references, max_order=max_order, smooth=smooth
         )
 
     def _compute_single_pred_multi_ref(
-        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, max_order=4, smooth=False
+        self,
+        predictions: Collator,
+        references: Collator,
+        reduce_fn: Callable = None,
+        max_order: int = 4,
+        smooth: bool = False,
     ):
         # Bleu score inherently supports multiple references.
         return self._compute_single_pred_single_ref(
@@ -175,8 +185,28 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
         )
 
     def _compute_multi_pred_multi_ref(
-        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, max_order=4, smooth=False
+        self,
+        predictions: Collator,
+        references: Collator,
+        reduce_fn: Callable = None,
+        max_order: int = 4,
+        smooth: bool = False,
     ):
+        """
+        For multiple predictions in the input, the resulting bleu score is computed using corpus level bleu
+        as if it is the same for single prediction inputs (which is directly supported by evaluation function).
+        The only difference however is that, since the score is calculated corpus level, `reduce_fn` is ignored.
+        In other words, there is no aggregation for multiple predictions, and it is rather handled by the corpus
+        level bleu score computation. After the pure blue score is calculated, parameters are changed accordingly,
+        so the resulting predictions may not be a direct match of bleu score equivalent.
+
+        Args:
+            predictions: (Collator) Collator object of predictions.
+            references: (Collator) Collator object of references.
+            reduce_fn: (Callable) Ignored.
+            max_order: (int) Maximum order of bleu precision counts (e.g n in BLEU-n), passed to evaluation function.
+            smooth: (bool) Whether to apply smoothing or not, passed to evaluation function. False by default.
+        """
         flattened_predictions = []
         matched_references = []
         adjusted_reference_length = adjusted_prediction_length = 0
@@ -204,13 +234,10 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
         bleu_score = score["score"]
         if ratio > 1.0:
             adjusted_bp = 1.0
-            bleu_score = bleu_score
         else:
             bp = math.exp(1 - 1.0 / ratio)
             adjusted_bp = math.exp(1 - 1.0 / adjusted_ratio)
             bleu_score = bleu_score * (adjusted_bp / bp)
-
-        bleu_score *= adjusted_ratio ** 2 / ratio
 
         score.update(
             {
