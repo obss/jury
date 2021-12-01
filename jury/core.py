@@ -159,8 +159,9 @@ class Jury:
 
     def add_metric(self, metric_name: str, resulting_name: str = None, compute_kwargs: Dict = None) -> None:
         metric = load_metric(metric_name, resulting_name=resulting_name, compute_kwargs=compute_kwargs)
-        self.metrics.append(metric)
-        self._validate_metrics()
+        if metric not in self.metrics:
+            self.metrics.append(metric)
+            self._validate_metrics()
 
     def remove_metric(self, resulting_name: str, error: bool = True) -> None:
         for i, metric in enumerate(self.metrics):

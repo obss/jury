@@ -17,7 +17,7 @@
     "empty_predictions": 0,
     "total_items": 2,
     "recall": {
-      "score": 0.7285714285714285
+      "score": 0.9285714285714286
     }
   },
   "basic_sequence_classification": {
