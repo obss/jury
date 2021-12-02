@@ -1,6 +1,6 @@
 {
   "basic": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "rouge": {
       "rouge1": 0.6904761904761905,
@@ -10,7 +10,7 @@
     }
   },
   "multiple_ref": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "rouge": {
       "rouge1": 0.6904761904761905,
@@ -20,7 +20,7 @@
     }
   },
   "multiple_pred_multiple_ref": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "rouge": {
       "rouge1": 0.8321678321678321,

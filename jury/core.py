@@ -84,10 +84,11 @@ class Jury:
         n_items = len(predictions)
         n_empty = 0
         for i in reversed(range(n_items)):
-            if not predictions[i] or not references[i]:
-                predictions.pop(i)
-                references.pop(i)
-                n_empty += 1
+            if isinstance(predictions[i], list) and isinstance(references[i], list):
+                if not predictions[i] or not references[i]:
+                    predictions.pop(i)
+                    references.pop(i)
+                    n_empty += 1
         return n_empty
 
     def _load_single_metric(self, metric: Union[str, Metric]) -> List[Metric]:

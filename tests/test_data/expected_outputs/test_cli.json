@@ -1,6 +1,6 @@
 {
   "cli_from_file": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "bleu_1": {
       "score": 0.06666666666666667,
@@ -60,7 +60,7 @@
   },
   "cli_from_folder": {
     "experiment0.txt": {
-      "empty_predictions": 0,
+      "empty_items": 0,
       "total_items": 2,
       "bleu_1": {
         "score": 0.06666666666666667,

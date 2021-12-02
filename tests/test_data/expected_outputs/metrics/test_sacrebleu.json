@@ -1,6 +1,6 @@
 {
   "basic": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "sacrebleu": {
       "score": 0.42728700639623396,
@@ -28,7 +28,7 @@
     }
   },
   "multiple_ref": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "sacrebleu": {
       "score": 0.2705411345269698,
@@ -56,7 +56,7 @@
     }
   },
   "multiple_pred_multiple_ref": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "sacrebleu": {
       "score": 0.5773502691896256,

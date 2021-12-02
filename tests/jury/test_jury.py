@@ -142,9 +142,9 @@ def test_evaluate_corpus(single_prediction_array, multiple_references, jury, out
 
 
 def test_evaluate_multiple_predictions_empty(
-    multiple_predictions_empty, multiple_references, jury, output_evaluate_multiple_predictions_empty
+    multiple_predictions_empty, multiple_references_empty, jury, output_evaluate_multiple_predictions_empty
 ):
-    scores = jury(predictions=multiple_predictions_empty, references=multiple_references)
+    scores = jury(predictions=multiple_predictions_empty, references=multiple_references_empty)
     assert_almost_equal_dict(
         actual=scores, desired=output_evaluate_multiple_predictions_empty, exclude_paths="root['bertscore']['hashcode']"
     )

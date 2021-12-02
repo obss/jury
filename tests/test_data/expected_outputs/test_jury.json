@@ -1,6 +1,6 @@
 {
   "evaluate": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "accuracy": {
       "score": 0.6571428571428571
@@ -82,7 +82,7 @@
     }
   },
   "evaluate_concurrent": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "accuracy": {
       "score": 0.6571428571428571
@@ -164,7 +164,7 @@
     }
   },
   "evaluate_str_input": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "bleu": {
       "score": 0.0,
@@ -181,7 +181,7 @@
     }
   },
   "evaluate_list_str_input": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "accuracy": {
       "score": 0.6571428571428571
@@ -263,7 +263,7 @@
     }
   },
   "evaluate_list_dict_input": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "accuracy": {
       "score": 0.6571428571428571
@@ -353,7 +353,7 @@
     }
   },
   "evaluate_list_mixed_input": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "accuracy": {
       "score": 0.6571428571428571
@@ -435,12 +435,12 @@
     }
   },
   "evaluate_datasets_metric": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "wer": 0.5833333333333334
   },
   "evaluate_corpus": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "accuracy": {
       "score": 0.7285714285714285
@@ -601,7 +601,7 @@
     }
   },
   "evaluate_multiple_predictions": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "accuracy": {
       "score": 0.8452380952380952
@@ -680,8 +680,8 @@
     }
   },
   "evaluate_sequence_classification": {
-    "empty_predictions": 3,
     "total_items": 6,
+    "empty_items": 0,
     "accuracy": {
       "score": 0.3333333333333333
     },

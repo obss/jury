@@ -1,6 +1,6 @@
 {
   "basic": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "squad": {
       "exact_match": 0.5,
       "f1": 0.8333333333333333
@@ -8,7 +8,7 @@
     "total_items": 2
   },
   "multiple_ref": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "squad": {
       "exact_match": 1.0,
       "f1": 1.0
@@ -16,7 +16,7 @@
     "total_items": 2
   },
   "multiple_pred_multiple_ref": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "squad": {
       "exact_match": 1.0,
       "f1": 1.0
