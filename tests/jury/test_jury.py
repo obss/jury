@@ -56,6 +56,12 @@ def output_evaluate_corpus():
 
 @pytest.fixture
 @get_expected_output(prefix=None)
+def output_evaluate_multiple_predictions_empty():
+    return output_evaluate_multiple_predictions_empty.output
+
+
+@pytest.fixture
+@get_expected_output(prefix=None)
 def output_evaluate_multiple_predictions():
     return output_evaluate_multiple_predictions.output
 
@@ -132,6 +138,15 @@ def test_evaluate_corpus(single_prediction_array, multiple_references, jury, out
     scores = jury(predictions=single_prediction_array, references=multiple_references)
     assert_almost_equal_dict(
         actual=scores, desired=output_evaluate_corpus, exclude_paths="root['bertscore']['hashcode']"
+    )
+
+
+def test_evaluate_multiple_predictions_empty(
+    multiple_predictions_empty, multiple_references, jury, output_evaluate_multiple_predictions_empty
+):
+    scores = jury(predictions=multiple_predictions_empty, references=multiple_references)
+    assert_almost_equal_dict(
+        actual=scores, desired=output_evaluate_multiple_predictions_empty, exclude_paths="root['bertscore']['hashcode']"
     )
 
 

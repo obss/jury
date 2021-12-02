@@ -63,8 +63,8 @@ class Jury:
             raise ValueError("Lengths of predictions and references must be equal.")
 
         scores = dict()
-        scores["empty_predictions"] = len([1 for p in predictions if not p])
         scores["total_items"] = len(references)
+        scores["empty_items"] = self._remove_empty(predictions, references)
 
         if self._concurrent:
             inputs_list = self._prepare_concurrent_inputs(predictions, references, reduce_fn)
@@ -79,6 +79,16 @@ class Jury:
                 scores.update(score)
 
         return scores
+
+    def _remove_empty(self, predictions: EvaluationInstance, references: EvaluationInstance):
+        n_items = len(predictions)
+        n_empty = 0
+        for i in reversed(range(n_items)):
+            if not predictions[i] or not references[i]:
+                predictions.pop(i)
+                references.pop(i)
+                n_empty += 1
+        return n_empty
 
     def _load_single_metric(self, metric: Union[str, Metric]) -> List[Metric]:
         if isinstance(metric, str):
