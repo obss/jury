@@ -1,3 +1,4 @@
+import warnings
 from concurrent.futures import ProcessPoolExecutor
 from typing import Any, Callable, Dict, List, Mapping, Optional, Union
 
@@ -65,6 +66,12 @@ class Jury:
         scores = dict()
         scores["total_items"] = len(references)
         scores["empty_items"] = self._remove_empty(predictions, references)
+
+        if scores["total_items"] == scores["empty_items"]:
+            warnings.warn(
+                "At least one of the pairs are empty for all evaluation instances. " "No evaluation takes place."
+            )
+            return scores
 
         if self._concurrent:
             inputs_list = self._prepare_concurrent_inputs(predictions, references, reduce_fn)
