@@ -113,6 +113,22 @@ def single_prediction_array():
     return [["the cat is on the mat"], ["Look! a wonderful day."]]
 
 
+@pytest.fixture(scope="function")
+def multiple_predictions_empty():
+    return [
+        [],
+        ["Look! what a wonderful day, today.", "Today is a very wonderful day"],
+    ]
+
+
+@pytest.fixture(scope="function")
+def multiple_references_empty():
+    return [
+        ["the cat is playing on the mat.", "The cat plays on the mat."],
+        ["Today is a wonderful day", "The weather outside is wonderful."],
+    ]
+
+
 @pytest.fixture(scope="package")
 def multiple_predictions():
     return [

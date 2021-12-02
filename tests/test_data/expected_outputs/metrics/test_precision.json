@@ -1,27 +1,27 @@
 {
   "basic_language_generation": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "precision": {
       "score": 0.7321428571428572
     }
   },
   "multiple_ref_language_generation": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "precision": {
       "score": 0.7321428571428572
     }
   },
   "multiple_pred_multiple_ref_language_generation": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "precision": {
       "score": 0.9166666666666667
     }
   },
   "basic_sequence_classification": {
-    "empty_predictions": 3,
+    "empty_items": 0,
     "total_items": 6,
     "precision": {
       "score": [
@@ -32,7 +32,7 @@
     }
   },
   "multiple_ref_sequence_classification": {
-    "empty_predictions": 3,
+    "empty_items": 0,
     "total_items": 6,
     "precision": {
       "score": [
@@ -43,7 +43,7 @@
     }
   },
   "multiple_pred_multiple_ref_sequence_classification": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 6,
     "precision": {
       "score": [

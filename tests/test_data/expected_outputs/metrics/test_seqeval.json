@@ -1,6 +1,6 @@
 {
   "basic": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "seqeval": {
       "MISC": {

@@ -1,6 +1,6 @@
 {
   "basic": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "bleu": {
       "score": 0.0,
@@ -17,7 +17,7 @@
     }
   },
   "multiple_ref": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "bleu": {
       "score": 0.0,
@@ -34,7 +34,7 @@
     }
   },
   "multiple_pred_multiple_ref": {
-    "empty_predictions": 0,
+    "empty_items": 0,
     "total_items": 2,
     "bleu": {
       "score": 0.0,
