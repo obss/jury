@@ -69,7 +69,7 @@ class Jury:
 
         if scores["total_items"] == scores["empty_items"]:
             warnings.warn(
-                "At least one of the pairs are empty for all evaluation instances. " "No evaluation takes place."
+                "At least one of the pairs are empty for all evaluation instances. No evaluation takes place."
             )
             return scores
 
