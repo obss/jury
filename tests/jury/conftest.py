@@ -120,6 +120,7 @@ def multiple_predictions_empty():
         ["Look! what a wonderful day, today.", "Today is a very wonderful day"],
     ]
 
+
 @pytest.fixture(scope="function")
 def multiple_references_empty():
     return [
