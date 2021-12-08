@@ -91,7 +91,7 @@ class Jury:
         n_items = len(predictions)
         n_empty = 0
         for i in reversed(range(n_items)):
-            if isinstance(predictions[i], list) and isinstance(references[i], list):
+            if isinstance(predictions, list) and isinstance(references, list):
                 if not predictions[i] or not references[i]:
                     predictions.pop(i)
                     references.pop(i)
