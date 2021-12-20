@@ -1,3 +1,4 @@
+import os.path
 import warnings
 from concurrent.futures import ProcessPoolExecutor
 from typing import Any, Callable, Dict, List, Mapping, Optional, Union
@@ -109,7 +110,7 @@ class Jury:
                 metric_name = metric_param
                 metrics = replace(metrics, load_metric(metric_name.lower()), i)
             elif isinstance(metric_param, dict):
-                metric_name = metric_param.pop("metric_name")  # must be given
+                metric_name = metric_param.pop("path")  # must be given
                 task = pop_item_from_dict(metric_param, "task")
                 resulting_name = pop_item_from_dict(metric_param, "resulting_name")
                 compute_kwargs = pop_item_from_dict(metric_param, "compute_kwargs")
@@ -117,7 +118,7 @@ class Jury:
                 metrics = replace(
                     metrics,
                     load_metric(
-                        metric_name=metric_name,
+                        path=metric_name,
                         task=task,
                         resulting_name=resulting_name,
                         compute_kwargs=compute_kwargs,
@@ -199,3 +200,27 @@ class Jury:
     ) -> Dict[str, float]:
         """Returns __call__() method. For backward compatibility."""
         return self.__call__(predictions=predictions, references=references, reduce_fn=reduce_fn)
+
+
+if __name__ == "__main__":
+    import json
+
+    mt_predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
+    mt_references = [
+        ["the cat is playing on the mat.", "The cat plays on the mat."],
+        ["Today is a wonderful day", "The weather outside is wonderful."],
+    ]
+    print(os.path.abspath("../tests/test_data/custom_accuracy"))
+    MT_METRICS = [
+        load_metric("bleu", resulting_name="bleu_1", compute_kwargs={"max_order": 1}),
+        load_metric("bleu", resulting_name="bleu_2", compute_kwargs={"max_order": 2}),
+        load_metric("meteor"),
+        load_metric("rouge"),
+        load_metric("../tests/test_data/custom_accuracy"),
+    ]
+    # Compute scores
+    mt_scorer = Jury(metrics=MT_METRICS, run_concurrent=False)
+    # mt_scorer.add_metric()
+    scores = mt_scorer(predictions=mt_predictions, references=mt_references)
+    # Display results
+    print(json.dumps(scores, indent=4))

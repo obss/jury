@@ -25,7 +25,7 @@ from jury.metrics._core.utils import import_module, list_metrics
 
 
 def load_metric(
-    metric_name: str,
+    path: str,
     resulting_name: Optional[str] = None,
     task: Optional[str] = None,
     compute_kwargs: Optional[Dict[str, Any]] = None,
@@ -36,7 +36,7 @@ def load_metric(
 
     Args:
 
-        metric_name (``str``):
+        path (``str``):
             path to the metric processing script with the metric builder. Can be either:
                 - a local absolute or relative path to processing script or the directory containing the script,
                     e.g. ``'./metrics/rogue/rouge.py'``
@@ -53,7 +53,7 @@ def load_metric(
         `datasets.Metric`
     """
     return AutoMetric.load(
-        metric_name=metric_name,
+        path=path,
         resulting_name=resulting_name,
         task=task,
         use_jury_only=use_jury_only,
@@ -77,14 +77,14 @@ class AutoMetric:
     @classmethod
     def load(
         cls,
-        metric_name: str,
+        path: str,
         task: Optional[str] = None,
         resulting_name: Optional[str] = None,
         compute_kwargs: Optional[Dict[str, Any]] = None,
         use_jury_only: bool = False,
         **kwargs,
     ) -> Metric:
-        resolved_metric_name = cls.resolve_metric_name(metric_name)
+        resolved_metric_name = cls.resolve_metric_path(path)
         if task is None:
             task = "language-generation"
 
@@ -92,7 +92,7 @@ class AutoMetric:
         try:
             module_path = resolved_metric_name.path
             if resolved_metric_name.resolution == "external-module":
-                module_name = module_path.split("/")[-1].replace(".py", "")
+                module_name = os.path.basename(module_path)
                 module = import_module(module_name=module_name, filepath=module_path)
             else:
                 module = importlib.import_module(module_path)
@@ -117,16 +117,27 @@ class AutoMetric:
         return metric
 
     @staticmethod
-    def resolve_metric_name(metric_name: str):
+    def resolve_metric_path(path: str):
         class ResolvedName(NamedTuple):
             path: str
             resolution: str
 
-        if metric_name in list_metrics():
-            metric_name = metric_name.lower()
-            module_name = f"jury.metrics.{metric_name}.{metric_name}"
+        if path in list_metrics():
+            path = path.lower()
+            module_name = f"jury.metrics.{path}.{path}"
             return ResolvedName(path=module_name, resolution="internal-module")
-        elif os.path.exists(metric_name):
-            return ResolvedName(path=metric_name, resolution="external-module")
+        elif os.path.exists(path):
+            # Get absolute path
+            path = os.path.abspath(path)
+            if not os.path.isdir(path):
+                raise ValueError(
+                    "Given 'path' must be a enclosing directory of metric. The names of the directory "
+                    "(custom_metric/) and metric script (custom_metric.py) must be the same."
+                )
+            parent_dir, module_name = os.path.split(path)
+            path = os.path.join(parent_dir, module_name, module_name + ".py")
+            if not os.path.exists(path):
+                raise FileNotFoundError(f"File {path} does not exists.")
+            return ResolvedName(path=path, resolution="external-module")
         else:
-            return ResolvedName(path=metric_name, resolution="datasets")
+            return ResolvedName(path=path, resolution="datasets")

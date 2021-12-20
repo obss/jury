@@ -2,6 +2,7 @@ from typing import Any, Dict, Optional, Union
 
 from jury.metrics._core.base import MetricForTask
 from jury.metrics._core.utils import TaskNotAvailable
+from jury.utils.common import camel_to_snake
 
 
 class TaskMapper:
@@ -61,7 +62,7 @@ class TaskMapper:
 
     @classmethod
     def _get_metric_name(cls):
-        return cls.__name__.lower()
+        return camel_to_snake(cls.__name__)
 
 
 class MetricAlias(TaskMapper):
@@ -69,7 +70,7 @@ class MetricAlias(TaskMapper):
     Extension of TaskMapper which allows a single :py:class:`jury.metrics.MetricForTask` class to be aliased. If a
     metric has a single task, use this class instead of :py:class:`jury.metrics._core.TaskMapper`.
 
-    All metrics using TaskMapper must implement _SUBCLASS attribute.
+    All metrics using MetricAlias must implement _SUBCLASS attribute.
     """
 
     _SUBCLASS: MetricForTask = None

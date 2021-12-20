@@ -1,15 +1,14 @@
 from typing import Any, Dict, Optional
 
 from jury.metrics._core import MetricAlias
-from jury.metrics.bleu.bleu_for_language_generation import BleuForLanguageGeneration
-
-__main_class__ = "Bleu"
-
 from jury.utils.common import camel_to_snake
+from tests.test_data.custom_bleu.custom_bleu_for_language_generation import CustomBleuForLanguageGeneration
+
+__main_class__ = "CustomBleu"
 
 
-class Bleu(MetricAlias):
-    _SUBCLASS = BleuForLanguageGeneration
+class CustomBleu(MetricAlias):
+    _SUBCLASS = CustomBleuForLanguageGeneration
 
     @classmethod
     def construct(
