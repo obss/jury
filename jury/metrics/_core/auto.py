@@ -84,14 +84,14 @@ class AutoMetric:
         use_jury_only: bool = False,
         **kwargs,
     ) -> Metric:
-        resolved_metric_name = cls.resolve_metric_path(path)
+        resolved_path = cls.resolve_metric_path(path)
         if task is None:
             task = "language-generation"
 
         # load the module, will raise ImportError if module cannot be loaded
         try:
-            module_path = resolved_metric_name.path
-            if resolved_metric_name.resolution == "external-module":
+            module_path = resolved_path.path
+            if resolved_path.resolution == "external-module":
                 module_name = os.path.basename(module_path)
                 module = import_module(module_name=module_name, filepath=module_path)
             else:
@@ -100,15 +100,15 @@ class AutoMetric:
             # Metric not in Jury
             if use_jury_only:
                 raise ValueError(
-                    f"Metric {resolved_metric_name.path} is not available on jury, set use_jury_only=False to use"
+                    f"Metric {resolved_path.path} is not available on jury, set use_jury_only=False to use"
                     f"additional metrics (e.g datasets metrics)."
                 )
             warnings.warn(
-                f"Metric {resolved_metric_name.path} is not available on jury, falling back to datasets metric. "
+                f"Metric {resolved_path.path} is not available on jury, falling back to datasets metric. "
                 f"You may not fully utilize this metric for different input types, e.g multiple predictions"
                 f"or multiple references."
             )
-            metric = datasets.load_metric(resolved_metric_name.path, **kwargs)
+            metric = datasets.load_metric(resolved_path.path, **kwargs)
         else:
             # get the class, will raise AttributeError if class cannot be found
             factory_class = module.__main_class__

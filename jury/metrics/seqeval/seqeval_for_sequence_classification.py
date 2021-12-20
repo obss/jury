@@ -113,7 +113,7 @@ class SeqevalForLanguageGeneration(MetricForSequenceLabeling):
         try:
             import seqeval.metrics
         except ModuleNotFoundError:
-            raise ModuleNotFoundError(requirement_message(metric_name="Seqeval", package_name="seqeval"))
+            raise ModuleNotFoundError(requirement_message(path="Seqeval", package_name="seqeval"))
         else:
             super(SeqevalForLanguageGeneration, self)._download_and_prepare(dl_manager)
 

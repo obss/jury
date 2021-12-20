@@ -32,7 +32,7 @@ class TaskMapper:
         Args:
             task: (``str``) Task name for the desired metric to obtain the subclass.
             resulting_name (Optional ``str``): Resulting name of the computed score returned. If None,
-                `~._get_metric_name()` is used.
+                `~._get_path()` is used.
             compute_kwargs (Optional ``Dict[str, Any]``): Arguments to be passed to `compute()` method of metric at
                 computation.
 
@@ -41,10 +41,10 @@ class TaskMapper:
         Returns: Metric for proper task if available.
         """
         subclass = cls._get_subclass(task=task)
-        metric_name = cls._get_metric_name()
-        resulting_name = resulting_name or metric_name
+        path = cls._get_path()
+        resulting_name = resulting_name or path
         if subclass is None:
-            raise TaskNotAvailable(metric_name=metric_name, task=task)
+            raise TaskNotAvailable(path=path, task=task)
         return subclass._construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
     @classmethod
@@ -61,7 +61,7 @@ class TaskMapper:
         return cls._TASKS.get(task, None)
 
     @classmethod
-    def _get_metric_name(cls):
+    def _get_path(cls):
         return camel_to_snake(cls.__name__)
 
 
@@ -90,14 +90,14 @@ class MetricAlias(TaskMapper):
         Args:
             task: (Ignored ``str``) Ignored. Preserved to provide a common interface.
             resulting_name (Optional ``str``): Resulting name of the computed score returned. If None,
-                `~._get_metric_name()` is used.
+                `~._get_path()` is used.
             compute_kwargs (Optional ``Dict[str, Any]``): Arguments to be passed to `compute()` method of metric at
                 computation.
 
         Returns: Metric for proper task if available.
         """
         subclass = cls._get_subclass()
-        resulting_name = resulting_name or cls._get_metric_name()
+        resulting_name = resulting_name or cls._get_path()
         return subclass._construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
     @classmethod

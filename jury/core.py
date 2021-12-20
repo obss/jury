@@ -107,10 +107,10 @@ class Jury:
     def _load_multiple_metrics(self, metrics: Union[List[str], List[Dict[str, Any]], List[Metric]]) -> List[Metric]:
         for i, metric_param in enumerate(metrics):
             if isinstance(metric_param, str):
-                metric_name = metric_param
-                metrics = replace(metrics, load_metric(metric_name.lower()), i)
+                path = metric_param
+                metrics = replace(metrics, load_metric(path.lower()), i)
             elif isinstance(metric_param, dict):
-                metric_name = metric_param.pop("path")  # must be given
+                path = metric_param.pop("path")  # must be given
                 task = pop_item_from_dict(metric_param, "task")
                 resulting_name = pop_item_from_dict(metric_param, "resulting_name")
                 compute_kwargs = pop_item_from_dict(metric_param, "compute_kwargs")
@@ -118,7 +118,7 @@ class Jury:
                 metrics = replace(
                     metrics,
                     load_metric(
-                        path=metric_name,
+                        path=path,
                         task=task,
                         resulting_name=resulting_name,
                         compute_kwargs=compute_kwargs,
@@ -176,8 +176,8 @@ class Jury:
                 )
         return True
 
-    def add_metric(self, metric_name: str, resulting_name: str = None, compute_kwargs: Dict = None) -> None:
-        metric = load_metric(metric_name, resulting_name=resulting_name, compute_kwargs=compute_kwargs)
+    def add_metric(self, path: str, resulting_name: str = None, compute_kwargs: Dict = None) -> None:
+        metric = load_metric(path, resulting_name=resulting_name, compute_kwargs=compute_kwargs)
         if metric not in self.metrics:
             self.metrics.append(metric)
             self._validate_metrics()
