@@ -200,27 +200,3 @@ class Jury:
     ) -> Dict[str, float]:
         """Returns __call__() method. For backward compatibility."""
         return self.__call__(predictions=predictions, references=references, reduce_fn=reduce_fn)
-
-
-if __name__ == "__main__":
-    import json
-
-    mt_predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
-    mt_references = [
-        ["the cat is playing on the mat.", "The cat plays on the mat."],
-        ["Today is a wonderful day", "The weather outside is wonderful."],
-    ]
-    print(os.path.abspath("../tests/test_data/custom_accuracy"))
-    MT_METRICS = [
-        load_metric("bleu", resulting_name="bleu_1", compute_kwargs={"max_order": 1}),
-        load_metric("bleu", resulting_name="bleu_2", compute_kwargs={"max_order": 2}),
-        load_metric("meteor"),
-        load_metric("rouge"),
-        load_metric("../tests/test_data/custom_accuracy"),
-    ]
-    # Compute scores
-    mt_scorer = Jury(metrics=MT_METRICS, run_concurrent=False)
-    # mt_scorer.add_metric()
-    scores = mt_scorer(predictions=mt_predictions, references=mt_references)
-    # Display results
-    print(json.dumps(scores, indent=4))
