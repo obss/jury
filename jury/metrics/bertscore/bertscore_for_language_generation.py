@@ -122,7 +122,7 @@ class BertscoreForLanguageGeneration(MetricForLanguageGeneration):
         try:
             import bert_score
         except ModuleNotFoundError:
-            raise ModuleNotFoundError(requirement_message(metric_name="Bertscore", package_name="bert-score"))
+            raise ModuleNotFoundError(requirement_message(path="Bertscore", package_name="bert-score"))
         else:
             super(BertscoreForLanguageGeneration, self)._download_and_prepare(dl_manager)
 

@@ -1,15 +1,14 @@
 from typing import Any, Dict, Optional
 
 from jury.metrics._core import MetricAlias
-from jury.metrics.bleu.bleu_for_language_generation import BleuForLanguageGeneration
-
-__main_class__ = "Bleu"
-
 from jury.utils.common import camel_to_snake
+from tests.test_data.custom_bleu.custom_bleu_for_language_generation import CustomBleuForLanguageGeneration
+
+__main_class__ = "CustomBleu"
 
 
-class Bleu(MetricAlias):
-    _SUBCLASS = BleuForLanguageGeneration
+class CustomBleu(MetricAlias):
+    _SUBCLASS = CustomBleuForLanguageGeneration
 
     @classmethod
     def construct(
@@ -20,20 +19,20 @@ class Bleu(MetricAlias):
         **kwargs,
     ):
         subclass = cls._get_subclass()
-        resulting_name = resulting_name or cls._get_path(compute_kwargs=compute_kwargs)
+        resulting_name = resulting_name or cls._get_metric_name(compute_kwargs=compute_kwargs)
         return subclass._construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
     @classmethod
-    def _get_path(cls, compute_kwargs: Dict[str, Any] = None) -> str:
+    def _get_metric_name(cls, compute_kwargs: Dict[str, Any] = None) -> str:
         """
         All metric modules must implement this method as it is used to form MetricOutput properly.
 
         Returns: Metric name.
         """
-        path = camel_to_snake(cls.__name__)
+        metric_name = camel_to_snake(cls.__name__)
         if compute_kwargs is None:
-            return path
+            return metric_name
 
         max_order = compute_kwargs.get("max_order")
         if max_order is not None:
-            return f"{path}_{max_order}"
+            return f"{metric_name}_{max_order}"

@@ -107,7 +107,7 @@ class SacrebleuForLanguageGeneration(MetricForLanguageGeneration):
         try:
             import sacrebleu as scb
         except ModuleNotFoundError:
-            raise ModuleNotFoundError(requirement_message(metric_name="Sacrebleu", package_name="sacrebleu"))
+            raise ModuleNotFoundError(requirement_message(path="Sacrebleu", package_name="sacrebleu"))
         else:
             super(SacrebleuForLanguageGeneration, self)._download_and_prepare(dl_manager)
 

@@ -37,39 +37,39 @@ _LIST_STR_TEST_METRICS = [
 ]
 
 _LIST_DICT_TEST_METRICS = [
-    {"metric_name": "accuracy"},
-    {"metric_name": "bertscore", "compute_kwargs": {"model_type": "albert-base-v1"}},
-    {"metric_name": "bleu", "resulting_name": "bleu-1", "compute_kwargs": {"max_order": 1}},
-    {"metric_name": "bleu", "resulting_name": "bleu-2", "compute_kwargs": {"max_order": 2}},
-    {"metric_name": "f1", "resulting_name": "F1"},
-    {"metric_name": "meteor", "resulting_name": "METEOR"},
-    {"metric_name": "precision"},
-    {"metric_name": "recall"},
-    {"metric_name": "rouge"},
-    {"metric_name": "sacrebleu"},
-    {"metric_name": "squad"},
+    {"path": "accuracy"},
+    {"path": "bertscore", "compute_kwargs": {"model_type": "albert-base-v1"}},
+    {"path": "bleu", "resulting_name": "bleu-1", "compute_kwargs": {"max_order": 1}},
+    {"path": "bleu", "resulting_name": "bleu-2", "compute_kwargs": {"max_order": 2}},
+    {"path": "f1", "resulting_name": "F1"},
+    {"path": "meteor", "resulting_name": "METEOR"},
+    {"path": "precision"},
+    {"path": "recall"},
+    {"path": "rouge"},
+    {"path": "sacrebleu"},
+    {"path": "squad"},
 ]
 
 _LIST_MIXED_TEST_METRICS = [
     "accuracy",
     "bertscore",
     "bleu",
-    {"metric_name": "f1"},
-    {"metric_name": "meteor"},
-    {"metric_name": "precision"},
+    {"path": "f1"},
+    {"path": "meteor"},
+    {"path": "precision"},
     "recall",
     "rouge",
-    {"metric_name": "sacrebleu"},
-    {"metric_name": "squad"},
+    {"path": "sacrebleu"},
+    {"path": "squad"},
 ]
 
 _DATASETS_METRICS = "wer"
 
 _TEST_METRICS_SEQUENCE_CLASSIFICATION = [
-    {"metric_name": "accuracy", "task": "sequence-classification"},
-    {"metric_name": "f1", "task": "sequence-classification"},
-    {"metric_name": "precision", "task": "sequence-classification"},
-    {"metric_name": "recall", "task": "sequence-classification"},
+    {"path": "accuracy", "task": "sequence-classification"},
+    {"path": "f1", "task": "sequence-classification"},
+    {"path": "precision", "task": "sequence-classification"},
+    {"path": "recall", "task": "sequence-classification"},
 ]
 
 

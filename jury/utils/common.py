@@ -1,4 +1,5 @@
 import os
+import re
 from typing import Any, Dict, List, Optional
 
 
@@ -38,6 +39,11 @@ class NestedSingleType:
                 return None
 
         return cls.join(types)
+
+
+def camel_to_snake(name):
+    name = re.sub("(.)([A-Z][a-z]+)", r"\1_\2", name)
+    return re.sub("([a-z0-9])([A-Z])", r"\1_\2", name).lower()
 
 
 def bulk_remove_keys(obj: Dict, keys: List[str]) -> Dict:

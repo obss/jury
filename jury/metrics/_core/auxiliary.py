@@ -2,6 +2,7 @@ from typing import Any, Dict, Optional, Union
 
 from jury.metrics._core.base import MetricForTask
 from jury.metrics._core.utils import TaskNotAvailable
+from jury.utils.common import camel_to_snake
 
 
 class TaskMapper:
@@ -31,7 +32,7 @@ class TaskMapper:
         Args:
             task: (``str``) Task name for the desired metric to obtain the subclass.
             resulting_name (Optional ``str``): Resulting name of the computed score returned. If None,
-                `~._get_metric_name()` is used.
+                `~._get_path()` is used.
             compute_kwargs (Optional ``Dict[str, Any]``): Arguments to be passed to `compute()` method of metric at
                 computation.
 
@@ -40,10 +41,10 @@ class TaskMapper:
         Returns: Metric for proper task if available.
         """
         subclass = cls._get_subclass(task=task)
-        metric_name = cls._get_metric_name()
-        resulting_name = resulting_name or metric_name
+        path = cls._get_path()
+        resulting_name = resulting_name or path
         if subclass is None:
-            raise TaskNotAvailable(metric_name=metric_name, task=task)
+            raise TaskNotAvailable(path=path, task=task)
         return subclass._construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
     @classmethod
@@ -60,8 +61,8 @@ class TaskMapper:
         return cls._TASKS.get(task, None)
 
     @classmethod
-    def _get_metric_name(cls):
-        return cls.__name__.lower()
+    def _get_path(cls):
+        return camel_to_snake(cls.__name__)
 
 
 class MetricAlias(TaskMapper):
@@ -69,7 +70,7 @@ class MetricAlias(TaskMapper):
     Extension of TaskMapper which allows a single :py:class:`jury.metrics.MetricForTask` class to be aliased. If a
     metric has a single task, use this class instead of :py:class:`jury.metrics._core.TaskMapper`.
 
-    All metrics using TaskMapper must implement _SUBCLASS attribute.
+    All metrics using MetricAlias must implement _SUBCLASS attribute.
     """
 
     _SUBCLASS: MetricForTask = None
@@ -89,14 +90,14 @@ class MetricAlias(TaskMapper):
         Args:
             task: (Ignored ``str``) Ignored. Preserved to provide a common interface.
             resulting_name (Optional ``str``): Resulting name of the computed score returned. If None,
-                `~._get_metric_name()` is used.
+                `~._get_path()` is used.
             compute_kwargs (Optional ``Dict[str, Any]``): Arguments to be passed to `compute()` method of metric at
                 computation.
 
         Returns: Metric for proper task if available.
         """
         subclass = cls._get_subclass()
-        resulting_name = resulting_name or cls._get_metric_name()
+        resulting_name = resulting_name or cls._get_path()
         return subclass._construct(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
     @classmethod
