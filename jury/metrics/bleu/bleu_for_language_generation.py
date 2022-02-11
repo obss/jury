@@ -167,6 +167,9 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
         max_order: int = 4,
         smooth: bool = False,
     ):
+        # _compute_bleu_score expects a slighthly different reference structure
+        #   than the one we currently have for single prediction single reference
+        references = [[r] for r in references]
         return self._compute_bleu_score(
             predictions=predictions, references=references, max_order=max_order, smooth=smooth
         )
@@ -180,8 +183,10 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
         smooth: bool = False,
     ):
         # Bleu score inherently supports multiple references.
-        return self._compute_single_pred_single_ref(
-            predictions=predictions, references=references, reduce_fn=reduce_fn, max_order=max_order, smooth=smooth
+        # Bypassing _compute_single_pred_single_ref, as it does structure
+        #   manipulation that isn't needed for here
+        return self._compute_bleu_score(
+            predictions=predictions, references=references, max_order=max_order, smooth=smooth
         )
 
     def _compute_multi_pred_multi_ref(
