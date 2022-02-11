@@ -119,7 +119,9 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
                     "references": datasets.Sequence(datasets.Value("string", id="tokens"), id="sequence"),
                 }
             ),
-            codebase_urls=["https://github.com/tensorflow/nmt/blob/0be864257a76c151eef20ea689755f08bc1faf4e/nmt/scripts/bleu.py"],
+            codebase_urls=[
+                "https://github.com/tensorflow/nmt/blob/0be864257a76c151eef20ea689755f08bc1faf4e/nmt/scripts/bleu.py"
+            ],
             reference_urls=[
                 "https://en.wikipedia.org/wiki/BLEU",
                 "https://towardsdatascience.com/evaluating-text-output-in-nlp-bleu-at-your-own-risk-e8609665a213",
