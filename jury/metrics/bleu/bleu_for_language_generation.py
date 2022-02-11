@@ -119,7 +119,9 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
                     "references": datasets.Sequence(datasets.Value("string", id="tokens"), id="sequence"),
                 }
             ),
-            codebase_urls=["https://github.com/tensorflow/nmt/blob/master/nmt/scripts/bleu.py"],
+            codebase_urls=[
+                "https://github.com/tensorflow/nmt/blob/0be864257a76c151eef20ea689755f08bc1faf4e/nmt/scripts/bleu.py"
+            ],
             reference_urls=[
                 "https://en.wikipedia.org/wiki/BLEU",
                 "https://towardsdatascience.com/evaluating-text-output-in-nlp-bleu-at-your-own-risk-e8609665a213",
@@ -129,10 +131,11 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
     def _download_and_prepare(self, dl_manager) -> None:
         """
         Downloads and import the computation of bleu score from the implementation
-        of BLEU computation from tensorflow/nmt. See
-        https://github.com/tensorflow/nmt/blob/master/nmt/scripts/bleu.py
+        of BLEU computation from tensorflow/nmt. The code is sourced from a specific
+        commit on the master branch, in order to keep things stable. See
+        https://github.com/tensorflow/nmt/blob/0be864257a76c151eef20ea689755f08bc1faf4e/nmt/scripts/bleu.py
         """
-        nmt_source = "https://raw.githubusercontent.com/tensorflow/nmt/master/nmt/scripts/bleu.py"
+        nmt_source = "https://raw.githubusercontent.com/tensorflow/nmt/0be864257a76c151eef20ea689755f08bc1faf4e/nmt/scripts/bleu.py"
         nmt_dest = os.path.join(self.data_dir, "nmt_bleu.py")
         download(
             source=nmt_source,
@@ -167,6 +170,9 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
         max_order: int = 4,
         smooth: bool = False,
     ):
+        # _compute_bleu_score expects a slighthly different reference structure
+        #   than the one we currently have for single prediction single reference
+        references = [[r] for r in references]
         return self._compute_bleu_score(
             predictions=predictions, references=references, max_order=max_order, smooth=smooth
         )
@@ -180,8 +186,10 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
         smooth: bool = False,
     ):
         # Bleu score inherently supports multiple references.
-        return self._compute_single_pred_single_ref(
-            predictions=predictions, references=references, reduce_fn=reduce_fn, max_order=max_order, smooth=smooth
+        # Bypassing _compute_single_pred_single_ref, as it does structure
+        #   manipulation that isn't needed for here
+        return self._compute_bleu_score(
+            predictions=predictions, references=references, max_order=max_order, smooth=smooth
         )
 
     def _compute_multi_pred_multi_ref(
