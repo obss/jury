@@ -3,50 +3,50 @@
     "empty_items": 0,
     "total_items": 2,
     "bleu_1": {
-      "score": 0.06666666666666667,
+      "score": 0.6666666666666666,
       "precisions": [
-        0.06666666666666667
+        0.6666666666666666
       ],
       "brevity_penalty": 1.0,
-      "length_ratio": 3.75,
+      "length_ratio": 1.0714285714285714,
       "translation_length": 15,
-      "reference_length": 4
+      "reference_length": 14
     },
     "bleu_2": {
-      "score": 0.0,
+      "score": 0.5063696835418333,
       "precisions": [
-        0.06666666666666667,
-        0.0
+        0.6666666666666666,
+        0.38461538461538464
       ],
       "brevity_penalty": 1.0,
-      "length_ratio": 3.75,
+      "length_ratio": 1.0714285714285714,
       "translation_length": 15,
-      "reference_length": 4
+      "reference_length": 14
     },
     "bleu_3": {
-      "score": 0.0,
+      "score": 0.4119912453171404,
       "precisions": [
-        0.06666666666666667,
-        0.0,
-        0.0
+        0.6666666666666666,
+        0.38461538461538464,
+        0.2727272727272727
       ],
       "brevity_penalty": 1.0,
-      "length_ratio": 3.75,
+      "length_ratio": 1.0714285714285714,
       "translation_length": 15,
-      "reference_length": 4
+      "reference_length": 14
     },
     "bleu_4": {
-      "score": 0.0,
+      "score": 0.29689669509442307,
       "precisions": [
-        0.06666666666666667,
-        0.0,
-        0.0,
-        0.0
+        0.6666666666666666,
+        0.38461538461538464,
+        0.2727272727272727,
+        0.1111111111111111
       ],
       "brevity_penalty": 1.0,
-      "length_ratio": 3.75,
+      "length_ratio": 1.0714285714285714,
       "translation_length": 15,
-      "reference_length": 4
+      "reference_length": 14
     },
     "meteor": {
       "score": 0.6594164989939638
@@ -63,50 +63,50 @@
       "empty_items": 0,
       "total_items": 2,
       "bleu_1": {
-        "score": 0.06666666666666667,
+        "score": 0.6666666666666666,
         "precisions": [
-          0.06666666666666667
+          0.6666666666666666
         ],
         "brevity_penalty": 1.0,
-        "length_ratio": 3.75,
+        "length_ratio": 1.0714285714285714,
         "translation_length": 15,
-        "reference_length": 4
+        "reference_length": 14
       },
       "bleu_2": {
-        "score": 0.0,
+        "score": 0.5063696835418333,
         "precisions": [
-          0.06666666666666667,
-          0.0
+          0.6666666666666666,
+          0.38461538461538464
         ],
         "brevity_penalty": 1.0,
-        "length_ratio": 3.75,
+        "length_ratio": 1.0714285714285714,
         "translation_length": 15,
-        "reference_length": 4
+        "reference_length": 14
       },
       "bleu_3": {
-        "score": 0.0,
+        "score": 0.4119912453171404,
         "precisions": [
-          0.06666666666666667,
-          0.0,
-          0.0
+          0.6666666666666666,
+          0.38461538461538464,
+          0.2727272727272727
         ],
         "brevity_penalty": 1.0,
-        "length_ratio": 3.75,
+        "length_ratio": 1.0714285714285714,
         "translation_length": 15,
-        "reference_length": 4
+        "reference_length": 14
       },
       "bleu_4": {
-        "score": 0.0,
+        "score": 0.29689669509442307,
         "precisions": [
-          0.06666666666666667,
-          0.0,
-          0.0,
-          0.0
+          0.6666666666666666,
+          0.38461538461538464,
+          0.2727272727272727,
+          0.1111111111111111
         ],
         "brevity_penalty": 1.0,
-        "length_ratio": 3.75,
+        "length_ratio": 1.0714285714285714,
         "translation_length": 15,
-        "reference_length": 4
+        "reference_length": 14
       },
       "meteor": {
         "score": 0.6594164989939638
