@@ -1,0 +1,38 @@
+{
+  "basic": {
+    "empty_items": 0,
+    "total_items": 2,
+    "bleurt": {
+      "score": 0.1981795746833086,
+      "scores": [
+        0.3505285978317261,
+        0.04583055153489113
+      ],
+      "checkpoint": "bleurt-tiny-128"
+    }
+  },
+  "multiple_ref": {
+    "total_items": 2,
+    "empty_items": 0,
+    "bleurt": {
+      "score": 0.1981795746833086,
+      "scores": [
+        0.3505285978317261,
+        0.04583055153489113
+      ],
+      "checkpoint": "bleurt-tiny-128"
+    }
+  },
+  "multiple_pred_multiple_ref": {
+    "total_items": 2,
+    "empty_items": 0,
+    "bleurt": {
+      "score": 0.5585096478462219,
+      "scores": [
+        0.3068092465400696,
+        0.8102100491523743
+      ],
+      "checkpoint": "bleurt-tiny-128"
+    }
+  }
+}

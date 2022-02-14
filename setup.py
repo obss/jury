@@ -45,7 +45,12 @@ _DEV_REQUIREMENTS = [
     "pytest-timeout>=1.4.2",
 ]
 
-_METRIC_REQUIREMENTS = ["sacrebleu>=2.0.0", "bert_score==0.3.10", "seqeval==1.2.2"]
+_METRIC_REQUIREMENTS = [
+    "sacrebleu>=2.0.0",
+    "bert_score==0.3.10",
+    "seqeval==1.2.2",
+    "bleurt @ git+https://github.com/google-research/bleurt.git",
+]
 add_pywin(_METRIC_REQUIREMENTS)
 
 extras = {
