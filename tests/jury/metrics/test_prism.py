@@ -117,7 +117,9 @@ def test_basic_segmented(predictions, references, jury_segmented, output_basic_s
     assert_almost_equal_dict(actual=scores, desired=output_basic_segmented)
 
 
-def test_basic_normalized_and_segmented(predictions, references, jury_normalized_and_segmented, output_basic_normalized_and_segmented):
+def test_basic_normalized_and_segmented(
+    predictions, references, jury_normalized_and_segmented, output_basic_normalized_and_segmented
+):
     scores = jury_normalized_and_segmented(predictions=predictions, references=references)
     assert_almost_equal_dict(actual=scores, desired=output_basic_normalized_and_segmented)
 
@@ -137,7 +139,9 @@ def test_multiple_ref_segmented(predictions, references, jury_segmented, output_
     assert_almost_equal_dict(actual=scores, desired=output_multiple_ref_segmented)
 
 
-def test_multiple_ref_normalized_and_segmented(predictions, references, jury_normalized_and_segmented, output_multiple_ref_normalized_and_segmented):
+def test_multiple_ref_normalized_and_segmented(
+    predictions, references, jury_normalized_and_segmented, output_multiple_ref_normalized_and_segmented
+):
     scores = jury_normalized_and_segmented(predictions=predictions, references=references)
     assert_almost_equal_dict(actual=scores, desired=output_multiple_ref_normalized_and_segmented)
 
@@ -147,7 +151,9 @@ def test_multiple_pred_multiple_ref(multiple_predictions, multiple_references, j
     assert_almost_equal_dict(actual=scores, desired=output_multiple_pred_multiple_ref)
 
 
-def test_multiple_pred_multiple_ref_normalized(multiple_predictions, multiple_references, jury_normalized, output_multiple_pred_multiple_ref_normalized):
+def test_multiple_pred_multiple_ref_normalized(
+    multiple_predictions, multiple_references, jury_normalized, output_multiple_pred_multiple_ref_normalized
+):
     scores = jury_normalized(predictions=multiple_predictions, references=multiple_references)
     assert_almost_equal_dict(actual=scores, desired=output_multiple_pred_multiple_ref_normalized)
 

@@ -215,7 +215,7 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
             "model_path_or_url": self.model_path_or_url,
             "lang": self.lang,
             "segment_scores": segment_scores,
-            "normalized": normalize
+            "normalized": normalize,
         }
 
     def _compute_single_pred_multi_ref(
@@ -248,7 +248,7 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
             "model_path_or_url": self.model_path_or_url,
             "lang": self.lang,
             "segment_scores": segment_scores,
-            "normalized": normalize
+            "normalized": normalize,
         }
 
     def _compute_multi_pred_multi_ref(
@@ -282,10 +282,10 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
             scores = self._normalize_score(scores, log_base)
 
         return {
-            "score"            : scores,
-            "identifier"       : self.scorer.identifier(),
+            "score": scores,
+            "identifier": self.scorer.identifier(),
             "model_path_or_url": self.model_path_or_url,
-            "lang"             : self.lang,
-            "segment_scores"   : segment_scores,
-            "normalized"       : normalize
+            "lang": self.lang,
+            "segment_scores": segment_scores,
+            "normalized": normalize,
         }
