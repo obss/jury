@@ -15,7 +15,7 @@
 """ Prism metric. The part of this file is adapted from metric implementations
 of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/ """
-
+import math
 import os
 from typing import Callable, Dict, List, Union
 
@@ -62,6 +62,8 @@ Computation Args:
     references (list of str or list of list of str): Reference sentences.
     segment_scores (bool): If True, then score for each instance are returned separately. Otherwise,
         average score is returned.
+    normalized (bool): If True, resulting score/scores are normalized with exponentiation by log base,
+        which bounds the score range within [0,1] (still higher is better). 
 
 Returns:
     'score': Prism score.
@@ -81,9 +83,18 @@ Examples:
     >>> print(results)
     {
       "score": -1.1489432752132416,
+      "identifier": {
+          "version": "0.1",
+          "model": "m39v1",
+          "seg_scores": "avg_log_prob",
+          "sys_scores": "avg_log_prob",
+          "log_base": 2,
+          "temperature": 1.0
+      },
       "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
       "lang": "en",
-      "segment_scores": false
+      "segment_scores": false,
+      "normalized": false
     }
 """
 
@@ -179,20 +190,32 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
             return score.tolist()
         return float(score)
 
+    def _normalize_score(self, score: Union[float, List[float]], exponent: float):
+        if isinstance(score, float):
+            return exponent ** score
+        return [exponent ** s for s in score]
+
     def _compute_single_pred_single_ref(
         self,
         predictions: LanguageGenerationInstance,
         references: LanguageGenerationInstance,
         reduce_fn=None,
         segment_scores: bool = False,
+        normalize: bool = False,
         **kwargs,
     ):
-        prism_score = self._compute_prism_score(predictions, references, segment_scores=segment_scores, **kwargs)
+        score = self._compute_prism_score(predictions, references, segment_scores=segment_scores, **kwargs)
+        if normalize:
+            log_base = self.scorer.identifier()["log_base"]
+            score = self._normalize_score(score, log_base)
+
         return {
-            "score": prism_score,
+            "score": score,
+            "identifier": self.scorer.identifier(),
             "model_path_or_url": self.model_path_or_url,
             "lang": self.lang,
             "segment_scores": segment_scores,
+            "normalized": normalize
         }
 
     def _compute_single_pred_multi_ref(
@@ -201,6 +224,7 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
         references: LanguageGenerationInstance,
         reduce_fn: Callable = None,
         segment_scores: bool = False,
+        normalize: bool = False,
         **kwargs,
     ):
         self._load_scorer()
@@ -213,11 +237,18 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
 
         if not segment_scores:
             scores = sum(scores) / len(scores)
+
+        if normalize:
+            log_base = self.scorer.identifier()["log_base"]
+            scores = self._normalize_score(scores, log_base)
+
         return {
             "score": scores,
+            "identifier": self.scorer.identifier(),
             "model_path_or_url": self.model_path_or_url,
             "lang": self.lang,
             "segment_scores": segment_scores,
+            "normalized": normalize
         }
 
     def _compute_multi_pred_multi_ref(
@@ -226,6 +257,7 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
         references: LanguageGenerationInstance,
         reduce_fn: Callable = None,
         segment_scores: bool = False,
+        normalize: bool = False,
         **kwargs,
     ):
         self._load_scorer()
@@ -244,9 +276,16 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
 
         if not segment_scores:
             scores = sum(scores) / len(scores)
+
+        if normalize:
+            log_base = self.scorer.identifier()["log_base"]
+            scores = self._normalize_score(scores, log_base)
+
         return {
-            "score": scores,
+            "score"            : scores,
+            "identifier"       : self.scorer.identifier(),
             "model_path_or_url": self.model_path_or_url,
-            "lang": self.lang,
-            "segment_scores": segment_scores,
+            "lang"             : self.lang,
+            "segment_scores"   : segment_scores,
+            "normalized"       : normalize
         }
