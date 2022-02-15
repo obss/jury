@@ -22,7 +22,7 @@ from typing import Dict, List, Optional, Union
 
 import datasets
 
-from jury.metrics._core import MetricForSequenceLabeling, SequenceClassificationInstance, SequenceLabelingInstance
+from jury.metrics._core import MetricForSequenceLabeling, SequenceLabelingInstance
 from jury.metrics._core.utils import PackagePlaceholder, requirement_message
 
 # `import seqeval` placeholder

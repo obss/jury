@@ -88,7 +88,7 @@ class AutoMetric:
         if task is None:
             task = "language-generation"
 
-        # load the module, will raise ImportError if module cannot be loaded
+        # load the module, will catch ModuleNotFoundError if module cannot be loaded
         try:
             module_path = resolved_path.path
             if resolved_path.resolution == "external-module":
@@ -105,7 +105,7 @@ class AutoMetric:
                 )
             warnings.warn(
                 f"Metric {resolved_path.path} is not available on jury, falling back to datasets metric. "
-                f"You may not fully utilize this metric for different input types, e.g multiple predictions"
+                f"You may not fully utilize this metric for different input types, e.g multiple predictions "
                 f"or multiple references."
             )
             metric = datasets.load_metric(resolved_path.path, **kwargs)
