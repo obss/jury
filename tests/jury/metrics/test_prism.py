@@ -81,6 +81,8 @@ def test_multiple_pred_multiple_ref(multiple_predictions, multiple_references, j
     assert_almost_equal_dict(actual=scores, desired=output_multiple_pred_multiple_ref)
 
 
-def test_multiple_pred_multiple_ref_segmented(predictions, references, jury_segmented, output_multiple_pred_multiple_ref_segmented):
+def test_multiple_pred_multiple_ref_segmented(
+    predictions, references, jury_segmented, output_multiple_pred_multiple_ref_segmented
+):
     scores = jury_segmented(predictions=predictions, references=references)
     assert_almost_equal_dict(actual=scores, desired=output_multiple_pred_multiple_ref_segmented)
