@@ -17,7 +17,7 @@ of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/ """
 
 import os
-from typing import Dict, Callable
+from typing import Callable, Dict, List, Union
 
 import datasets
 import validators
@@ -27,7 +27,7 @@ from jury.metrics._core import MetricForLanguageGeneration
 from jury.metrics._core.utils import download
 from jury.utils.io import untar_file
 
-_CITATION = """\
+_CITATION = """
 @inproceedings{thompson-post-2020-automatic,
     title={Automatic Machine Translation Evaluation in Many Languages via Zero-Shot Paraphrasing},
     author={Brian Thompson and Matt Post},
@@ -39,7 +39,7 @@ _CITATION = """\
 }
 """
 
-_DESCRIPTION = """\
+_DESCRIPTION = """
 Prism is an automatic MT metric which uses a sequence-to-sequence paraphraser to score MT system outputs 
 conditioned on their respective human references. Prism uses a multilingual NMT model as a zero-shot paraphraser, 
 which negates the need for synthetic paraphrase data and results in a single model which works in many languages.
@@ -51,26 +51,17 @@ information.
 _KWARGS_DESCRIPTION = """
 Prism metric arguments.
 
-Args:
+Construction Args:
+    model_path_or_url (str): Path to the model directory or a URL of model file (tar).
+    lang (str): Language of the sentences; required (e.g. 'en').
+    temperature (float): Softmax temperature, where values >1.0 produce more uniform samples 
+        and values <1.0 produce sharper samples.
+    
+Computation Args:
     predictions (list of str): Prediction/candidate sentences.
     references (list of str or list of list of str): Reference sentences.
-    lang (str): Language of the sentences; required (e.g. 'en').
-    model_type (str): Bert specification, default using the suggested
-        model for the target language; has to specify at least one of
-        `model_type` or `lang`.
-    num_layers (int): The layer of representation to use,
-        default using the number of layers tuned on WMT16 correlation data.
-    verbose (bool): Turn on intermediate status update.
-    idf (bool or dict): Use idf weighting; can also be a precomputed idf_dict.
-    device (str): On which the contextual embedding model will be allocated on.
-        If this argument is None, the model lives on cuda:0 if cuda is available.
-    nthreads (int): Number of threads.
-    batch_size (int): Bert score processing batch size,
-        at least one of `model_type` or `lang`. `lang` needs to be
-        specified when `rescale_with_baseline` is True.
-    rescale_with_baseline (bool): Rescale bertscore with pre-computed baseline.
-    baseline_path (str): Customized baseline file.
-    use_fast_tokenizer (bool): `use_fast` parameter passed to HF tokenizer. New in version 0.3.10.
+    segment_scores (bool): If True, then score for each instance are returned separately. Otherwise,
+        average score is returned.
 
 Returns:
     'score': Prism score.
@@ -78,23 +69,41 @@ Returns:
 Examples:
 
     >>> prism = jury.load_metric("prism")
-    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
+    >>> predictions = [
+        ["the cat is on the mat", "There is cat playing on mat"],
+        ["Look! what a wonderful day, today.", "Today is a very wonderful day"],
+    ]
     >>> references = [
-        ["the cat is playing on the mat.", "The cat plays on the mat."], 
-        ["Today is a wonderful day", "The weather outside is wonderful."]
+        ["the cat is playing on the mat.", "The cat plays on the mat."],
+        ["Today is a wonderful day", "The weather outside is wonderful."],
     ]
     >>> results = prism.compute(predictions=predictions, references=references)
     >>> print(results)
-    {'prism': {'score': 1.0}}
+    {
+      "score": -1.1489432752132416,
+      "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
+      "lang": "en",
+      "segment_scores": false
+    }
 """
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class PrismForLanguageGeneration(MetricForLanguageGeneration):
-    def __init__(self, resulting_name: str = None, compute_kwargs: Dict = None, model_path_or_url: str = None, lang: str = "en", **kwargs):
+    def __init__(
+        self,
+        resulting_name: str = None,
+        compute_kwargs: Dict = None,
+        model_path_or_url: str = None,
+        lang: str = "en",
+        temperature: float = 1.0,
+        **kwargs,
+    ):
         self.model_path_or_url = model_path_or_url
         self.lang = lang
+        self.temperature = temperature
         self.model_dir = None
+        self.scorer = None
         super().__init__(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
     def _download_model(self):
@@ -102,17 +111,23 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
             self.model_path_or_url = "http://data.statmt.org/prism/m39v1.tar"
 
         if not os.path.isdir(self.model_path_or_url) and not validators.url(self.model_path_or_url):
-            raise ValueError("Provided 'model_path_or_url' neither points to an existing directory "
-                             "nor a valid URL.")
+            raise ValueError("Provided 'model_path_or_url' neither points to an existing directory " "nor a valid URL.")
         elif os.path.isdir(self.model_path_or_url):
             self.model_dir = self.model_path_or_url
         else:
+            if not self.model_path_or_url.endswith(".tar"):
+                raise ValueError("Provided model URL must be a tarfile.")
             model_source = self.model_path_or_url
-            model_dest = os.path.join(self.data_dir, f"prism_model_{self.model_path_or_url}")
-            print(f"Downloading the model at {self.model_path_or_url} ...")
-            download(source=model_source, destination=model_dest)
-            print("Model downloaded.")
-            untar_file(model_dest, "/home/devrimcavusoglu/Desktop/abc")
+            file_name = os.path.basename(self.model_path_or_url)
+            model_dir = os.path.join(self.data_dir, file_name.replace(".tar", ""))
+            if not os.path.isdir(model_dir):
+                model_dest = os.path.join(self.data_dir, f"prism_model_{file_name}")
+                print(f"Downloading the model at {self.model_path_or_url} ...")
+                download(source=model_source, destination=model_dest)
+                print("Model downloaded.")
+                untar_file(model_dest, self.data_dir)
+                os.remove(model_dest)
+            self.model_dir = model_dir
 
     def _download_and_prepare(self, dl_manager) -> None:
         """
@@ -122,7 +137,9 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
         https://github.com/thompsonb/prism/blob/42e45a46d1c7924e98bceeed2ea81b31efcb6f9d/prism.py
         """
         self._download_model()
-        prism_source = "https://raw.githubusercontent.com/thompsonb/prism/42e45a46d1c7924e98bceeed2ea81b31efcb6f9d/prism.py"
+        prism_source = (
+            "https://raw.githubusercontent.com/thompsonb/prism/42e45a46d1c7924e98bceeed2ea81b31efcb6f9d/prism.py"
+        )
         prism_dest = os.path.join(self.data_dir, "prism.py")
         download(
             source=prism_source,
@@ -144,48 +161,89 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
             ],
         )
 
-    def _compute_prism_score(self, predictions: LanguageGenerationInstance, references: LanguageGenerationInstance, **kwargs):
-        Prism = self._get_external_resource("prism", attr="Prism")
-        prism = Prism()
+    def _load_scorer(self):
+        if self.scorer is None:
+            Prism = self._get_external_resource("prism", attr="Prism")
+            self.scorer = Prism(model_dir=self.model_dir, lang=self.lang, temperature=self.temperature)
 
-        score = prism.score(
-            ref=references, cand=predictions, **kwargs
-        )
-        return score
+    def _compute_prism_score(
+        self,
+        predictions: LanguageGenerationInstance,
+        references: LanguageGenerationInstance,
+        segment_scores: bool,
+        **kwargs,
+    ) -> Union[float, List[float]]:
+        self._load_scorer()
+        score = self.scorer.score(ref=references, cand=predictions, segment_scores=segment_scores, **kwargs)
+        if segment_scores:
+            return score.tolist()
+        return float(score)
 
     def _compute_single_pred_single_ref(
         self,
         predictions: LanguageGenerationInstance,
         references: LanguageGenerationInstance,
         reduce_fn=None,
-        lang: str = "en",
         segment_scores: bool = False,
+        **kwargs,
     ):
-        prism_score = self._compute_prism_score(predictions, references)
-        return {"score": 1}
+        prism_score = self._compute_prism_score(predictions, references, segment_scores=segment_scores, **kwargs)
+        return {
+            "score": prism_score,
+            "model_path_or_url": self.model_path_or_url,
+            "lang": self.lang,
+            "segment_scores": segment_scores,
+        }
 
     def _compute_single_pred_multi_ref(
         self,
         predictions: LanguageGenerationInstance,
         references: LanguageGenerationInstance,
         reduce_fn: Callable = None,
+        segment_scores: bool = False,
         **kwargs,
     ):
-        pass
+        self._load_scorer()
+        scores = []
+        for pred, refs in zip(predictions, references):
+            pred = [pred] * len(refs)
+            prism_score = self._compute_prism_score(predictions=pred, references=refs, segment_scores=True, **kwargs)
+            scores.append(reduce_fn(prism_score))
+
+        if not segment_scores:
+            scores = sum(scores) / len(scores)
+        return {
+            "score": scores,
+            "model_path_or_url": self.model_path_or_url,
+            "lang": self.lang,
+            "segment_scores": segment_scores,
+        }
 
     def _compute_multi_pred_multi_ref(
         self,
         predictions: LanguageGenerationInstance,
         references: LanguageGenerationInstance,
         reduce_fn: Callable = None,
+        segment_scores: bool = False,
         **kwargs,
     ):
-        pass
+        self._load_scorer()
+        scores = []
+        for preds, refs in zip(predictions, references):
+            pred_scores = []
+            for pred in preds:
+                pred = [pred] * len(refs)
+                prism_score = self._compute_prism_score(
+                    predictions=pred, references=refs, segment_scores=True, **kwargs
+                )
+                pred_scores.append(reduce_fn(prism_score))
+            scores.append(reduce_fn(pred_scores))
 
-
-if __name__ == "__main__":
-    predictions = ["the cat is on the mat", "Look! a wonderful day."]
-    references = ["the cat is playing on the mat.", "Today is a wonderful day"]
-    prism = PrismForLanguageGeneration()
-    res = prism._compute_single_pred_single_ref(predictions=predictions, references=references)
-    print(res)
+        if not segment_scores:
+            scores = sum(scores) / len(scores)
+        return {
+            "score": scores,
+            "model_path_or_url": self.model_path_or_url,
+            "lang": self.lang,
+            "segment_scores": segment_scores,
+        }

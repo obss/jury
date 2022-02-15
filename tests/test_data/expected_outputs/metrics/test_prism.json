@@ -1,0 +1,71 @@
+{
+  "basic": {
+    "total_items": 2,
+    "empty_items": 0,
+    "prism": {
+      "score": -2.418287754058838,
+      "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
+      "lang": "en",
+      "segment_scores": false
+    }
+  },
+  "basic_segmented": {
+    "total_items": 2,
+    "empty_items": 0,
+    "prism": {
+      "score": [
+        -1.7939081192016602,
+        -3.0426673889160156
+      ],
+      "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
+      "lang": "en",
+      "segment_scores": true
+    }
+  },
+  "multiple_ref": {
+    "total_items": 2,
+    "empty_items": 0,
+    "prism": {
+      "score": -2.4729533195495605,
+      "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
+      "lang": "en",
+      "segment_scores": false
+    }
+  },
+  "multiple_ref_segmented": {
+    "total_items": 2,
+    "empty_items": 0,
+    "prism": {
+      "score": [
+        -1.7939081192016602,
+        -3.0426673889160156
+      ],
+      "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
+      "lang": "en",
+      "segment_scores": true
+    }
+  },
+  "multiple_pred_multiple_ref": {
+    "total_items": 2,
+    "empty_items": 0,
+    "prism": {
+      "score": -1.1489432752132416,
+      "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
+      "lang": "en",
+      "segment_scores": false
+    }
+  },
+  "multiple_pred_multiple_ref_segmented": {
+    "total_items": 2,
+    "empty_items": 0,
+    "prism": {
+      "score": [
+        -1.7939081192016602,
+        -3.0426673889160156
+      ],
+      "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
+      "lang": "en",
+      "segment_scores": true
+    }
+  }
+}

@@ -45,13 +45,10 @@ _DEV_REQUIREMENTS = [
     "pytest-timeout>=1.4.2",
 ]
 
-_PRISM_REQUIREMENTS = [
-    "sentencepiece==0.1.86",
-    "fairseq==0.9.0",
-    "validators"
-]
+_PRISM_REQUIREMENTS = ["fairseq==0.9.0", "validators"]
 
-_METRIC_REQUIREMENTS = ["sacrebleu>=2.0.0", "bert_score==0.3.10", "seqeval==1.2.2"] + _PRISM_REQUIREMENTS
+_METRIC_REQUIREMENTS = ["sacrebleu>=2.0.0", "bert_score==0.3.11", "seqeval==1.2.2", "sentencepiece==0.1.96"]
+_METRIC_REQUIREMENTS.extend(_PRISM_REQUIREMENTS)
 add_pywin(_METRIC_REQUIREMENTS)
 
 extras = {
