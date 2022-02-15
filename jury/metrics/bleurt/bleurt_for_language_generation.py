@@ -17,7 +17,7 @@ of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/bleurt/bleurt.py """
 
 import os
-from typing import Callable, Dict
+from typing import Callable
 
 import datasets
 
