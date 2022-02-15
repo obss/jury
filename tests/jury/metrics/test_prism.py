@@ -27,8 +27,20 @@ def output_basic():
 
 @pytest.fixture
 @get_expected_output(prefix="metrics")
+def output_basic_segmented():
+    return output_basic_segmented.output
+
+
+@pytest.fixture
+@get_expected_output(prefix="metrics")
 def output_multiple_ref():
     return output_multiple_ref.output
+
+
+@pytest.fixture
+@get_expected_output(prefix="metrics")
+def output_multiple_ref_segmented():
+    return output_basic_segmented.output
 
 
 @pytest.fixture
@@ -37,15 +49,21 @@ def output_multiple_pred_multiple_ref():
     return output_multiple_pred_multiple_ref.output
 
 
+@pytest.fixture
+@get_expected_output(prefix="metrics")
+def output_multiple_pred_multiple_ref_segmented():
+    return output_multiple_pred_multiple_ref_segmented.output
+
+
 def test_basic(predictions, references, jury, output_basic):
     torch.cuda.empty_cache()
     scores = jury(predictions=predictions, references=references)
     assert_almost_equal_dict(actual=scores, desired=output_basic)
 
 
-def test_basic_segmented(predictions, references, jury_segmented, output_basic):
+def test_basic_segmented(predictions, references, jury_segmented, output_basic_segmented):
     scores = jury_segmented(predictions=predictions, references=references)
-    assert_almost_equal_dict(actual=scores, desired=output_basic)
+    assert_almost_equal_dict(actual=scores, desired=output_basic_segmented)
 
 
 def test_multiple_ref(predictions, multiple_references, jury, output_multiple_ref):
@@ -53,9 +71,9 @@ def test_multiple_ref(predictions, multiple_references, jury, output_multiple_re
     assert_almost_equal_dict(actual=scores, desired=output_multiple_ref)
 
 
-def test_multiple_ref_segmented(predictions, references, jury_segmented, output_basic):
+def test_multiple_ref_segmented(predictions, references, jury_segmented, output_multiple_ref_segmented):
     scores = jury_segmented(predictions=predictions, references=references)
-    assert_almost_equal_dict(actual=scores, desired=output_basic)
+    assert_almost_equal_dict(actual=scores, desired=output_multiple_ref_segmented)
 
 
 def test_multiple_pred_multiple_ref(multiple_predictions, multiple_references, jury, output_multiple_pred_multiple_ref):
@@ -63,6 +81,6 @@ def test_multiple_pred_multiple_ref(multiple_predictions, multiple_references, j
     assert_almost_equal_dict(actual=scores, desired=output_multiple_pred_multiple_ref)
 
 
-def test_multiple_pred_multiple_ref_segmented(predictions, references, jury_segmented, output_basic):
+def test_multiple_pred_multiple_ref_segmented(predictions, references, jury_segmented, output_multiple_pred_multiple_ref_segmented):
     scores = jury_segmented(predictions=predictions, references=references)
-    assert_almost_equal_dict(actual=scores, desired=output_basic)
+    assert_almost_equal_dict(actual=scores, desired=output_multiple_pred_multiple_ref_segmented)

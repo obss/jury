@@ -208,7 +208,8 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
         for pred, refs in zip(predictions, references):
             pred = [pred] * len(refs)
             prism_score = self._compute_prism_score(predictions=pred, references=refs, segment_scores=True, **kwargs)
-            scores.append(reduce_fn(prism_score))
+            reduced_score = float(reduce_fn(prism_score))
+            scores.append(reduced_score)
 
         if not segment_scores:
             scores = sum(scores) / len(scores)
@@ -236,8 +237,10 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
                 prism_score = self._compute_prism_score(
                     predictions=pred, references=refs, segment_scores=True, **kwargs
                 )
-                pred_scores.append(reduce_fn(prism_score))
-            scores.append(reduce_fn(pred_scores))
+                reduced_pred_score = float(reduce_fn(prism_score))
+                pred_scores.append(reduced_pred_score)
+            reduced_score = float(reduce_fn(pred_scores))
+            scores.append(reduced_score)
 
         if not segment_scores:
             scores = sum(scores) / len(scores)
