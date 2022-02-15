@@ -12,7 +12,8 @@ exclude = '''
 
 [tool.pytest.ini_options]
 minversion = "6.2"
-timeout = 150
+# Temporarily disabling timeout
+#timeout = 150
 timeout_method = "thread"
 testpaths = "tests"
 addopts = "-vvv"
