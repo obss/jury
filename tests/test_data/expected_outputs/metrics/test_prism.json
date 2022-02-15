@@ -18,47 +18,6 @@
       "normalized": false
     }
   },
-  "basic_normalized": {
-    "total_items": 2,
-    "empty_items": 0,
-    "prism": {
-      "score": 0.1870780558028898,
-      "identifier": {
-        "version": "0.1",
-        "model": "m39v1",
-        "seg_scores": "avg_log_prob",
-        "sys_scores": "avg_log_prob",
-        "log_base": 2,
-        "temperature": 1.0
-      },
-      "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
-      "lang": "en",
-      "segment_scores": false,
-      "normalized": true
-    }
-  },
-  "basic_segmented": {
-    "total_items": 2,
-    "empty_items": 0,
-    "prism": {
-      "score": [
-        -1.7939081192016602,
-        -3.0426673889160156
-      ],
-      "identifier": {
-        "version": "0.1",
-        "model": "m39v1",
-        "seg_scores": "avg_log_prob",
-        "sys_scores": "avg_log_prob",
-        "log_base": 2,
-        "temperature": 1.0
-      },
-      "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
-      "lang": "en",
-      "segment_scores": true,
-      "normalized": false
-    }
-  },
   "basic_normalized_and_segmented": {
     "total_items": 2,
     "empty_items": 0,
@@ -100,47 +59,6 @@
       "normalized": false
     }
   },
-  "multiple_ref_normalized": {
-    "total_items": 2,
-    "empty_items": 0,
-    "prism": {
-      "score": 0.1870780558028898,
-      "identifier": {
-        "version": "0.1",
-        "model": "m39v1",
-        "seg_scores": "avg_log_prob",
-        "sys_scores": "avg_log_prob",
-        "log_base": 2,
-        "temperature": 1.0
-      },
-      "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
-      "lang": "en",
-      "segment_scores": false,
-      "normalized": true
-    }
-  },
-  "multiple_ref_segmented": {
-    "total_items": 2,
-    "empty_items": 0,
-    "prism": {
-      "score": [
-        -1.7939081192016602,
-        -3.0426673889160156
-      ],
-      "identifier": {
-        "version": "0.1",
-        "model": "m39v1",
-        "seg_scores": "avg_log_prob",
-        "sys_scores": "avg_log_prob",
-        "log_base": 2,
-        "temperature": 1.0
-      },
-      "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
-      "lang": "en",
-      "segment_scores": true,
-      "normalized": false
-    }
-  },
   "multiple_ref_normalized_and_segmented": {
     "total_items": 2,
     "empty_items": 0,
@@ -179,47 +97,6 @@
       "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
       "lang": "en",
       "segment_scores": false,
-      "normalized": false
-    }
-  },
-  "multiple_pred_multiple_ref_normalized": {
-    "total_items": 2,
-    "empty_items": 0,
-    "prism": {
-      "score": 0.4509554197900488,
-      "identifier": {
-        "version": "0.1",
-        "model": "m39v1",
-        "seg_scores": "avg_log_prob",
-        "sys_scores": "avg_log_prob",
-        "log_base": 2,
-        "temperature": 1.0
-      },
-      "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
-      "lang": "en",
-      "segment_scores": false,
-      "normalized": true
-    }
-  },
-  "multiple_pred_multiple_ref_segmented": {
-    "total_items": 2,
-    "empty_items": 0,
-    "prism": {
-      "score": [
-        -1.7939081192016602,
-        -3.0426673889160156
-      ],
-      "identifier": {
-        "version": "0.1",
-        "model": "m39v1",
-        "seg_scores": "avg_log_prob",
-        "sys_scores": "avg_log_prob",
-        "log_base": 2,
-        "temperature": 1.0
-      },
-      "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
-      "lang": "en",
-      "segment_scores": true,
       "normalized": false
     }
   },
