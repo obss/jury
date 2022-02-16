@@ -12,7 +12,7 @@
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 <a href="https://github.com/obss/jury/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/pypi/l/jury"></a>
 <br>
-<a href="https://zenodo.org/badge/latestdoi/460055212"><img src="https://zenodo.org/badge/460055212.svg" alt="DOI"></a>
+<a href="https://doi.org/10.5281/zenodo.6109838"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.6109838.svg" alt="DOI"></a>
 </p>
 
 A comprehensive toolkit for evaluating NLP experiments offering various automated metrics. Jury offers a smooth and easy-to-use interface. It uses [datasets](https://github.com/huggingface/datasets/) for underlying metric computation, and hence adding custom metric is easy as extending proper class.
@@ -198,11 +198,11 @@ To format codebase,
 
 If you use this package in your work, please cite it as:
 
-    @software{obss2021sahi,
+    @software{obss2021jury,
       author       = {Cavusoglu, Devrim and Akyon, Fatih Cagatay and Sert, Ulas and Cengiz, Cemil},
-      title        = {{Jury: A comprehensive evaluation package for NLP}},
-      month        = feb,
-      year         = 2022,
+      title        = {{Jury: Comprehensive NLP Evaluation toolkit}},
+      month        = {feb},
+      year         = {2022},
       publisher    = {Zenodo},
       doi          = {10.5281/zenodo.6108229},
       url          = {https://doi.org/10.5281/zenodo.6108229}
