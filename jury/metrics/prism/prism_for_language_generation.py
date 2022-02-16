@@ -15,7 +15,6 @@
 """ Prism metric. The part of this file is adapted from metric implementations
 of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/ """
-import math
 import os
 from typing import Callable, Dict, List, Union
 
@@ -117,6 +116,11 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
         self.scorer = None
         super().__init__(resulting_name=resulting_name, compute_kwargs=compute_kwargs, **kwargs)
 
+    @property
+    def model_identifier(self):
+        if self.scorer is not None:
+            return self.scorer.identifier()
+
     def _download_model(self):
         if self.model_path_or_url is None:
             self.model_path_or_url = "http://data.statmt.org/prism/m39v1.tar"
@@ -190,7 +194,8 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
             return score.tolist()
         return float(score)
 
-    def _normalize_score(self, score: Union[float, List[float]], exponent: float):
+    @staticmethod
+    def _normalize_score(score: Union[float, List[float]], exponent: float):
         if isinstance(score, float):
             return exponent ** score
         return [exponent ** s for s in score]
@@ -206,12 +211,11 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
     ):
         score = self._compute_prism_score(predictions, references, segment_scores=segment_scores, **kwargs)
         if normalize:
-            log_base = self.scorer.identifier()["log_base"]
-            score = self._normalize_score(score, log_base)
+            score = self._normalize_score(score, self.model_identifier["log_base"])
 
         return {
             "score": score,
-            "identifier": self.scorer.identifier(),
+            "identifier": self.model_identifier,
             "model_path_or_url": self.model_path_or_url,
             "lang": self.lang,
             "segment_scores": segment_scores,
@@ -239,12 +243,11 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
             scores = sum(scores) / len(scores)
 
         if normalize:
-            log_base = self.scorer.identifier()["log_base"]
-            scores = self._normalize_score(scores, log_base)
+            scores = self._normalize_score(scores, self.model_identifier["log_base"])
 
         return {
             "score": scores,
-            "identifier": self.scorer.identifier(),
+            "identifier": self.model_identifier,
             "model_path_or_url": self.model_path_or_url,
             "lang": self.lang,
             "segment_scores": segment_scores,
@@ -278,12 +281,11 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
             scores = sum(scores) / len(scores)
 
         if normalize:
-            log_base = self.scorer.identifier()["log_base"]
-            scores = self._normalize_score(scores, log_base)
+            scores = self._normalize_score(scores, self.model_identifier["log_base"])
 
         return {
             "score": scores,
-            "identifier": self.scorer.identifier(),
+            "identifier": self.model_identifier,
             "model_path_or_url": self.model_path_or_url,
             "lang": self.lang,
             "segment_scores": segment_scores,
