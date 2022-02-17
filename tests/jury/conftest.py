@@ -38,7 +38,7 @@ _LIST_STR_TEST_METRICS = [
 
 _LIST_DICT_TEST_METRICS = [
     {"path": "accuracy"},
-    {"path": "bertscore", "compute_kwargs": {"model_type": "albert-base-v1"}},
+    {"path": "bertscore", "compute_kwargs": {"model_type": "albert-base-v1", "device": "cpu"}},
     {"path": "bleu", "resulting_name": "bleu-1", "compute_kwargs": {"max_order": 1}},
     {"path": "bleu", "resulting_name": "bleu-2", "compute_kwargs": {"max_order": 2}},
     {"path": "f1", "resulting_name": "F1"},
