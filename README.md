@@ -6,15 +6,16 @@
 <a href="https://pypi.org/project/jury"><img src="https://img.shields.io/pypi/v/jury?color=blue" alt="PyPI version"></a>
 <a href="https://github.com/obss/jury/releases/latest"><img alt="Latest Release" src="https://img.shields.io/github/release-date/obss/jury"></a>
 <a href="https://colab.research.google.com/github/obss/jury/blob/main/examples/jury_evaluate.ipynb"><img alt="Open in Colab" src="https://colab.research.google.com/assets/colab-badge.svg"></a>
-
 <br>
 <a href="https://github.com/obss/jury/actions"><img alt="Build status" src="https://github.com/obss/jury/actions/workflows/ci.yml/badge.svg"></a>
 <a href="https://libraries.io/pypi/jury"><img alt="Dependencies" src="https://img.shields.io/librariesio/github/obss/jury"></a>
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 <a href="https://github.com/obss/jury/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/pypi/l/jury"></a>
+<br>
+<a href="https://doi.org/10.5281/zenodo.6109838"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.6109838.svg" alt="DOI"></a>
 </p>
 
-Simple toolkit for evaluating NLP experiments offering various automated metrics. Jury offers a smooth and easy-to-use interface. It uses [datasets](https://github.com/huggingface/datasets/) for underlying metric computation, and hence adding custom metric is easy as extending proper class.
+A comprehensive toolkit for evaluating NLP experiments offering various automated metrics. Jury offers a smooth and easy-to-use interface. It uses [datasets](https://github.com/huggingface/datasets/) for underlying metric computation, and hence adding custom metric is easy as extending proper class.
 
 Main advantages that Jury offers are:
 
@@ -192,6 +193,20 @@ To format codebase,
 
     python tests/run_code_style.py format
 
+
+## <div align="center"> Citation </div>
+
+If you use this package in your work, please cite it as:
+
+    @software{obss2021jury,
+      author       = {Cavusoglu, Devrim and Akyon, Fatih Cagatay and Sert, Ulas and Cengiz, Cemil},
+      title        = {{Jury: Comprehensive NLP Evaluation toolkit}},
+      month        = {feb},
+      year         = {2022},
+      publisher    = {Zenodo},
+      doi          = {10.5281/zenodo.6108229},
+      url          = {https://doi.org/10.5281/zenodo.6108229}
+    }
 
 ## <div align="center"> License </div>
 
