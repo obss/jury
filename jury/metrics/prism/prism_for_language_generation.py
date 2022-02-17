@@ -126,7 +126,7 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
             self.model_path_or_url = "http://data.statmt.org/prism/m39v1.tar"
 
         if not os.path.isdir(self.model_path_or_url) and not validators.url(self.model_path_or_url):
-            raise ValueError("Provided 'model_path_or_url' neither points to an existing directory " "nor a valid URL.")
+            raise ValueError("Provided 'model_path_or_url' neither points to an existing directory nor a valid URL.")
         elif os.path.isdir(self.model_path_or_url):
             self.model_dir = self.model_path_or_url
         else:
@@ -166,13 +166,13 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
         return datasets.MetricInfo(
             description=_DESCRIPTION,
             citation=_CITATION,
-            homepage="https://github.com/Tiiiger/bert_score",
+            homepage="https://github.com/thompsonb/prism",
             inputs_description=_KWARGS_DESCRIPTION,
             features=self._default_features,
-            codebase_urls=["https://github.com/Tiiiger/bert_score"],
+            codebase_urls=["https://github.com/thompsonb/prism"],
             reference_urls=[
-                "https://github.com/Tiiiger/bert_score",
-                "https://arxiv.org/abs/1904.09675",
+                "https://github.com/thompsonb/prism",
+                "https://www.aclweb.org/anthology/2020.emnlp-main.8/",
             ],
         )
 
