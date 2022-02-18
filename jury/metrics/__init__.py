@@ -13,6 +13,7 @@ from jury.metrics._core import (
     load_metric,
 )
 from jury.metrics.accuracy import Accuracy
+from jury.metrics.bartscore import Bartscore
 from jury.metrics.bertscore import Bertscore
 from jury.metrics.bleu import Bleu
 from jury.metrics.bleurt import Bleurt
