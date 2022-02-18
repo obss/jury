@@ -280,9 +280,3 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
             "segment_scores": segment_scores,
             "normalized": normalize,
         }
-
-
-if __name__ == "__main__":
-    prism = PrismForLanguageGeneration()
-    res = prism._compute_single_pred_single_ref(predictions=["abc"], references=["def"])
-    print(res)
