@@ -45,8 +45,3 @@ def pickle_save(obj: Dict, fp: str, overwrite: bool = True) -> None:
 
     with open(fp, "wb") as pkl:
         pickle.dump(obj, pkl)
-
-
-def untar_file(fp: str, extract_path: str) -> None:
-    with tarfile.open(fp) as tar_buffer:
-        tar_buffer.extractall(extract_path)

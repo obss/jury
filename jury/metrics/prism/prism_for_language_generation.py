@@ -23,8 +23,6 @@ import validators
 
 from jury.metrics import LanguageGenerationInstance
 from jury.metrics._core import MetricForLanguageGeneration
-from jury.metrics._core.utils import download
-from jury.utils.io import untar_file
 
 _CITATION = """
 @inproceedings{thompson-post-2020-automatic,
@@ -121,7 +119,7 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
         if self.scorer is not None:
             return self.scorer.identifier()
 
-    def _download_model(self):
+    def _download_model(self, dl_manager):
         if self.model_path_or_url is None:
             self.model_path_or_url = "http://data.statmt.org/prism/m39v1.tar"
 
@@ -131,18 +129,11 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
             self.model_dir = self.model_path_or_url
         else:
             if not self.model_path_or_url.endswith(".tar"):
-                raise ValueError("Provided model URL must be a tarfile.")
+                raise ValueError("Provided model URL must be a tar file.")
             model_source = self.model_path_or_url
-            file_name = os.path.basename(self.model_path_or_url)
-            model_dir = os.path.join(self.data_dir, file_name.replace(".tar", ""))
-            if not os.path.isdir(model_dir):
-                model_dest = os.path.join(self.data_dir, f"prism_model_{file_name}")
-                print(f"Downloading the model at {self.model_path_or_url} ...")
-                download(source=model_source, destination=model_dest)
-                print("Model downloaded.")
-                untar_file(model_dest, self.data_dir)
-                os.remove(model_dest)
-            self.model_dir = model_dir
+            folder_name = os.path.basename(model_source).replace(".tar", "")
+            extraction_dir = dl_manager.download_and_extract(model_source)
+            self.model_dir = os.path.join(extraction_dir, folder_name)
 
     def _download_and_prepare(self, dl_manager) -> None:
         """
@@ -151,14 +142,12 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
         commit on the master branch, in order to keep things stable. See
         https://github.com/thompsonb/prism/blob/42e45a46d1c7924e98bceeed2ea81b31efcb6f9d/prism.py
         """
-        self._download_model()
+        self._download_model(dl_manager)
         prism_source = (
             "https://raw.githubusercontent.com/thompsonb/prism/42e45a46d1c7924e98bceeed2ea81b31efcb6f9d/prism.py"
         )
-        prism_dest = os.path.join(self.data_dir, "prism.py")
-        download(
-            source=prism_source,
-            destination=prism_dest,
+        prism_dest = dl_manager.download(
+            prism_source,
         )
         self.external_module_path = prism_dest
 
@@ -291,3 +280,9 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
             "segment_scores": segment_scores,
             "normalized": normalize,
         }
+
+
+if __name__ == "__main__":
+    prism = PrismForLanguageGeneration()
+    res = prism._compute_single_pred_single_ref(predictions=["abc"], references=["def"])
+    print(res)
