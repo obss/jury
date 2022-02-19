@@ -24,7 +24,6 @@ import pandas as pd
 
 from jury.collator import Collator
 from jury.metrics._core import MetricForLanguageGeneration
-from jury.metrics._core.utils import download
 from jury.utils.common import NestedSingleType
 
 _CITATION = """\
@@ -88,12 +87,9 @@ class SquadForLanguageGeneration(MetricForLanguageGeneration):
         https://github.com/huggingface/datasets/blob/master/metrics/squad/evaluate.py
         """
         squad_source = "https://raw.githubusercontent.com/huggingface/datasets/master/metrics/squad/evaluate.py"
-        squad_dest = os.path.join(self.data_dir, "squad_evaluate.py")
-        download(
-            source=squad_source,
-            destination=squad_dest,
+        self.external_module_path = dl_manager.download(
+            squad_source
         )
-        self.external_module_path = squad_dest
 
     def _info(self):
         return datasets.MetricInfo(

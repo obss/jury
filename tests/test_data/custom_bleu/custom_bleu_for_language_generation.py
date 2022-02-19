@@ -26,7 +26,7 @@ import datasets
 
 from jury.collator import Collator
 from jury.metrics._core import MetricForLanguageGeneration
-from jury.metrics._core.utils import download, get_token_lengths
+from jury.metrics._core.utils import get_token_lengths
 from jury.tokenizer import DefaultTokenizer, TokenizerWrapper
 
 _CITATION = """\
