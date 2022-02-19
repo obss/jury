@@ -146,7 +146,7 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
         prism_source = (
             "https://raw.githubusercontent.com/thompsonb/prism/42e45a46d1c7924e98bceeed2ea81b31efcb6f9d/prism.py"
         )
-        self.external_module_path  = dl_manager.download(
+        self.external_module_path = dl_manager.download(
             prism_source,
         )
 

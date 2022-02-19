@@ -136,9 +136,7 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
         https://github.com/tensorflow/nmt/blob/0be864257a76c151eef20ea689755f08bc1faf4e/nmt/scripts/bleu.py
         """
         nmt_source = "https://raw.githubusercontent.com/tensorflow/nmt/0be864257a76c151eef20ea689755f08bc1faf4e/nmt/scripts/bleu.py"
-        self.external_module_path = dl_manager.download(
-            nmt_source
-        )
+        self.external_module_path = dl_manager.download(nmt_source)
 
     def _preprocess(self, predictions: Collator, references: Collator) -> Tuple[Collator, Collator]:
         tokenizer_wrapper = TokenizerWrapper(self.tokenizer)

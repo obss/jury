@@ -87,9 +87,7 @@ class SquadForLanguageGeneration(MetricForLanguageGeneration):
         https://github.com/huggingface/datasets/blob/master/metrics/squad/evaluate.py
         """
         squad_source = "https://raw.githubusercontent.com/huggingface/datasets/master/metrics/squad/evaluate.py"
-        self.external_module_path = dl_manager.download(
-            squad_source
-        )
+        self.external_module_path = dl_manager.download(squad_source)
 
     def _info(self):
         return datasets.MetricInfo(
