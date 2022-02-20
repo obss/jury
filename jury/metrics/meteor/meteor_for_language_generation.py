@@ -117,8 +117,8 @@ class MeteorForLanguageGeneration(MetricForLanguageGeneration):
         import nltk
 
         nltk.download("wordnet", quiet=True)
-        nltk.download("punkt")
-        nltk.download("omw-1.4")
+        nltk.download("punkt", quiet=True)
+        nltk.download("omw-1.4", quiet=True)
 
     def _preprocess(self, predictions: Collator, references: Collator) -> Tuple[Collator, Collator]:
         tokenizer_wrapper = TokenizerWrapper(self.tokenizer)
