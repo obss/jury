@@ -26,7 +26,9 @@ from nltk.translate import meteor_score
 from packaging.version import Version
 
 if Version(NLTK_VERSION) < Version("3.6.6"):
-    raise EnvironmentError(f"Version constraints does not hold for 'nltk', expected version >=3.6.6, got {NLTK_VERSION}.")
+    raise EnvironmentError(
+        f"Version constraints does not hold for 'nltk', expected version >=3.6.6, got {NLTK_VERSION}."
+    )
 
 from jury.collator import Collator
 from jury.metrics._core import MetricForLanguageGeneration
