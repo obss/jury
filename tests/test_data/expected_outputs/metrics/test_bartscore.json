@@ -9,6 +9,16 @@
           "segment_scores": false
         }
       },
+    "basic_segment": {
+        "total_items": 2,
+        "empty_items": 0,
+        "bartscore": {
+          "score": [-1.740734338760376, -3.0517942905426025],
+          "model_checkpoint": "bartscore-large-cnn",
+          "model_weights": null,
+          "segment_scores": true
+        }
+      },
     "multiple_ref": {
         "total_items": 2,
         "empty_items": 0,
