@@ -42,7 +42,7 @@ information.
 """
 
 _KWARGS_DESCRIPTION = """
-Prism metric arguments.
+BARTScore metric arguments.
 
 Construction Args:
     model_checkpoint (str): BARTScore checkpoint. Will default to bartscore-large-cnn.
