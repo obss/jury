@@ -20,10 +20,13 @@ import warnings
 from typing import Callable, List, Tuple, Union
 
 import datasets
-import jiwer
-import jiwer.transforms as tr
 
 from jury.metrics import LanguageGenerationInstance, MetricForLanguageGeneration
+from jury.metrics._core.utils import PackagePlaceholder, requirement_message
+
+# `import jiwer` placeholder
+jiwer = PackagePlaceholder(version="2.3.0")
+
 
 _CITATION = """\
 @inproceedings{inproceedings,
@@ -82,6 +85,18 @@ class CERForLanguageGeneration(MetricForLanguageGeneration):
                 "https://sites.google.com/site/textdigitisation/qualitymeasures/computingerrorrates",
             ],
         )
+
+    def _download_and_prepare(self, dl_manager):
+        global jiwer
+        global tr
+
+        try:
+            import jiwer
+            import jiwer.transforms as tr
+        except ModuleNotFoundError:
+            raise ModuleNotFoundError(requirement_message(path="CER", package_name="jiwer"))
+        else:
+            super(CERForLanguageGeneration, self)._download_and_prepare(dl_manager)
 
     @staticmethod
     def _get_cer_transform():
@@ -232,12 +247,3 @@ class CERForLanguageGeneration(MetricForLanguageGeneration):
                 "hits": total_hits / total_refs,
             },
         }
-
-
-if __name__ == "__main__":
-    predictions = ["this is the prediction", "there is an other sample", "a b c d"]
-    references = [["this is the reference"], ["there is another one"], ["a d e f g y", "a b c d"]]
-
-    cer = CERForLanguageGeneration()
-    res = cer._compute_single_pred_multi_ref(predictions=predictions, references=references, concatenate_texts=False)
-    print(res)
