@@ -15,9 +15,7 @@
 """ Bartscore metric. The part of this file is adapted from metric implementations
 of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/ """
-import os
-import warnings
-from typing import Callable, Dict, List, Union
+from typing import Callable, Dict, List
 
 import datasets
 import numpy as np
@@ -170,30 +168,11 @@ class BartscoreForLanguageGeneration(MetricForLanguageGeneration):
             ],
         )
 
-    def _compute_prism_score(
-        self,
-        predictions: LanguageGenerationInstance,
-        references: LanguageGenerationInstance,
-        segment_scores: bool,
-        **kwargs,
-    ) -> Union[float, List[float]]:
-        self._load_scorer()
-        score = self.scorer.score(ref=references, cand=predictions, segment_scores=segment_scores, **kwargs)
-        if segment_scores:
-            return score.tolist()
-        return float(score)
-
-    @staticmethod
-    def _normalize_score(score: Union[float, List[float]], exponent: float):
-        if isinstance(score, float):
-            return exponent ** score
-        return [exponent ** s for s in score]
-
     def _compute_single_pred_single_ref(
         self,
         predictions: LanguageGenerationInstance,
         references: LanguageGenerationInstance,
-        reduce_fn=None,
+        reduce_fn: Callable = None,
         batch_size: int = 4,
         segment_scores: bool = False,
         **kwargs,
@@ -213,7 +192,7 @@ class BartscoreForLanguageGeneration(MetricForLanguageGeneration):
         self,
         predictions: LanguageGenerationInstance,
         references: LanguageGenerationInstance,
-        reduce_fn=None,
+        reduce_fn: Callable = None,
         batch_size: int = 4,
         segment_scores: bool = False,
         **kwargs,
@@ -257,7 +236,7 @@ class BartscoreForLanguageGeneration(MetricForLanguageGeneration):
         self,
         predictions: LanguageGenerationInstance,
         references: LanguageGenerationInstance,
-        reduce_fn=None,
+        reduce_fn: Callable = None,
         batch_size: int = 4,
         segment_scores: bool = False,
         **kwargs,
