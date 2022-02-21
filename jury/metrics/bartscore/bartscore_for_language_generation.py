@@ -35,7 +35,9 @@ _CITATION = """
 """
 
 _DESCRIPTION = """
-[TODO: DESCRIPTION, COULDNT FIND AN EASY ONE]
+BARTScore formulates evaluating generated text as a text generation task from pre-trained language models. It
+operationalizes this idea using BART, an encoder-decoder based pre-trained model. BARTScore is conceptually
+simple and empirically effective.
 
 See the `README.md` file at [https://github.com/neulab/BARTScore](https://github.com/neulab/BARTScore) for more
 information.
