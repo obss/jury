@@ -24,7 +24,6 @@ import numpy as np
 
 from jury.metrics import LanguageGenerationInstance
 from jury.metrics._core import MetricForLanguageGeneration
-from jury.metrics._core.utils import download
 
 _CITATION = """
 @misc{yuan2021bartscore,
@@ -185,22 +184,6 @@ class BartscoreForLanguageGeneration(MetricForLanguageGeneration):
             "segment_scores": segment_scores,
         }
 
-    # This is the multi_ref_score from BARTScore, but modified to accept any reduce function
-    def _generic_multi_ref_score(self, srcs, tgts: List[List[str]], reduce_fn: Callable, batch_size=4):
-        # Assert we have the same number of references
-        ref_nums = [len(x) for x in tgts]
-        if len(set(ref_nums)) > 1:
-            raise Exception("You have different number of references per test sample.")
-
-        ref_num = len(tgts[0])
-        score_matrix = []
-        for i in range(ref_num):
-            curr_tgts = [x[i] for x in tgts]
-            scores = self.scorer.score(srcs, curr_tgts, batch_size)
-            score_matrix.append(scores)
-        score_list = reduce_fn(score_matrix, axis=0)
-        return list(score_list)
-
     def _compute_single_pred_multi_ref(
         self,
         predictions: LanguageGenerationInstance,
@@ -210,17 +193,30 @@ class BartscoreForLanguageGeneration(MetricForLanguageGeneration):
         segment_scores: bool = False,
         **kwargs,
     ):
-        if reduce_fn in [np.max, np.mean]:
-            agg = "max" if reduce_fn == np.max else "mean"
-            score = self.scorer.multi_ref_score(predictions, references, batch_size=batch_size, agg=agg, **kwargs)
-        else:
-            warnings.warn(
-                f"Using '{reduce_fn.__name__}' as a non-native reduction function with BARTScore. "
-                f"Only 'max' and 'mean' functions are natively supported."
-            )
-            score = self._generic_multi_ref_score(
-                predictions, references, batch_size=batch_size, reduce_fn=reduce_fn, **kwargs
-            )
+        """
+        Ideally we would use the already-implemented multi-ref function in BARTScore,
+        but unfortunately it only supports two reduction functions and doesn't support
+        inconsistent number of reference per predictions. So instead we pre-combine our
+        prediction/reference pairs and use their single prediction/reference function
+        in order to utilize the batch_size argument.
+        """
+        flat_predictions: List[str] = []
+        flat_references: List[str] = []
+        ranges = []
+        cursor = 0
+        for pred, refs in zip(predictions, references):
+            ref_count = len(refs)
+            flat_predictions += [pred] * ref_count
+            flat_references += refs
+            new_cursor = cursor + ref_count
+            ranges.append((cursor, new_cursor))
+            cursor = new_cursor
+
+        flat_scores = self.scorer.score(flat_predictions, flat_references, batch_size=batch_size, **kwargs)
+        score = []
+        for start, end in ranges:
+            reduced_score = float(reduce_fn(flat_scores[start:end]))
+            score.append(reduced_score)
 
         if not segment_scores:
             score = np.mean(score)
@@ -241,24 +237,47 @@ class BartscoreForLanguageGeneration(MetricForLanguageGeneration):
         segment_scores: bool = False,
         **kwargs,
     ):
-        scores = []
+        """
+        Like Single Pred/Multi Ref, we pre-combine all possible prediction/reference
+        pairs into a list of single prediction/single reference pairs in order to utilize
+        the batch_size argument.
+        """
+        flat_predictions: List[str] = []
+        flat_references: List[str] = []
+        ranges = []
+        shapes = []
+        cursor = 0
         for preds, refs in zip(predictions, references):
-            pred_scores = []
+            pred_count = len(preds)
+            ref_count = len(refs)
             for pred in preds:
-                pred = [pred] * len(refs)
-                prism_score = self._compute_prism_score(
-                    predictions=pred, references=refs, segment_scores=True, **kwargs
-                )
-                reduced_pred_score = float(reduce_fn(prism_score))
-                pred_scores.append(reduced_pred_score)
-            reduced_score = float(reduce_fn(pred_scores))
-            scores.append(reduced_score)
+                flat_predictions += [pred] * ref_count
+                flat_references += refs
+            new_cursor = cursor + (pred_count * ref_count)
+            ranges.append((cursor, new_cursor))
+            shapes.append((pred_count, ref_count))
+            cursor = new_cursor
+
+        flat_scores = self.scorer.score(flat_predictions, flat_references, batch_size=batch_size, **kwargs)
+        score = []
+        for pair_range, pair_shape in zip(ranges, shapes):
+            pair_start, pair_end = pair_range
+            pred_count, ref_count = pair_shape
+            pair_scores = []
+            for i in range(pred_count):
+                pred_start = pair_start + i * ref_count
+                pred_end = pred_start + ref_count
+                pred_score = flat_scores[pred_start:pred_end]
+                reduced_pred_score = float(reduce_fn(pred_score))
+                pair_scores.append(reduced_pred_score)
+            reduced_score = float(reduce_fn(pair_scores))
+            score.append(reduced_score)
 
         if not segment_scores:
-            scores = sum(scores) / len(scores)
+            score = np.mean(score)
 
         return {
-            "score": scores,
+            "score": score,
             "model_checkpoint": self.model_checkpoint,
             "model_path_or_url": self.model_path_or_url,
             "segment_scores": segment_scores,
