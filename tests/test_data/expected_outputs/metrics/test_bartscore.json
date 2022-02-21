@@ -1,0 +1,32 @@
+{
+    "basic": {
+        "total_items": 2,
+        "empty_items": 0,
+        "bartscore": {
+          "score": -2.3962643146514893,
+          "model_checkpoint": "facebook/bart-large-cnn",
+          "model_path_or_url": null,
+          "segment_scores": false
+        }
+      },
+    "multiple_ref": {
+        "total_items": 2,
+        "empty_items": 0,
+        "bartscore": {
+          "score": -2.4193317890167236,
+          "model_checkpoint": "facebook/bart-large-cnn",
+          "model_path_or_url": null,
+          "segment_scores": false
+        }
+      },
+    "multiple_pred_multiple_ref": {
+        "total_items": 2,
+        "empty_items": 0,
+        "bartscore": {
+          "score": -1.8933048248291016,
+          "model_checkpoint": "facebook/bart-large-cnn",
+          "model_path_or_url": null,
+          "segment_scores": false
+        }
+      }
+}
