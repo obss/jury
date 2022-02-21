@@ -1,0 +1,125 @@
+{
+  "basic": {
+    "total_items": 2,
+    "empty_items": 0,
+    "prism": {
+      "score": -2.418287754058838,
+      "identifier": {
+        "version": "0.1",
+        "model": "m39v1",
+        "seg_scores": "avg_log_prob",
+        "sys_scores": "avg_log_prob",
+        "log_base": 2,
+        "temperature": 1.0
+      },
+      "model_path_or_url": "default",
+      "lang": "en",
+      "segment_scores": false,
+      "normalized": false
+    }
+  },
+  "basic_normalized_and_segmented": {
+    "total_items": 2,
+    "empty_items": 0,
+    "prism": {
+      "score": [
+        0.28838976733513916,
+        0.12135728422817992
+      ],
+      "identifier": {
+        "version": "0.1",
+        "model": "m39v1",
+        "seg_scores": "avg_log_prob",
+        "sys_scores": "avg_log_prob",
+        "log_base": 2,
+        "temperature": 1.0
+      },
+      "model_path_or_url": "default",
+      "lang": "en",
+      "segment_scores": true,
+      "normalized": true
+    }
+  },
+  "multiple_ref": {
+    "total_items": 2,
+    "empty_items": 0,
+    "prism": {
+      "score": -2.4729533195495605,
+      "identifier": {
+        "version": "0.1",
+        "model": "m39v1",
+        "seg_scores": "avg_log_prob",
+        "sys_scores": "avg_log_prob",
+        "log_base": 2,
+        "temperature": 1.0
+      },
+      "model_path_or_url": "default",
+      "lang": "en",
+      "segment_scores": false,
+      "normalized": false
+    }
+  },
+  "multiple_ref_normalized_and_segmented": {
+    "total_items": 2,
+    "empty_items": 0,
+    "prism": {
+      "score": [
+        0.28838976733513916,
+        0.12135728422817992
+      ],
+      "identifier": {
+        "version": "0.1",
+        "model": "m39v1",
+        "seg_scores": "avg_log_prob",
+        "sys_scores": "avg_log_prob",
+        "log_base": 2,
+        "temperature": 1.0
+      },
+      "model_path_or_url": "default",
+      "lang": "en",
+      "segment_scores": true,
+      "normalized": true
+    }
+  },
+  "multiple_pred_multiple_ref": {
+    "total_items": 2,
+    "empty_items": 0,
+    "prism": {
+      "score": -1.1489432752132416,
+      "identifier": {
+        "version": "0.1",
+        "model": "m39v1",
+        "seg_scores": "avg_log_prob",
+        "sys_scores": "avg_log_prob",
+        "log_base": 2,
+        "temperature": 1.0
+      },
+      "model_path_or_url": "default",
+      "lang": "en",
+      "segment_scores": false,
+      "normalized": false
+    }
+  },
+  "multiple_pred_multiple_ref_normalized_and_segmented": {
+    "total_items": 2,
+    "empty_items": 0,
+    "prism": {
+      "score": [
+        0.28838976733513916,
+        0.12135728422817992
+      ],
+      "identifier": {
+        "version": "0.1",
+        "model": "m39v1",
+        "seg_scores": "avg_log_prob",
+        "sys_scores": "avg_log_prob",
+        "log_base": 2,
+        "temperature": 1.0
+      },
+      "model_path_or_url": "default",
+      "lang": "en",
+      "segment_scores": true,
+      "normalized": true
+    }
+  }
+}

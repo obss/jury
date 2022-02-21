@@ -21,7 +21,14 @@ from typing import Callable, Dict, Tuple
 
 import datasets
 import numpy as np
+from nltk import __version__ as NLTK_VERSION
 from nltk.translate import meteor_score
+from packaging.version import Version
+
+if Version(NLTK_VERSION) < Version("3.6.6"):
+    raise EnvironmentError(
+        f"Version constraints does not hold for 'nltk', expected version >=3.6.6, got {NLTK_VERSION}."
+    )
 
 from jury.collator import Collator
 from jury.metrics._core import MetricForLanguageGeneration
@@ -110,6 +117,8 @@ class MeteorForLanguageGeneration(MetricForLanguageGeneration):
         import nltk
 
         nltk.download("wordnet", quiet=True)
+        nltk.download("punkt", quiet=True)
+        nltk.download("omw-1.4", quiet=True)
 
     def _preprocess(self, predictions: Collator, references: Collator) -> Tuple[Collator, Collator]:
         tokenizer_wrapper = TokenizerWrapper(self.tokenizer)
