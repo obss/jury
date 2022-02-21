@@ -95,6 +95,13 @@ Examples:
     }
 """
 
+CHECKPOINT_URLS = {
+    "default": {
+        "url": "https://huggingface.co/Devrim/prism-default/resolve/main/m39v1.tar",
+        "model_dir": "m39v1",
+    }
+}
+
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class PrismForLanguageGeneration(MetricForLanguageGeneration):
@@ -102,7 +109,7 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
         self,
         resulting_name: str = None,
         compute_kwargs: Dict = None,
-        model_path_or_url: str = None,
+        model_path_or_url: str = "default",
         lang: str = "en",
         temperature: float = 1.0,
         **kwargs,
@@ -120,20 +127,23 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
             return self.scorer.identifier()
 
     def _download_model(self, dl_manager):
-        if self.model_path_or_url is None:
-            self.model_path_or_url = "http://data.statmt.org/prism/m39v1.tar"
-
-        if not os.path.isdir(self.model_path_or_url) and not validators.url(self.model_path_or_url):
+        if (
+            self.model_path_or_url not in CHECKPOINT_URLS
+            and not os.path.isdir(self.model_path_or_url)
+            and not validators.url(self.model_path_or_url)
+        ):
             raise ValueError("Provided 'model_path_or_url' neither points to an existing directory nor a valid URL.")
         elif os.path.isdir(self.model_path_or_url):
             self.model_dir = self.model_path_or_url
         else:
-            if not self.model_path_or_url.endswith(".tar"):
-                raise ValueError("Provided model URL must be a tar file.")
-            model_source = self.model_path_or_url
-            folder_name = os.path.basename(model_source).replace(".tar", "")
+            if self.model_path_or_url in CHECKPOINT_URLS:
+                model_source = CHECKPOINT_URLS[self.model_path_or_url]["url"]
+                model_dir = CHECKPOINT_URLS[self.model_path_or_url]["model_dir"]
+            else:
+                model_source = self.model_path_or_url
+                model_dir = os.path.basename(self.model_path_or_url).replace(".tar", "")
             extraction_dir = dl_manager.download_and_extract(model_source)
-            self.model_dir = os.path.join(extraction_dir, folder_name)
+            self.model_dir = os.path.join(extraction_dir, model_dir)
 
     def _download_and_prepare(self, dl_manager) -> None:
         """
