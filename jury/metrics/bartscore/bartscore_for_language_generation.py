@@ -160,8 +160,7 @@ class BartscoreForLanguageGeneration(MetricForLanguageGeneration):
         bartscore_source = (
             "https://raw.githubusercontent.com/neulab/BARTScore/47b8341854e1b8be965b65480ce236b0c2f7543b/bart_score.py"
         )
-        bartscore_dest = dl_manager.download(bartscore_source)
-        self.external_module_path = bartscore_dest
+        self.external_module_path = dl_manager.download(bartscore_source)
         BARTScorer = self._get_external_resource("bart_score", attr="BARTScorer")
 
         self.scorer = BARTScorer(device=self.device, max_length=self.max_length, checkpoint=model_checkpoint)
