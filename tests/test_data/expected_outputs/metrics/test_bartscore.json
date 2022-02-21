@@ -5,7 +5,7 @@
         "bartscore": {
           "score": -2.3962643146514893,
           "model_checkpoint": "facebook/bart-large-cnn",
-          "model_path_or_url": null,
+          "model_weights": null,
           "segment_scores": false
         }
       },
@@ -15,7 +15,7 @@
         "bartscore": {
           "score": -2.4193317890167236,
           "model_checkpoint": "facebook/bart-large-cnn",
-          "model_path_or_url": null,
+          "model_weights": null,
           "segment_scores": false
         }
       },
@@ -25,7 +25,7 @@
         "bartscore": {
           "score": -1.8933048248291016,
           "model_checkpoint": "facebook/bart-large-cnn",
-          "model_path_or_url": null,
+          "model_weights": null,
           "segment_scores": false
         }
       }
