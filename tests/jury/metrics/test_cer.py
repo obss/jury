@@ -26,6 +26,12 @@ def output_basic():
 
 @pytest.fixture
 @get_expected_output(prefix="metrics")
+def output_basic_concat():
+    return output_basic_concat.output
+
+
+@pytest.fixture
+@get_expected_output(prefix="metrics")
 def output_multiple_ref():
     return output_multiple_ref.output
 
@@ -41,9 +47,9 @@ def test_basic(predictions, references, jury, output_basic):
     assert_almost_equal_dict(actual=scores, desired=output_basic)
 
 
-def test_basic_concat(predictions, references, jury_concat, output_basic):
+def test_basic_concat(predictions, references, jury_concat, output_basic_concat):
     scores = jury_concat(predictions=predictions, references=references)
-    assert_almost_equal_dict(actual=scores, desired=output_basic)
+    assert_almost_equal_dict(actual=scores, desired=output_basic_concat)
 
 
 def test_multiple_ref(predictions, multiple_references, jury, output_multiple_ref):
