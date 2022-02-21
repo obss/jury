@@ -4,7 +4,7 @@
         "empty_items": 0,
         "bartscore": {
           "score": -2.3962643146514893,
-          "model_checkpoint": "facebook/bart-large-cnn",
+          "model_checkpoint": "bartscore-large-cnn",
           "model_weights": null,
           "segment_scores": false
         }
@@ -14,7 +14,7 @@
         "empty_items": 0,
         "bartscore": {
           "score": -2.4193317890167236,
-          "model_checkpoint": "facebook/bart-large-cnn",
+          "model_checkpoint": "bartscore-large-cnn",
           "model_weights": null,
           "segment_scores": false
         }
@@ -24,7 +24,7 @@
         "empty_items": 0,
         "bartscore": {
           "score": -1.8933048248291016,
-          "model_checkpoint": "facebook/bart-large-cnn",
+          "model_checkpoint": "bartscore-large-cnn",
           "model_weights": null,
           "segment_scores": false
         }
