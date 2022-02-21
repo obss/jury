@@ -175,7 +175,7 @@ class BartscoreForLanguageGeneration(MetricForLanguageGeneration):
     ):
         score = self.scorer.score(predictions, references, batch_size=batch_size, **kwargs)
         if not segment_scores:
-            score = np.mean(score)
+            score = float(np.mean(score))
 
         return {
             "score": score,
@@ -219,7 +219,7 @@ class BartscoreForLanguageGeneration(MetricForLanguageGeneration):
             score.append(reduced_score)
 
         if not segment_scores:
-            score = np.mean(score)
+            score = float(np.mean(score))
 
         return {
             "score": score,
@@ -274,7 +274,7 @@ class BartscoreForLanguageGeneration(MetricForLanguageGeneration):
             score.append(reduced_score)
 
         if not segment_scores:
-            score = np.mean(score)
+            score = float(np.mean(score))
 
         return {
             "score": score,
