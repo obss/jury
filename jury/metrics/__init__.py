@@ -16,6 +16,7 @@ from jury.metrics.accuracy import Accuracy
 from jury.metrics.bertscore import Bertscore
 from jury.metrics.bleu import Bleu
 from jury.metrics.bleurt import Bleurt
+from jury.metrics.cer import CER
 from jury.metrics.f1 import F1
 from jury.metrics.meteor import Meteor
 from jury.metrics.precision import Precision

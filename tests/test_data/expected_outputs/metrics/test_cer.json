@@ -1,0 +1,54 @@
+{
+  "basic": {
+    "total_items": 2,
+    "empty_items": 0,
+    "cer": {
+      "score": 0.3333333333333333,
+      "overall": {
+        "substitutions": 10,
+        "deletions": 7,
+        "insertions": 1,
+        "hits": 37
+      }
+    }
+  },
+  "basic_concat": {
+    "total_items": 2,
+    "empty_items": 0,
+    "cer": {
+      "score": 0.3333333333333333,
+      "overall": {
+        "substitutions": 10,
+        "deletions": 7,
+        "insertions": 1,
+        "hits": 37
+      }
+    }
+  },
+  "multiple_ref": {
+    "total_items": 2,
+    "empty_items": 0,
+    "cer": {
+      "score": 0.7272727272727273,
+      "overall": {
+        "substitutions": 6.25,
+        "deletions": 5.5,
+        "insertions": 1.5,
+        "hits": 16.25
+      }
+    }
+  },
+  "multiple_pred_multiple_ref": {
+    "total_items": 2,
+    "empty_items": 0,
+    "cer": {
+      "score": 0.8484848484848485,
+      "overall": {
+        "substitutions": 6.625,
+        "deletions": 3.875,
+        "insertions": 3.625,
+        "hits": 17.5
+      }
+    }
+  }
+}

@@ -39,7 +39,6 @@ _DEV_REQUIREMENTS = [
     "deepdiff==5.5.0",
     "flake8==3.9.2",
     "isort==5.9.2",
-    "jiwer>=2.2.0",
     "pytest>=6.2.4",
     "pytest-cov>=2.12.1",
     "pytest-timeout>=1.4.2",
@@ -50,9 +49,10 @@ _PRISM_REQUIREMENTS = ["fairseq==0.9.0", "validators"]
 _METRIC_REQUIREMENTS = [
     "sacrebleu>=2.0.0",
     "bert_score==0.3.11",
+    "bleurt @ git+https://github.com/google-research/bleurt.git",
+    "jiwer>=2.3.0",
     "seqeval==1.2.2",
     "sentencepiece==0.1.96",
-    "bleurt @ git+https://github.com/google-research/bleurt.git",
 ]
 _METRIC_REQUIREMENTS.extend(_PRISM_REQUIREMENTS)
 add_pywin(_METRIC_REQUIREMENTS)
