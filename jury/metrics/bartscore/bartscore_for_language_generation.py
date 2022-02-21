@@ -47,8 +47,8 @@ _KWARGS_DESCRIPTION = """
 Prism metric arguments.
 
 Construction Args:
-    model_checkpoint (str): [TODO]
-    model_path_or_url (str): Path to the model directory or a URL of model file (pth).
+    model_checkpoint (str): BARTScore checkpoint. Will default to bartscore-large-cnn.
+    model_weights (str): Optional BARTScore weights, overrides the checkpoint weights.
     device (str): On which the contextual embedding model will be allocated on.
         If this argument is None, the model lives on cuda:0 if cuda is available.
     
@@ -85,12 +85,21 @@ Examples:
           "log_base": 2,
           "temperature": 1.0
       },
-      "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
+      "model_weights": "http://data.statmt.org/prism/m39v1.tar",
       "lang": "en",
       "segment_scores": false,
       "normalized": false
     }
 """
+
+CHECKPOINT_URLS = {
+    "bartscore-large-cnn": {
+        "model_checkpoint": "facebook/bart-large-cnn",
+        "model_weights": {
+            "parabank2": "https://drive.google.com/uc?export=download&id=1_7JfF7KOInb7ZrxKHIigTMR4ChVET01m&confirm=t"
+        },
+    }
+}
 
 
 @datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
@@ -99,14 +108,14 @@ class BartscoreForLanguageGeneration(MetricForLanguageGeneration):
         self,
         resulting_name: str = None,
         compute_kwargs: Dict = None,
-        model_checkpoint: str = "facebook/bart-large-cnn",
-        model_path_or_url: str = None,
+        model_checkpoint: str = "bartscore-large-cnn",
+        model_weights: str = None,
         max_length: int = 1024,
         device: str = None,
         **kwargs,
     ):
         self.model_checkpoint = model_checkpoint
-        self.model_path_or_url = model_path_or_url
+        self.model_weights = model_weights
         self.max_length = max_length
         self.device = device
         self.model_path = None
@@ -120,16 +129,39 @@ class BartscoreForLanguageGeneration(MetricForLanguageGeneration):
         commit on the master branch, in order to keep things stable. See
         https://github.com/neulab/BARTScore/blob/47b8341854e1b8be965b65480ce236b0c2f7543b/bart_score.py
         """
-        self.model_path = dl_manager.download(self.model_path_or_url) if self.model_path_or_url else None
+
+        if self.model_checkpoint.lower() in CHECKPOINT_URLS:
+            checkpoint_name = self.model_checkpoint.lower()
+        else:
+            raise KeyError(
+                f"{self.model_checkpoint} checkpoint not found. You should supply the name of a model checkpoint for BARTScore in {CHECKPOINT_URLS.keys()}"
+            )
+        model_checkpoint = CHECKPOINT_URLS[checkpoint_name]["model_checkpoint"]
+
+        if self.model_weights:
+            if self.model_weights.lower() in CHECKPOINT_URLS[checkpoint_name]["model_weights"]:
+                weights_name = self.model_weights.lower()
+            else:
+                raise KeyError(
+                    f"Weights named '{self.model_weights}' not found. You should supply the name of a model weight for BARTScore in "
+                    + str(list(CHECKPOINT_URLS[checkpoint_name]["model_weights"].keys()))
+                )
+            model_path = CHECKPOINT_URLS[checkpoint_name]["model_weights"][weights_name]
+        else:
+            model_path = None
+
         bartscore_source = (
             "https://raw.githubusercontent.com/neulab/BARTScore/47b8341854e1b8be965b65480ce236b0c2f7543b/bart_score.py"
         )
         bartscore_dest = dl_manager.download(bartscore_source)
         self.external_module_path = bartscore_dest
         BARTScorer = self._get_external_resource("bart_score", attr="BARTScorer")
-        self.scorer = BARTScorer(device=self.device, max_length=self.max_length, checkpoint=self.model_checkpoint)
-        if self.model_path is not None:
-            self.scorer.load(path=self.model_path)
+
+        self.scorer = BARTScorer(device=self.device, max_length=self.max_length, checkpoint=model_checkpoint)
+
+        if model_path is not None:
+            model_dest = dl_manager.download(model_path)
+            self.scorer.load(path=model_dest)
 
     def _info(self):
         return datasets.MetricInfo(
@@ -180,7 +212,7 @@ class BartscoreForLanguageGeneration(MetricForLanguageGeneration):
         return {
             "score": score,
             "model_checkpoint": self.model_checkpoint,
-            "model_path_or_url": self.model_path_or_url,
+            "model_weights": self.model_weights,
             "segment_scores": segment_scores,
         }
 
@@ -224,7 +256,7 @@ class BartscoreForLanguageGeneration(MetricForLanguageGeneration):
         return {
             "score": score,
             "model_checkpoint": self.model_checkpoint,
-            "model_path_or_url": self.model_path_or_url,
+            "model_weights": self.model_weights,
             "segment_scores": segment_scores,
         }
 
@@ -279,6 +311,6 @@ class BartscoreForLanguageGeneration(MetricForLanguageGeneration):
         return {
             "score": score,
             "model_checkpoint": self.model_checkpoint,
-            "model_path_or_url": self.model_path_or_url,
+            "model_weights": self.model_weights,
             "segment_scores": segment_scores,
         }
