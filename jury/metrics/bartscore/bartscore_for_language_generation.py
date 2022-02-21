@@ -76,19 +76,12 @@ Examples:
     >>> results = bartscore.compute(predictions=predictions, references=references)
     >>> print(results)
     {
-      "score": -1.1489432752132416,
-      "identifier": {
-          "version": "0.1",
-          "model": "m39v1",
-          "seg_scores": "avg_log_prob",
-          "sys_scores": "avg_log_prob",
-          "log_base": 2,
-          "temperature": 1.0
-      },
-      "model_weights": "http://data.statmt.org/prism/m39v1.tar",
-      "lang": "en",
-      "segment_scores": false,
-      "normalized": false
+        'bartscore': {
+            'score': -1.8933048248291016,
+            'model_checkpoint': 'bartscore-large-cnn',
+            'model_weights': None,
+            'segment_scores': False
+        }
     }
 """
 
