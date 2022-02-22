@@ -39,9 +39,9 @@ _DEV_REQUIREMENTS = [
     "deepdiff==5.5.0",
     "flake8==3.9.2",
     "isort==5.9.2",
-    "pytest>=7.0.1",
-    "pytest-cov>=3.0.0",
-    "pytest-timeout>=2.1.0",
+    "pytest>=6.2.4",
+    "pytest-cov>=2.12.1",
+    "pytest-timeout>=1.4.2",
 ]
 
 _PRISM_REQUIREMENTS = ["fairseq==0.9.0", "validators"]
