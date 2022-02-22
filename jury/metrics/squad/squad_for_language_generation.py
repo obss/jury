@@ -15,7 +15,6 @@
 """ SQuAD metric. The part of this file is adapted from SacreBLEU implementation
 of datasets package. See
 https://github.com/huggingface/datasets/blob/master/metrics/squad/squad.py"""
-import os
 from typing import Callable, Dict, List
 
 import datasets

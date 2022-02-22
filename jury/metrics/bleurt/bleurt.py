@@ -1,5 +1,3 @@
-from typing import Any, Dict, Optional
-
 from jury.metrics._core import MetricAlias
 from jury.metrics.bleurt.bleurt_for_language_generation import BleurtForLanguageGeneration
 

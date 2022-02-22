@@ -19,7 +19,6 @@ https://github.com/huggingface/datasets/blob/master/metrics/bleu/bleu.py
 """
 
 import math
-import os
 from typing import Callable, Dict, Tuple
 
 import datasets
