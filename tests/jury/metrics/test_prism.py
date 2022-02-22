@@ -78,7 +78,9 @@ def test_multiple_ref_normalized_and_segmented(
     assert_almost_equal_dict(actual=scores, desired=output_multiple_ref_normalized_and_segmented)
 
 
-def test_multiple_pred_multiple_ref(multiple_predictions, multiple_references, jury_prism, output_multiple_pred_multiple_ref):
+def test_multiple_pred_multiple_ref(
+    multiple_predictions, multiple_references, jury_prism, output_multiple_pred_multiple_ref
+):
     scores = jury_prism(predictions=multiple_predictions, references=multiple_references)
     assert_almost_equal_dict(actual=scores, desired=output_multiple_pred_multiple_ref)
 
