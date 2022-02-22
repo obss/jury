@@ -7,7 +7,7 @@ from tests.utils import assert_almost_equal_dict
 
 
 @pytest.fixture(scope="module")
-def jury():
+def jury_seqeval():
     metric = AutoMetric.load("seqeval")
     return Jury(metrics=metric)
 
@@ -28,6 +28,6 @@ def output_basic():
     return output_basic.output
 
 
-def test_basic(predictions, references, jury, output_basic):
-    scores = jury(predictions=predictions, references=references)
+def test_basic(predictions, references, jury_seqeval, output_basic):
+    scores = jury_seqeval(predictions=predictions, references=references)
     assert_almost_equal_dict(actual=scores, desired=output_basic)

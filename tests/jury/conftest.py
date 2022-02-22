@@ -6,11 +6,15 @@ from typing import Optional
 import pytest
 
 from jury import Jury, load_metric
+from jury.utils.common import set_env
 from tests.jury import EXPECTED_OUTPUTS
+
+# Setting cuda visible devices to None
+# assessing CPU only computation for test suite.
+set_env("CUDA_VISIBLE_DEVICES", "-1")
 
 _TEST_METRICS = [
     load_metric("accuracy"),
-    load_metric("bertscore", compute_kwargs={"model_type": "albert-base-v1", "device": "cpu"}),
     load_metric("bleu"),
     load_metric("f1"),
     load_metric("meteor"),
@@ -25,7 +29,6 @@ _STR_TEST_METRIC = "bleu"
 
 _LIST_STR_TEST_METRICS = [
     "accuracy",
-    "bertscore",
     "bleu",
     "f1",
     "meteor",
@@ -38,7 +41,6 @@ _LIST_STR_TEST_METRICS = [
 
 _LIST_DICT_TEST_METRICS = [
     {"path": "accuracy"},
-    {"path": "bertscore", "compute_kwargs": {"model_type": "albert-base-v1", "device": "cpu"}},
     {"path": "bleu", "resulting_name": "bleu-1", "compute_kwargs": {"max_order": 1}},
     {"path": "bleu", "resulting_name": "bleu-2", "compute_kwargs": {"max_order": 2}},
     {"path": "f1", "resulting_name": "F1"},
@@ -52,7 +54,6 @@ _LIST_DICT_TEST_METRICS = [
 
 _LIST_MIXED_TEST_METRICS = [
     "accuracy",
-    "bertscore",
     "bleu",
     {"path": "f1"},
     {"path": "meteor"},
@@ -146,7 +147,7 @@ def multiple_references():
 
 
 @pytest.fixture(scope="module")
-def jury():
+def jury_base():
     return Jury(metrics=_TEST_METRICS)
 
 
