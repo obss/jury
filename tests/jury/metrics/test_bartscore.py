@@ -7,7 +7,7 @@ from tests.utils import assert_almost_equal_dict
 
 
 @pytest.fixture(scope="module")
-def jury():
+def jury_bartscore():
     metric = AutoMetric.load("bartscore", device="cpu")
     return Jury(metrics=metric)
 
@@ -42,8 +42,8 @@ def output_multiple_pred_multiple_ref():
     return output_multiple_pred_multiple_ref.output
 
 
-def test_basic(predictions, references, jury, output_basic):
-    scores = jury(predictions=predictions, references=references)
+def test_basic(predictions, references, jury_bartscore, output_basic):
+    scores = jury_bartscore(predictions=predictions, references=references)
     assert_almost_equal_dict(actual=scores, desired=output_basic)
 
 
@@ -52,11 +52,11 @@ def test_basic_segment(predictions, references, jury_segment, output_basic_segme
     assert_almost_equal_dict(actual=scores, desired=output_basic_segment)
 
 
-def test_multiple_ref(predictions, multiple_references, jury, output_multiple_ref):
-    scores = jury(predictions=predictions, references=multiple_references)
+def test_multiple_ref(predictions, multiple_references, jury_bartscore, output_multiple_ref):
+    scores = jury_bartscore(predictions=predictions, references=multiple_references)
     assert_almost_equal_dict(actual=scores, desired=output_multiple_ref)
 
 
-def test_multiple_pred_multiple_ref(multiple_predictions, multiple_references, jury, output_multiple_pred_multiple_ref):
-    scores = jury(predictions=multiple_predictions, references=multiple_references)
+def test_multiple_pred_multiple_ref(multiple_predictions, multiple_references, jury_bartscore, output_multiple_pred_multiple_ref):
+    scores = jury_bartscore(predictions=multiple_predictions, references=multiple_references)
     assert_almost_equal_dict(actual=scores, desired=output_multiple_pred_multiple_ref)
