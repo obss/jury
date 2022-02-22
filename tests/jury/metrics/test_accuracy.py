@@ -7,19 +7,19 @@ from tests.utils import assert_almost_equal_dict
 
 
 @pytest.fixture(scope="module")
-def jury_language_generation():
+def jury_accuracy_language_generation():
     metric = AutoMetric.load("accuracy")
     return Jury(metrics=metric)
 
 
 @pytest.fixture(scope="module")
-def jury_sequence_classification():
+def jury_accuracy_sequence_classification():
     metric = AutoMetric.load("accuracy", task="sequence-classification")
     return Jury(metrics=metric)
 
 
 @pytest.fixture(scope="module")
-def jury_sequence_classification_loose_match():
+def jury_accuracy_sequence_classification_loose_match():
     metric = AutoMetric.load("accuracy", task="sequence-classification", compute_kwargs={"exact_match": False})
     return Jury(metrics=metric)
 
@@ -72,35 +72,37 @@ def output_multiple_pred_multiple_ref_sequence_classification_loose_match():
     return output_multiple_pred_multiple_ref_sequence_classification_loose_match.output
 
 
-def test_basic_language_generation(predictions, references, jury_language_generation, output_basic_language_generation):
-    scores = jury_language_generation(predictions=predictions, references=references)
+def test_basic_language_generation(
+    predictions, references, jury_accuracy_language_generation, output_basic_language_generation
+):
+    scores = jury_accuracy_language_generation(predictions=predictions, references=references)
     assert_almost_equal_dict(actual=scores, desired=output_basic_language_generation)
 
 
 def test_multiple_ref_language_generation(
-    predictions, multiple_references, jury_language_generation, output_multiple_ref_language_generation
+    predictions, multiple_references, jury_accuracy_language_generation, output_multiple_ref_language_generation
 ):
-    scores = jury_language_generation(predictions=predictions, references=multiple_references)
+    scores = jury_accuracy_language_generation(predictions=predictions, references=multiple_references)
     assert_almost_equal_dict(actual=scores, desired=output_multiple_ref_language_generation)
 
 
 def test_multiple_pred_multiple_ref_language_generation(
     multiple_predictions,
     multiple_references,
-    jury_language_generation,
+    jury_accuracy_language_generation,
     output_multiple_pred_multiple_ref_language_generation,
 ):
-    scores = jury_language_generation(predictions=multiple_predictions, references=multiple_references)
+    scores = jury_accuracy_language_generation(predictions=multiple_predictions, references=multiple_references)
     assert_almost_equal_dict(actual=scores, desired=output_multiple_pred_multiple_ref_language_generation)
 
 
 def test_basic_sequence_classification(
     predictions_sequence_classification,
     references_sequence_classification,
-    jury_sequence_classification,
+    jury_accuracy_sequence_classification,
     output_basic_sequence_classification,
 ):
-    scores = jury_sequence_classification(
+    scores = jury_accuracy_sequence_classification(
         predictions=predictions_sequence_classification, references=references_sequence_classification
     )
     assert_almost_equal_dict(actual=scores, desired=output_basic_sequence_classification)
@@ -109,10 +111,10 @@ def test_basic_sequence_classification(
 def test_multiple_ref_sequence_classification(
     predictions_sequence_classification,
     multiple_references_sequence_classification,
-    jury_sequence_classification,
+    jury_accuracy_sequence_classification,
     output_multiple_ref_sequence_classification,
 ):
-    scores = jury_sequence_classification(
+    scores = jury_accuracy_sequence_classification(
         predictions=predictions_sequence_classification, references=multiple_references_sequence_classification
     )
     assert_almost_equal_dict(actual=scores, desired=output_multiple_ref_sequence_classification)
@@ -121,10 +123,10 @@ def test_multiple_ref_sequence_classification(
 def test_multiple_ref_sequence_classification_loose_match(
     predictions_sequence_classification,
     multiple_references_sequence_classification,
-    jury_sequence_classification_loose_match,
+    jury_accuracy_sequence_classification_loose_match,
     output_multiple_ref_sequence_classification_loose_match,
 ):
-    scores = jury_sequence_classification_loose_match(
+    scores = jury_accuracy_sequence_classification_loose_match(
         predictions=predictions_sequence_classification,
         references=multiple_references_sequence_classification,
     )
@@ -134,10 +136,10 @@ def test_multiple_ref_sequence_classification_loose_match(
 def test_multiple_pred_multiple_ref_sequence_classification(
     multiple_predictions_sequence_classification,
     multiple_references_sequence_classification,
-    jury_sequence_classification,
+    jury_accuracy_sequence_classification,
     output_multiple_pred_multiple_ref_sequence_classification,
 ):
-    scores = jury_sequence_classification(
+    scores = jury_accuracy_sequence_classification(
         predictions=multiple_predictions_sequence_classification, references=multiple_references_sequence_classification
     )
     assert_almost_equal_dict(actual=scores, desired=output_multiple_pred_multiple_ref_sequence_classification)
@@ -146,10 +148,10 @@ def test_multiple_pred_multiple_ref_sequence_classification(
 def test_multiple_pred_multiple_ref_sequence_classification_loose_match(
     multiple_predictions_sequence_classification,
     multiple_references_sequence_classification,
-    jury_sequence_classification_loose_match,
+    jury_accuracy_sequence_classification_loose_match,
     output_multiple_pred_multiple_ref_sequence_classification_loose_match,
 ):
-    scores = jury_sequence_classification_loose_match(
+    scores = jury_accuracy_sequence_classification_loose_match(
         predictions=multiple_predictions_sequence_classification, references=multiple_references_sequence_classification
     )
     assert_almost_equal_dict(
