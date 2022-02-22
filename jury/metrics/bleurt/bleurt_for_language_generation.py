@@ -69,6 +69,20 @@ Examples:
     [1.03, 1.04]
 """
 
+_LICENSE = """Copyright 2021 Google.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License."""
+
 CHECKPOINT_URLS = {
     "bleurt-tiny-128": "https://storage.googleapis.com/bleurt-oss/bleurt-tiny-128.zip",
     "bleurt-tiny-512": "https://storage.googleapis.com/bleurt-oss/bleurt-tiny-512.zip",
@@ -94,6 +108,7 @@ class BleurtForLanguageGeneration(MetricForLanguageGeneration):
             features=self._default_features,
             codebase_urls=["https://github.com/google-research/bleurt"],
             reference_urls=["https://github.com/google-research/bleurt", "https://arxiv.org/abs/2004.04696"],
+            license=_LICENSE,
         )
 
     def _download_and_prepare(self, dl_manager):
