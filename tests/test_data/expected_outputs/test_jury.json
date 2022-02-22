@@ -5,22 +5,6 @@
     "accuracy": {
       "score": 0.6571428571428571
     },
-    "bertscore": {
-      "score": 0.7350330352783203,
-      "precision": [
-        0.8328237533569336,
-        0.6074944734573364
-      ],
-      "recall": [
-        0.8258965015411377,
-        0.6777911186218262
-      ],
-      "f1": [
-        0.8293456435203552,
-        0.6407204270362854
-      ],
-      "hashcode": "albert-base-v1_L10_no-idf_version=0.3.10(hug_trans=4.9.1)"
-    },
     "bleu": {
       "score": 0.0,
       "precisions": [
@@ -86,22 +70,6 @@
     "total_items": 2,
     "accuracy": {
       "score": 0.6571428571428571
-    },
-    "bertscore": {
-      "score": 0.7350330352783203,
-      "precision": [
-        0.8328237533569336,
-        0.6074944734573364
-      ],
-      "recall": [
-        0.8258965015411377,
-        0.6777911186218262
-      ],
-      "f1": [
-        0.8293456435203552,
-        0.6407204270362854
-      ],
-      "hashcode": "albert-base-v1_L10_no-idf_version=0.3.10(hug_trans=4.9.1)"
     },
     "bleu": {
       "score": 0.0,
@@ -186,22 +154,6 @@
     "accuracy": {
       "score": 0.6571428571428571
     },
-    "bertscore": {
-      "score": 0.9396075010299683,
-      "precision": [
-        0.9543163180351257,
-        0.9277863502502441
-      ],
-      "recall": [
-        0.9502041935920715,
-        0.9261335134506226
-      ],
-      "f1": [
-        0.9522558450698853,
-        0.9269591569900513
-      ],
-      "hashcode": "roberta-large_L17_no-idf_version=0.3.10(hug_trans=4.9.1)"
-    },
     "bleu": {
       "score": 0.0,
       "precisions": [
@@ -267,22 +219,6 @@
     "total_items": 2,
     "accuracy": {
       "score": 0.6571428571428571
-    },
-    "bertscore": {
-      "score": 0.7350329756736755,
-      "precision": [
-        0.832823634147644,
-        0.6074944734573364
-      ],
-      "recall": [
-        0.8258962631225586,
-        0.6777912378311157
-      ],
-      "f1": [
-        0.8293454647064209,
-        0.6407204866409302
-      ],
-      "hashcode": "albert-base-v1_L10_no-idf_version=0.3.10(hug_trans=4.9.1)"
     },
     "bleu-1": {
       "score": 0.6640732482052816,
@@ -358,22 +294,6 @@
     "accuracy": {
       "score": 0.6571428571428571
     },
-    "bertscore": {
-      "score": 0.9396075010299683,
-      "precision": [
-        0.9543163180351257,
-        0.9277863502502441
-      ],
-      "recall": [
-        0.9502041935920715,
-        0.9261335134506226
-      ],
-      "f1": [
-        0.9522558450698853,
-        0.9269591569900513
-      ],
-      "hashcode": "roberta-large_L17_no-idf_version=0.3.10(hug_trans=4.9.1)"
-    },
     "bleu": {
       "score": 0.0,
       "precisions": [
@@ -440,26 +360,10 @@
     "wer": 0.5833333333333334
   },
   "evaluate_corpus": {
-    "empty_items": 0,
     "total_items": 2,
+    "empty_items": 0,
     "accuracy": {
       "score": 0.7285714285714285
-    },
-    "bertscore": {
-      "score": 0.7485644221305847,
-      "precision": [
-        0.8912335634231567,
-        0.6074944734573364
-      ],
-      "recall": [
-        0.8377017378807068,
-        0.6777911186218262
-      ],
-      "f1": [
-        0.856408417224884,
-        0.6407204270362854
-      ],
-      "hashcode": "albert-base-v1_L10_no-idf_version=0.3.10(hug_trans=4.11.3)"
     },
     "bleu": {
       "score": 0.0,
@@ -526,13 +430,6 @@
     "empty_items": 1,
     "accuracy": {
       "score": 0.8333333333333334
-    },
-    "bertscore": {
-      "score": 0.9471233487129211,
-      "precision": 0.9065421223640442,
-      "recall": 0.9915080070495605,
-      "f1": 0.9471233487129211,
-      "hashcode": "albert-base-v1_L10_no-idf_version=0.3.10(hug_trans=4.9.1)"
     },
     "bleu": {
       "score": 0.0,
@@ -601,17 +498,10 @@
     }
   },
   "evaluate_multiple_predictions": {
-    "empty_items": 0,
     "total_items": 2,
+    "empty_items": 0,
     "accuracy": {
       "score": 0.8452380952380952
-    },
-    "bertscore": {
-      "score": 0.9017658531665802,
-      "precision": 0.8988877832889557,
-      "recall": 0.9146048426628113,
-      "f1": 0.9017658531665802,
-      "hashcode": "albert-base-v1_L10_no-idf_version=0.3.10(hug_trans=4.9.1)"
     },
     "bleu": {
       "score": 0.0,
