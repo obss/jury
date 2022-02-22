@@ -1,7 +1,6 @@
 import json
 import os
 import pickle
-import tarfile
 from typing import Any, Dict, Union
 
 

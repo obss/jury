@@ -1,4 +1,3 @@
-import os.path
 import warnings
 from concurrent.futures import ProcessPoolExecutor
 from typing import Any, Callable, Dict, List, Mapping, Optional, Union
