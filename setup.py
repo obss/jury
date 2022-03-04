@@ -42,6 +42,7 @@ _DEV_REQUIREMENTS = [
     "pytest>=7.0.1",
     "pytest-cov>=3.0.0",
     "pytest-timeout>=2.1.0",
+    "math_equivalence @ git+https://github.com/hendrycks/math.git",  # for datasets test metric
 ]
 
 _PRISM_REQUIREMENTS = ["fairseq==0.9.0", "validators"]

@@ -355,9 +355,9 @@
     }
   },
   "evaluate_datasets_metric": {
-    "empty_items": 0,
     "total_items": 2,
-    "wer": 0.5833333333333334
+    "empty_items": 0,
+    "accuracy": 0.0
   },
   "evaluate_corpus": {
     "total_items": 2,
