@@ -64,7 +64,7 @@ _LIST_MIXED_TEST_METRICS = [
     {"path": "squad"},
 ]
 
-_DATASETS_METRICS = "wer"
+_DATASETS_METRICS = "competition_math"
 
 _TEST_METRICS_SEQUENCE_CLASSIFICATION = [
     {"path": "accuracy", "task": "sequence-classification"},
