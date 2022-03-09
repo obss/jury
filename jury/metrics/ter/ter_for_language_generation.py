@@ -16,11 +16,11 @@
 datasets package implementation of CER metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/wer/wer.py
 """
-import warnings
-from typing import Callable, List, Tuple, Union
+from typing import Callable, Dict, Sequence
 
 import datasets
 
+from jury.collator import Collator
 from jury.metrics import LanguageGenerationInstance, MetricForLanguageGeneration
 from jury.metrics._core.utils import PackagePlaceholder, requirement_message
 
@@ -118,10 +118,20 @@ class TERForLanguageGeneration(MetricForLanguageGeneration):
         else:
             super(TERForLanguageGeneration, self)._download_and_prepare(dl_manager)
 
-    def _compute_ter_score(self, predictions: LanguageGenerationInstance, references: LanguageGenerationInstance, **kwargs):
+    def _validate_references(self, references: Collator) -> None:
+        references_per_prediction = len(references[0])
+        if any(len(refs) != references_per_prediction for refs in references):
+            raise ValueError("Sacrebleu requires the same number of references for each prediction")
+
+    def _compute_ter_score(
+        self, predictions: Sequence[str], references: Sequence[Sequence[str]], sentence_level: bool = False, **kwargs
+    ):
         sb_ter = TERScorer(**kwargs)
-        output = sb_ter.corpus_score(predictions, references)
-        return {"score": output.score, "num_edits": output.num_edits, "ref_length": output.ref_length}
+        if sentence_level:
+            output = sb_ter.sentence_score(predictions, references)
+        else:
+            output = sb_ter.corpus_score(predictions, references)
+        return {"score": float(output.score / 100), "num_edits": output.num_edits, "ref_length": output.ref_length}
 
     def _compute_single_pred_single_ref(
         self,
@@ -133,14 +143,13 @@ class TERForLanguageGeneration(MetricForLanguageGeneration):
         asian_support: bool = False,
         case_sensitive: bool = False,
     ):
-        transformed_references = [[r] for r in references]
         return self._compute_ter_score(
-                predictions=predictions,
-                references=transformed_references,
-                normalized=normalized,
-                no_punct=no_punct,
-                asian_support=asian_support,
-                case_sensitive=case_sensitive
+            predictions=predictions,
+            references=references,
+            normalized=normalized,
+            no_punct=no_punct,
+            asian_support=asian_support,
+            case_sensitive=case_sensitive,
         )
 
     def _compute_single_pred_multi_ref(
@@ -153,18 +162,14 @@ class TERForLanguageGeneration(MetricForLanguageGeneration):
         asian_support: bool = False,
         case_sensitive: bool = False,
     ):
-        references_per_prediction = len(references[0])
-        if any(len(refs) != references_per_prediction for refs in references):
-            raise ValueError("Sacrebleu requires the same number of references for each prediction")
-        transformed_references = [[refs[i] for refs in references] for i in range(references_per_prediction)]
         # SacreBleu inherently supports multiple references.
         return self._compute_ter_score(
-                predictions=predictions,
-                references=transformed_references,
-                normalized=normalized,
-                no_punct=no_punct,
-                asian_support=asian_support,
-                case_sensitive=case_sensitive
+            predictions=predictions,
+            references=references,
+            normalized=normalized,
+            no_punct=no_punct,
+            asian_support=asian_support,
+            case_sensitive=case_sensitive,
         )
 
     def _compute_multi_pred_multi_ref(
@@ -178,31 +183,45 @@ class TERForLanguageGeneration(MetricForLanguageGeneration):
         case_sensitive: bool = False,
     ):
         scores = []
+        avg_num_edits = 0
+        avg_ref_length = 0
         for preds, refs in zip(predictions, references):
             pred_scores = []
+            num_edits = []
+            ref_lengths = []
             for pred in preds:
-                score = self._compute_single_pred_multi_ref(
-                        predictions=[pred],
-                        references=[refs],
-                        normalized=normalized,
-                        no_punct=no_punct,
-                        asian_support=asian_support,
-                        case_sensitive=case_sensitive
+                score = self._compute_ter_score(
+                    predictions=pred,
+                    references=refs,
+                    sentence_level=True,
+                    normalized=normalized,
+                    no_punct=no_punct,
+                    asian_support=asian_support,
+                    case_sensitive=case_sensitive,
                 )
                 pred_scores.append(score["score"])
-            pred_score = reduce_fn(pred_scores)
+                num_edits.append(score["num_edits"])
+                ref_lengths.append(score["ref_length"])
+            pred_score = reduce_fn(pred_scores).item()
+            avg_num_edits += sum(num_edits) / len(num_edits)
+            avg_ref_length += sum(ref_lengths) / len(ref_lengths)
             scores.append(pred_score)
-        return {"score": sum(scores) / len(scores)}
+        return {
+            "score": sum(scores) / len(scores),
+            "avg_num_edits": avg_num_edits / len(predictions),
+            "avg_ref_length": avg_ref_length / len(predictions),
+        }
 
-
-if __name__ == "__main__":
-    import json
-
-    predictions = [["hello there general kenobi", "hi there"], ["foo bar foobar"]]
-    # references = ["hello there general kenobi", "foo bar foobar"]
-    references = [["hello there general kenobi", "hello there !"], ["foo bar foobar", "foo bar foobar"]]
-
-    ter = TERForLanguageGeneration()
-    res = ter.compute(predictions=predictions, references=references)
-
-    print(json.dumps(res, indent=2))
+    def evaluate(
+        self, predictions: Collator, references: Collator, reduce_fn: Callable = None, **kwargs
+    ) -> Dict[str, float]:
+        if predictions.can_collapse() and references.can_collapse():
+            predictions = predictions.collapse()
+            eval_fn = self._compute_single_pred_single_ref
+        elif predictions.can_collapse() and not references.can_collapse():
+            predictions = predictions.collapse()
+            eval_fn = self._compute_single_pred_multi_ref
+        else:
+            eval_fn = self._compute_multi_pred_multi_ref
+        self._validate_references(references)
+        return eval_fn(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)
