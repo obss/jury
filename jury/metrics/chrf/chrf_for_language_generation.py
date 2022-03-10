@@ -16,7 +16,6 @@
 datasets package implementation of CHRF metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/chrf/chrf.py
 """
-import warnings
 from typing import Callable, Dict, List, Tuple, Union
 
 import datasets
