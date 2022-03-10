@@ -12,9 +12,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" Word Error Ratio (WER) metric. The part of this file is adapted from HuggingFace's
-datasets package implementation of CER metric. See
-https://github.com/huggingface/datasets/blob/master/metrics/wer/wer.py
+""" Translation Edit Rate(TER) metric. The part of this file is adapted from HuggingFace's
+datasets package implementation of TER metric. See
+https://github.com/huggingface/datasets/blob/master/metrics/ter/ter.py
 """
 from typing import Callable, Dict, Sequence
 
