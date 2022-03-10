@@ -12,7 +12,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" Translation Edit Rate(TER) metric. The part of this file is adapted from HuggingFace's
+""" Translation Edit Rate (TER) metric. The part of this file is adapted from HuggingFace's
 datasets package implementation of TER metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/ter/ter.py
 """
@@ -78,11 +78,11 @@ Args:
     asian_support: Whether to support Asian character processing.
     case_sensitive: Whether to disable lowercasing.
 Returns:
-    'score': TER score (num_edits / sum_ref_lengths * 100),
+    'score': TER score (num_edits / sum_ref_lengths),
     'num_edits': The cumulative number of edits,
     'ref_length': The cumulative average reference length.
 Examples:
-    >>> predictions = ["hello there general kenobi", "foo bar foobar"]
+    >>> predictions = [["hello there general kenobi", "foo bar foobar"]]
     >>> references = [["hello there general kenobi", "hello there !"], ["foo bar foobar", "foo bar foobar"]]
     >>> ter = jury.load_metric("ter")
     >>> results = ter.compute(predictions=predictions, references=references)
