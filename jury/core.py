@@ -56,6 +56,7 @@ class Jury:
         predictions: EvaluationInstance = None,
         references: EvaluationInstance = None,
         reduce_fn: Optional[Union[str, Callable]] = None,
+        **kwargs,
     ) -> Dict[str, float]:
         """Restricts positional arguments to prevent potential inconsistency between predictions and references."""
         if predictions is None or references is None:
@@ -74,14 +75,14 @@ class Jury:
             return scores
 
         if self._concurrent:
-            inputs_list = self._prepare_concurrent_inputs(predictions, references, reduce_fn)
+            inputs_list = self._prepare_concurrent_inputs(predictions, references, reduce_fn, kwargs)
             set_env("TOKENIZERS_PARALLELISM", "true")
             with ProcessPoolExecutor() as executor:
                 for score in executor.map(self._compute_single_score, inputs_list):
                     scores.update(score)
         else:
             for metric in self.metrics:
-                inputs = (metric, predictions, references, reduce_fn)
+                inputs = (metric, predictions, references, reduce_fn, kwargs)
                 score = self._compute_single_score(inputs)
                 scores.update(score)
 
@@ -149,20 +150,20 @@ class Jury:
         return {name: score}
 
     def _compute_single_score(self, inputs) -> Mapping[str, float]:
-        metric, predictions, references, reduce_fn = inputs
+        metric, predictions, references, reduce_fn, kwargs = inputs
         if isinstance(metric, Metric):
             predictions, references = Collator(predictions), Collator(references)
-            score = metric.compute(predictions=predictions, references=references, reduce_fn=reduce_fn)
+            score = metric.compute(predictions=predictions, references=references, reduce_fn=reduce_fn, **kwargs)
         else:
             metric.resulting_name = metric.name
-            score = metric.compute(predictions=predictions, references=references)
+            score = metric.compute(predictions=predictions, references=references, **kwargs)
             score = self._score_to_dict(score, name=metric.name)
         return score
 
-    def _prepare_concurrent_inputs(self, predictions, references, reduce_fn):
+    def _prepare_concurrent_inputs(self, predictions, references, reduce_fn, kwargs):
         inputs = []
         for metric in self.metrics:
-            inputs.append((metric, predictions, references, reduce_fn))
+            inputs.append((metric, predictions, references, reduce_fn, kwargs))
         return inputs
 
     def _validate_metrics(self):

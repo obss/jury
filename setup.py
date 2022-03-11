@@ -54,6 +54,7 @@ _METRIC_REQUIREMENTS = [
     "jiwer>=2.3.0",
     "seqeval==1.2.2",
     "sentencepiece==0.1.96",
+    "unbabel-comet==1.0.1",
 ]
 _METRIC_REQUIREMENTS.extend(_PRISM_REQUIREMENTS)
 add_pywin(_METRIC_REQUIREMENTS)

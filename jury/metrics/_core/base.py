@@ -17,7 +17,8 @@ Metrics base class. The part of this file is adapted from HuggingFace's
 datasets package implementation of Accuracy metric. See
 https://github.com/huggingface/datasets/blob/master/src/datasets/metric.py
 """
-
+import os
+import re
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
@@ -25,6 +26,8 @@ import datasets
 import numpy
 import numpy as np
 import pandas as pd
+import pyarrow as pa
+from datasets import temp_seed
 from datasets.utils.logging import get_logger
 
 from jury.collator import Collator
@@ -118,8 +121,7 @@ class Metric(datasets.Metric, ABC):
     @abstractmethod
     def _compute_single_pred_single_ref(
         self,
-        predictions: EvaluationInstance,
-        references: EvaluationInstance,
+        *args,
         **kwargs,
     ):
         """
@@ -137,8 +139,7 @@ class Metric(datasets.Metric, ABC):
     @abstractmethod
     def _compute_single_pred_multi_ref(
         self,
-        predictions: EvaluationInstance,
-        references: EvaluationInstance,
+        *args,
         **kwargs,
     ):
         """
@@ -156,8 +157,7 @@ class Metric(datasets.Metric, ABC):
     @abstractmethod
     def _compute_multi_pred_multi_ref(
         self,
-        predictions: EvaluationInstance,
-        references: EvaluationInstance,
+        *args,
         **kwargs,
     ):
         """
@@ -200,7 +200,7 @@ class Metric(datasets.Metric, ABC):
         return self._task
 
 
-class MetricForTask(Metric):
+class MetricForTask(Metric, ABC):
     """
     Base metric class for any task. All metrics must extend this class as metric is required to adopt a task
     inherently. Default task will be language-generation for AutoMetric.
@@ -503,3 +503,103 @@ class MetricForSequenceLabeling(MetricForTask):
         **kwargs,
     ):
         raise NotImplementedError(f"Task {self._task} does not support multiple predictions or multiple" "references.")
+
+
+class MetricForCrossLingualEvaluation(MetricForTask):
+    """
+    Base metric class for cross-lingual evaluation. Metrics fall in this category require
+    input as a triplet of (sources, predictions/translations, references).
+    """
+
+    _task = "cross-lingual-evaluation"
+
+    @property
+    def _default_features(self):
+        return datasets.Features(
+            {
+                "predictions": datasets.Sequence(datasets.Value("string", id="sequence")),
+                "references": datasets.Sequence(datasets.Value("string", id="sequence")),
+            }
+        )
+
+    def _compute(
+        self,
+        *,
+        sources: LanguageGenerationInstance = None,
+        predictions: LanguageGenerationInstance = None,
+        references: LanguageGenerationInstance = None,
+        **kwargs,
+    ) -> MetricOutput:
+        if sources is None:
+            raise TypeError("Parameter `sources` cannot be empty.")
+
+        return super()._compute(sources=sources, predictions=predictions, references=references, **kwargs)
+
+    @abstractmethod
+    def _compute_single_pred_single_ref(
+        self,
+        sources: LanguageGenerationInstance,
+        predictions: LanguageGenerationInstance,
+        references: LanguageGenerationInstance,
+        reduce_fn: Callable = None,
+        **kwargs,
+    ):
+        """
+        Computes the metric score(s) for single prediction and single reference case.
+
+        Args:
+            sources: (``List[str]``) Sources
+            predictions: (``List[str]``) Predictions
+            references: (``List[str]``) References
+            reduce_fn: (``Callable``) Reduce function name.
+            **kwargs: Additional arguments used for the metric computation.
+
+        Returns: score
+        """
+        pass
+
+    @abstractmethod
+    def _compute_single_pred_multi_ref(
+        self,
+        sources: LanguageGenerationInstance,
+        predictions: LanguageGenerationInstance,
+        references: LanguageGenerationInstance,
+        reduce_fn: Callable = None,
+        **kwargs,
+    ):
+        """
+        Computes the metric score(s) for single prediction and multiple references case.
+
+        Args:
+            sources: (``List[str]``) Sources
+            predictions: (``List[str]``) Predictions
+            references: (``List[List[str]]``) References
+            reduce_fn: (``Callable``) Reduce function name.
+            **kwargs: Additional arguments used for the metric computation.
+
+        Returns: score
+        """
+        pass
+
+    @abstractmethod
+    def _compute_multi_pred_multi_ref(
+        self,
+        sources: LanguageGenerationInstance,
+        predictions: LanguageGenerationInstance,
+        references: LanguageGenerationInstance,
+        reduce_fn: Callable = None,
+        **kwargs,
+    ):
+        """
+        Computes the metric score(s) for single prediction and multiple references case.
+
+        Args:
+            sources: (``List[str]``) Sources
+            predictions: (``List[List[str]]``) Predictions
+            references: (``List[List[str]]``) References
+            reduce_fn: (``Callable``) Reduce function name.
+            **kwargs: Additional arguments used for the metric computation.
+
+        Returns: score
+        """
+        pass
