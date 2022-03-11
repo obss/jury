@@ -28,14 +28,3 @@ from jury.metrics.rouge import Rouge
 from jury.metrics.sacrebleu import Sacrebleu
 from jury.metrics.squad import Squad
 from jury.metrics.wer import WER
-
-if __name__ == "__main__":
-    from jury.metrics.comet.comet_for_language_generation import CometForCrossLingualEvaluation
-
-    source = ["Dem Feuer konnte Einhalt geboten werden", "Schulen und Kindergärten wurden eröffnet."]
-    hypothesis = ["The fire could be stopped", "Schools and kindergartens were open"]
-    reference = ["They were able to control the fire.", "Schools and kindergartens opened"]
-
-    comet = CometForCrossLingualEvaluation()
-    res = comet.compute(sources=source, predictions=hypothesis, references=reference)
-    print(res)

@@ -13,12 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-SacreBLEU metric. The part of this file is adapted from SacreBLEU implementation
-of datasets package. See
-https://github.com/huggingface/datasets/blob/master/metrics/sacrebleu/sacrebleu.py
+Comet cross-lingual MT evaluation metric. The part of this file is adapted from
+Comet implementation of datasets package. See
+https://github.com/huggingface/datasets/blob/master/metrics/comet/comet.py
 """
 
-from typing import Callable, Sequence, Union
+from typing import Callable, Union
 
 import datasets
 
@@ -26,7 +26,7 @@ from jury.metrics import LanguageGenerationInstance
 from jury.metrics._core import MetricForCrossLingualEvaluation
 from jury.metrics._core.utils import PackagePlaceholder, requirement_message
 
-# `import comet.models as comet_models` placeholder
+# `import comet` placeholder
 comet = PackagePlaceholder(version="1.0.1")
 
 _CITATION = """\
@@ -77,15 +77,13 @@ Returns:
     `samples`: List of dictionaries with `src`, `mt`, `ref` and `score`.
     `scores`: List of scores.
 Examples:
-    >>> comet_metric = jury.load_metric('comet') # doctest:+ELLIPSIS
-    [...]Download succeeded. Loading model[...]
-    >>> # comet_metric = jury.load_metric('comet', 'wmt-large-hter-estimator')  # you can also choose which model to use
+    >>> comet_metric = jury.load_metric('comet')
     >>> source = ["Dem Feuer konnte Einhalt geboten werden", "Schulen und Kindergärten wurden eröffnet."]
     >>> hypothesis = ["The fire could be stopped", "Schools and kindergartens were open"]
     >>> reference = ["They were able to control the fire.", "Schools and kindergartens opened"]
     >>> results = comet_metric.compute(predictions=hypothesis, references=reference, sources=source)
-    >>> print([round(v, 2) for v in results["scores"]])
-    [0.19, 0.92]
+    >>> print(results)
+    {'scores': [0.19016975164413452, 0.9156621694564819], 'samples': 0.5529159605503082}
 """
 
 
