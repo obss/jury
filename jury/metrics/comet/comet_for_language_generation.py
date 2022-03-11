@@ -121,13 +121,6 @@ class CometForCrossLingualEvaluation(MetricForCrossLingualEvaluation):
             ],
         )
 
-    def _compute_comet_score(
-        self, sources: Sequence[str], predictions: Sequence[str], references: Sequence[str], **kwargs
-    ):
-        data = {"src": sources, "mt": predictions, "ref": references}
-        data = [dict(zip(data, t)) for t in zip(*data.values())]
-        return self.scorer.predict(data, **kwargs)
-
     def _compute_single_pred_single_ref(
         self,
         sources: LanguageGenerationInstance,
@@ -142,10 +135,10 @@ class CometForCrossLingualEvaluation(MetricForCrossLingualEvaluation):
         num_workers: int = None,
         length_batching: bool = True,
     ):
-        scores, samples = self._compute_comet_score(
-            sources,
-            predictions,
-            references,
+        data = {"src": sources, "mt": predictions, "ref": references}
+        data = [dict(zip(data, t)) for t in zip(*data.values())]
+        scores, samples = self.scorer.predict(
+            data,
             batch_size=batch_size,
             gpus=gpus,
             mc_dropout=mc_dropout,
@@ -170,20 +163,23 @@ class CometForCrossLingualEvaluation(MetricForCrossLingualEvaluation):
         num_workers: int = None,
         length_batching: bool = True,
     ):
-        # SacreBleu inherently supports multiple references.
-        return self._compute_single_pred_single_ref(
-            sources=sources,
-            predictions=predictions,
-            references=references,
-            reduce_fn=reduce_fn,
-            batch_size=batch_size,
-            gpus=gpus,
-            mc_dropout=mc_dropout,
-            progress_bar=progress_bar,
-            accelerator=accelerator,
-            num_workers=num_workers,
-            length_batching=length_batching,
-        )
+        scores = []
+        for src, pred, refs in zip(sources, predictions, references):
+            data = {"src": [src] * len(refs), "mt": [pred] * len(refs), "ref": refs}
+            data = [dict(zip(data, t)) for t in zip(*data.values())]
+            pred_scores, _ = self.scorer.predict(
+                data,
+                batch_size=batch_size,
+                gpus=gpus,
+                mc_dropout=mc_dropout,
+                progress_bar=progress_bar,
+                accelerator=accelerator,
+                num_workers=num_workers,
+                length_batching=length_batching,
+            )
+            scores.append(float(reduce_fn(pred_scores)))
+
+        return {"scores": scores, "samples": sum(scores) / len(scores)}
 
     def _compute_multi_pred_multi_ref(
         self,
@@ -199,16 +195,23 @@ class CometForCrossLingualEvaluation(MetricForCrossLingualEvaluation):
         num_workers: int = None,
         length_batching: bool = True,
     ):
-        return self._compute_single_pred_single_ref(
-            sources=sources,
-            predictions=predictions,
-            references=references,
-            reduce_fn=reduce_fn,
-            batch_size=batch_size,
-            gpus=gpus,
-            mc_dropout=mc_dropout,
-            progress_bar=progress_bar,
-            accelerator=accelerator,
-            num_workers=num_workers,
-            length_batching=length_batching,
-        )
+        scores = []
+        for src, preds, refs in zip(sources, predictions, references):
+            all_pred_scores = []
+            for pred in preds:
+                data = {"src": [src] * len(refs), "mt": [pred] * len(refs), "ref": refs}
+                data = [dict(zip(data, t)) for t in zip(*data.values())]
+                pred_scores, _ = self.scorer.predict(
+                    data,
+                    batch_size=batch_size,
+                    gpus=gpus,
+                    mc_dropout=mc_dropout,
+                    progress_bar=progress_bar,
+                    accelerator=accelerator,
+                    num_workers=num_workers,
+                    length_batching=length_batching,
+                )
+                all_pred_scores.append(float(reduce_fn(pred_scores)))
+            scores.append(float(reduce_fn(all_pred_scores)))
+
+        return {"scores": scores, "samples": sum(scores) / len(scores)}

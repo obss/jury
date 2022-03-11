@@ -200,7 +200,7 @@ class Metric(datasets.Metric, ABC):
         return self._task
 
 
-class MetricForTask(Metric, ABC):
+class MetricForTask(Metric):
     """
     Base metric class for any task. All metrics must extend this class as metric is required to adopt a task
     inherently. Default task will be language-generation for AutoMetric.
@@ -522,6 +522,13 @@ class MetricForCrossLingualEvaluation(MetricForTask):
             }
         )
 
+    def _validate_compute_kwargs(self, compute_kwargs: Dict[str, Any]) -> Dict[str, Any]:
+        if compute_kwargs is None:
+            compute_kwargs = {}
+        if "reduce_fn" not in compute_kwargs:
+            compute_kwargs.update({"reduce_fn": "max"})
+        return compute_kwargs
+
     def _compute(
         self,
         *,
@@ -530,10 +537,24 @@ class MetricForCrossLingualEvaluation(MetricForTask):
         references: LanguageGenerationInstance = None,
         **kwargs,
     ) -> MetricOutput:
-        if sources is None:
-            raise TypeError("Parameter `sources` cannot be empty.")
-
-        return super()._compute(sources=sources, predictions=predictions, references=references, **kwargs)
+        assert (
+            len(sources) == len(predictions) == len(references)
+        ), "Sources, predictions and references length does not match."
+        reduce_fn = kwargs.get("reduce_fn")
+        reduce_fn = self.compute_kwargs["reduce_fn"] if reduce_fn is None else reduce_fn
+        if isinstance(reduce_fn, str):
+            reduce_fn = getattr(numpy, reduce_fn)
+        elif reduce_fn is not None and not callable(reduce_fn):
+            raise TypeError(f"'reduce_fn' Expected str or callable, got {type(reduce_fn)}")
+        if reduce_fn is not None and not is_reduce_fn(reduce_fn):
+            raise ValueError("'reduce_fn' must be an aggregation function.")
+        eval_params = {**self.compute_kwargs, **kwargs}
+        eval_params.pop("reduce_fn")
+        predictions, references = Collator(predictions), Collator(references)
+        result = self.evaluate(
+            sources=sources, predictions=predictions, references=references, reduce_fn=reduce_fn, **eval_params
+        )
+        return {self.resulting_name: result}
 
     @abstractmethod
     def _compute_single_pred_single_ref(

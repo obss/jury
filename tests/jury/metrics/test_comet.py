@@ -8,7 +8,7 @@ from tests.utils import assert_almost_equal_dict
 
 @pytest.fixture(scope="module")
 def jury_comet():
-    metric = AutoMetric.load("comet")
+    metric = AutoMetric.load("comet", compute_kwargs={"gpus": 0})
     return Jury(metrics=metric)
 
 
@@ -36,17 +36,17 @@ def output_multiple_pred_multiple_ref():
 
 
 def test_basic(comet_sources, predictions, references, jury_comet, output_basic):
-    scores = jury_comet(sources=comet_sources, predictions=predictions, references=references, gpus=0)
+    scores = jury_comet(sources=comet_sources, predictions=predictions, references=references)
     assert_almost_equal_dict(actual=scores, desired=output_basic)
 
 
 def test_multiple_ref(comet_sources, predictions, multiple_references, jury_comet, output_multiple_ref):
-    scores = jury_comet(sources=comet_sources, predictions=predictions, references=multiple_references, gpus=0)
+    scores = jury_comet(sources=comet_sources, predictions=predictions, references=multiple_references)
     assert_almost_equal_dict(actual=scores, desired=output_multiple_ref)
 
 
 def test_multiple_pred_multiple_ref(
     comet_sources, multiple_predictions, multiple_references, jury_comet, output_multiple_pred_multiple_ref
 ):
-    scores = jury_comet(sources=comet_sources, predictions=multiple_predictions, references=multiple_references, gpus=0)
+    scores = jury_comet(sources=comet_sources, predictions=multiple_predictions, references=multiple_references)
     assert_almost_equal_dict(actual=scores, desired=output_multiple_pred_multiple_ref)
