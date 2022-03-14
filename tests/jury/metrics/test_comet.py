@@ -8,8 +8,9 @@ from tests.utils import assert_almost_equal_dict
 
 @pytest.fixture(scope="module")
 def jury_comet():
-    metric = AutoMetric.load("comet", compute_kwargs={"gpus": 0, "num_workers": 4, "progress_bar": False,
-                                                      "batch_size": 2})
+    metric = AutoMetric.load(
+        "comet", compute_kwargs={"gpus": 0, "num_workers": 4, "progress_bar": False, "batch_size": 2}
+    )
     return Jury(metrics=metric)
 
 
