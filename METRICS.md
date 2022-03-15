@@ -2,54 +2,56 @@
 
 The table below shows the current support status for available metrics.
 
-| Metric              | Jury Support* | HF/datasets Support** |
-|---------------------|---------------|-----------------------|
-| Accuracy-Numeric    | &#10004;      | &#10004;              |
-| Accuracy-Text       | &#10004;      | &#10060;              |
-| Bartscore           | &#10004;      | &#10060;              |
-| Bertscore           | &#10004;      | &#10004;              |
-| Bleu                | &#10004;      | &#10004;              |
-| Bleurt              | &#10004;      | &#10004;              |
-| CER                 | &#10004;      | &#10004;              |
-| CHRF                | &#10004;      | &#10004;              |
-| CodeEval            | &#129000;     | &#10004;              |
-| COMET               | &#10004;      | &#10004;              |
-| CompetitionMath     | &#129000;     | &#10004;              |
-| COVAL               | &#129000;     | &#10004;              |
-| CUAD                | &#129000;     | &#10004;              |
-| F1-Numeric          | &#10004;      | &#10004;              |
-| F1-Text             | &#10004;      | &#10060;              |
-| FrugalScore         | &#129000;     | &#10004;              |
-| Gleu                | &#129000;     | &#10004;              |
-| Glue                | &#129000;     | &#10004;              |
-| GoogleBleu          | &#129000;     | &#10004;              |
-| IndicGlue           | &#129000;     | &#10004;              |
-| MAE                 | &#129000;     | &#10004;              |
-| Mahalanobis         | &#129000;     | &#10004;              |
-| MatthewsCorrelation | &#129000;     | &#10004;              |
-| MAUVE               | &#129000;     | &#10004;              |
-| MeanIOU             | &#129000;     | &#10004;              |
-| METEOR              | &#10004;      | &#10004;              |
-| MSE                 | &#129000;     | &#10004;              |
-| PearsonR            | &#129000;     | &#10004;              |
-| Perplexity          | &#129000;     | &#10004;              |
-| Precision-Numeric   | &#10004;      | &#10004;              |
-| Precision-Text      | &#10004;      | &#10060;              |
-| Prism               | &#10004;      | &#10060;              |
-| Recall-Numeric      | &#10004;      | &#10004;              |
-| Recall-Text         | &#10004;      | &#10060;              |
-| ROUGE               | &#10004;      | &#10004;              |
-| SacreBleu           | &#10004;      | &#10004;              |
-| SARI                | &#129000;     | &#10004;              |
-| Seqeval             | &#10004;      | &#10004;              |
-| SpearmanR           | &#129000;     | &#10004;              |
-| Squad               | &#10004;      | &#10004;              |
-| Squadv2             | &#129000;     | &#10004;              |
-| SuperGlue           | &#129000;     | &#10004;              |
-| TER                 | &#10004;      | &#10004;              |
-| WER                 | &#10004;      | &#10004;              |
-| WikiSplit           | &#129000;     | &#10004;              |
-| XNLI                | &#129000;     | &#10004;              |
+|       Metric        |    Jury Support     | HF/datasets Support |
+|---------------------|---------------------|---------------------|
+| Accuracy-Numeric    | :heavy_check_mark:  | :heavy_check_mark:  |
+| Accuracy-Text       | :heavy_check_mark:  | :x:                 |
+| Bartscore           | :heavy_check_mark:  | :x:                 |
+| Bertscore           | :heavy_check_mark:  | :heavy_check_mark:  |
+| Bleu                | :heavy_check_mark:  | :heavy_check_mark:  |
+| Bleurt              | :heavy_check_mark:  | :heavy_check_mark:  |
+| CER                 | :heavy_check_mark:  | :heavy_check_mark:  |
+| CHRF                | :heavy_check_mark:  | :heavy_check_mark:  |
+| CodeEval            | :white_check_mark:  | :heavy_check_mark:  |
+| COMET               | :heavy_check_mark:  | :heavy_check_mark:  |
+| CompetitionMath     | :white_check_mark:  | :heavy_check_mark:  |
+| COVAL               | :white_check_mark:  | :heavy_check_mark:  |
+| CUAD                | :white_check_mark:  | :heavy_check_mark:  |
+| F1-Numeric          | :heavy_check_mark:  | :heavy_check_mark:  |
+| F1-Text             | :heavy_check_mark:  | :x:                 |
+| FrugalScore         | :white_check_mark:  | :heavy_check_mark:  |
+| Gleu                | :white_check_mark:  | :heavy_check_mark:  |
+| Glue                | :white_check_mark:  | :heavy_check_mark:  |
+| GoogleBleu          | :white_check_mark:  | :heavy_check_mark:  |
+| IndicGlue           | :white_check_mark:  | :heavy_check_mark:  |
+| MAE                 | :white_check_mark:  | :heavy_check_mark:  |
+| Mahalanobis         | :white_check_mark:  | :heavy_check_mark:  |
+| MatthewsCorrelation | :white_check_mark:  | :heavy_check_mark:  |
+| MAUVE               | :white_check_mark:  | :heavy_check_mark:  |
+| MeanIOU             | :white_check_mark:  | :heavy_check_mark:  |
+| METEOR              | :heavy_check_mark:  | :heavy_check_mark:  |
+| MSE                 | :white_check_mark:  | :heavy_check_mark:  |
+| PearsonR            | :white_check_mark:  | :heavy_check_mark:  |
+| Perplexity          | :white_check_mark:  | :heavy_check_mark:  |
+| Precision-Numeric   | :heavy_check_mark:  | :heavy_check_mark:  |
+| Precision-Text      | :heavy_check_mark:  | :x:                 |
+| Prism               | :heavy_check_mark:  | :x:                 |
+| Recall-Numeric      | :heavy_check_mark:  | :heavy_check_mark:  |
+| Recall-Text         | :heavy_check_mark:  | :x:                 |
+| ROUGE               | :heavy_check_mark:  | :heavy_check_mark:  |
+| SacreBleu           | :heavy_check_mark:  | :heavy_check_mark:  |
+| SARI                | :white_check_mark:  | :heavy_check_mark:  |
+| Seqeval             | :heavy_check_mark:  | :heavy_check_mark:  |
+| SpearmanR           | :white_check_mark:  | :heavy_check_mark:  |
+| Squad               | :heavy_check_mark:  | :heavy_check_mark:  |
+| Squadv2             | :white_check_mark:  | :heavy_check_mark:  |
+| SuperGlue           | :white_check_mark:  | :heavy_check_mark:  |
+| TER                 | :heavy_check_mark:  | :heavy_check_mark:  |
+| WER                 | :heavy_check_mark:  | :heavy_check_mark:  |
+| WikiSplit           | :white_check_mark:  | :heavy_check_mark:  |
+| XNLI                | :white_check_mark:  | :heavy_check_mark:  |
+
+
 
 
 
