@@ -26,7 +26,54 @@ Main advantages that Jury offers are:
 
 To see more, check the [official Jury blog post](https://medium.com/codable/jury-evaluating-performance-of-nlg-models-730eb9c9999f).
 
-To see all available metrics, see [METRICS.md](./METRICS.md)
+# Available Metrics
+
+The table below shows the current support status for available metrics.
+
+| Metric                                                                        | Jury Support       | HF/datasets Support |
+|-------------------------------------------------------------------------------|--------------------|---------------------|
+| Accuracy-Numeric                                                              | :heavy_check_mark: | :white_check_mark:  |
+| Accuracy-Text                                                                 | :heavy_check_mark: | :x:                 |
+| Bartscore                                                                     | :heavy_check_mark: | :x:                 |
+| Bertscore                                                                     | :heavy_check_mark: | :white_check_mark:  |
+| Bleu                                                                          | :heavy_check_mark: | :white_check_mark:  |
+| Bleurt                                                                        | :heavy_check_mark: | :white_check_mark:  |
+| CER                                                                           | :heavy_check_mark: | :white_check_mark:  |
+| CHRF                                                                          | :heavy_check_mark: | :white_check_mark:  |
+| COMET                                                                         | :heavy_check_mark: | :white_check_mark:  |
+| F1-Numeric                                                                    | :heavy_check_mark: | :white_check_mark:  |
+| F1-Text                                                                       | :heavy_check_mark: | :x:                 |
+| METEOR                                                                        | :heavy_check_mark: | :white_check_mark:  |
+| Precision-Numeric                                                             | :heavy_check_mark: | :white_check_mark:  |
+| Precision-Text                                                                | :heavy_check_mark: | :x:                 |
+| Prism                                                                         | :heavy_check_mark: | :x:                 |
+| Recall-Numeric                                                                | :heavy_check_mark: | :white_check_mark:  |
+| Recall-Text                                                                   | :heavy_check_mark: | :x:                 |
+| ROUGE                                                                         | :heavy_check_mark: | :white_check_mark:  |
+| SacreBleu                                                                     | :heavy_check_mark: | :white_check_mark:  |
+| Seqeval                                                                       | :heavy_check_mark: | :white_check_mark:  |
+| Squad                                                                         | :heavy_check_mark: | :white_check_mark:  |
+| TER                                                                           | :heavy_check_mark: | :white_check_mark:  |
+| WER                                                                           | :heavy_check_mark: | :white_check_mark:  |
+| [Other metrics](https://github.com/huggingface/datasets/tree/master/metrics)* | :white_check_mark: | :white_check_mark:  |
+
+_*_ Placeholder for the rest of the metrics available in `datasets` package apart from those which are present in the 
+table. 
+
+**Notes**
+
+* In the table :white_check_mark: means that this metric is supported (for Jury through the `datasets`), so that it 
+can be used just like the `datasets` metric although unfortunately full Jury support for those metrics are not yet 
+available.
+
+* For metrics marked as :white_check_mark: are available in Jury, and they can (and should) be used as instructed 
+in `datasets` implementation, and there may not be a unified interface that applies for all of these partially 
+supported metrics.
+
+## Request for a New Metric
+
+For the request of a new metric please [open an issue](https://github.com/obss/jury/issues/new?assignees=&labels=&template=new-metric.md&title=) providing the minimum information. Also, PRs addressing new metric 
+supports are welcomed :).
 
 ## <div align="center"> Installation </div>
 
