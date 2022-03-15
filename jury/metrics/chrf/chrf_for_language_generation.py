@@ -96,7 +96,7 @@ Returns:
     'word_order': The word n-gram order. If equals to 2, the metric is referred to as chrF++,
     'beta': Determine the importance of recall w.r.t precision
 Examples:
-    >>> prediction = ["The relationship between Obama and Netanyahu is not exactly friendly."]
+    >>> prediction = [["The relationship between Obama and Netanyahu is not exactly friendly."]]
     >>> reference = [["The ties between Obama and Netanyahu are not particularly friendly."]]
     >>> chrf = jury.load_metric("chrf")
     >>> results = chrf.compute(predictions=prediction, references=reference)
@@ -110,18 +110,18 @@ class CHRFForLanguageGeneration(MetricForLanguageGeneration):
     def _info(self):
         if version.parse(scb.__version__) < version.parse("1.4.12"):
             raise ImportWarning(
-                "To use `sacrebleu`, the module `sacrebleu>=1.4.12` is required, and the current version of `sacrebleu` doesn't match this condition.\n"
-                'You can install it with `pip install "sacrebleu>=1.4.12"`.'
+                "To use `sacrebleu`, the module `sacrebleu>=1.4.12` is required, and the current version of "
+                "`sacrebleu` doesn't match this condition.\nYou can install it with `pip install sacrebleu>=1.4.12`."
             )
         return datasets.MetricInfo(
             description=_DESCRIPTION,
             citation=_CITATION,
+            homepage="https://github.com/mjpost/sacreBLEU#chrf--chrf",
             inputs_description=_KWARGS_DESCRIPTION,
             features=self._default_features,
             codebase_urls=["https://github.com/mjpost/sacreBLEU#chrf--chrf"],
             reference_urls=[
-                "https://en.wikipedia.org/wiki/Word_error_rate",
-                "https://sites.google.com/site/textdigitisation/qualitymeasures/computingerrorrates",
+                "https://github.com/m-popovic/chrF",
             ],
         )
 
