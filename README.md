@@ -26,6 +26,8 @@ Main advantages that Jury offers are:
 
 To see more, check the [official Jury blog post](https://medium.com/codable/jury-evaluating-performance-of-nlg-models-730eb9c9999f).
 
+To see all available metrics, see [METRICS.md](./METRICS.md)
+
 ## <div align="center"> Installation </div>
 
 Through pip,
