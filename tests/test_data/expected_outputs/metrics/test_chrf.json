@@ -1,0 +1,32 @@
+{
+  "basic": {
+    "total_items": 2,
+    "empty_items": 0,
+    "chrf": {
+      "score": 0.4272182337289785,
+      "char_order": 6,
+      "word_order": 0,
+      "beta": 2
+    }
+  },
+  "multiple_ref": {
+    "total_items": 2,
+    "empty_items": 0,
+    "chrf": {
+      "score": 0.340817184979931,
+      "char_order": 6,
+      "word_order": 0,
+      "beta": 2
+    }
+  },
+  "multiple_pred_multiple_ref": {
+    "total_items": 2,
+    "empty_items": 0,
+    "chrf": {
+      "score": 0.4429840574418887,
+      "char_order": 6,
+      "word_order": 0,
+      "beta": 2
+    }
+  }
+}
