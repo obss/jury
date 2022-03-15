@@ -26,4 +26,5 @@ from jury.metrics.recall import Recall
 from jury.metrics.rouge import Rouge
 from jury.metrics.sacrebleu import Sacrebleu
 from jury.metrics.squad import Squad
+from jury.metrics.ter import TER
 from jury.metrics.wer import WER

@@ -1,0 +1,29 @@
+{
+  "basic": {
+    "total_items": 2,
+    "empty_items": 0,
+    "ter": {
+      "score": 0.4615384615384615,
+      "num_edits": 3,
+      "ref_length": 6.5
+    }
+  },
+  "multiple_ref": {
+    "total_items": 2,
+    "empty_items": 0,
+    "ter": {
+      "score": 0.6153846153846154,
+      "num_edits": 8,
+      "ref_length": 13.0
+    }
+  },
+  "multiple_pred_multiple_ref": {
+    "total_items": 2,
+    "empty_items": 0,
+    "ter": {
+      "score": 0.812121212121212,
+      "avg_num_edits": 3.25,
+      "avg_ref_length": 6.5
+    }
+  }
+}
