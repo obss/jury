@@ -235,10 +235,10 @@ class CHRFForLanguageGeneration(MetricForLanguageGeneration):
                     eps_smoothing=eps_smoothing,
                 )
                 pred_scores.append(score)
-            scores.append(reduce_fn(pred_scores))
+            scores.append(float(reduce_fn(pred_scores)))
 
         return {
-            "score": float(reduce_fn(scores)),
+            "score": sum(scores) / len(scores),
             "char_order": char_order or CHRFScorer.CHAR_ORDER,
             "word_order": word_order or CHRFScorer.WORD_ORDER,
             "beta": beta or CHRFScorer.BETA,
