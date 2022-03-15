@@ -118,7 +118,7 @@ class CHRFForLanguageGeneration(MetricForLanguageGeneration):
             citation=_CITATION,
             inputs_description=_KWARGS_DESCRIPTION,
             features=self._default_features,
-            codebase_urls=["https://github.com/jitsi/jiwer/"],
+            codebase_urls=["https://github.com/mjpost/sacreBLEU#chrf--chrf"],
             reference_urls=[
                 "https://en.wikipedia.org/wiki/Word_error_rate",
                 "https://sites.google.com/site/textdigitisation/qualitymeasures/computingerrorrates",
