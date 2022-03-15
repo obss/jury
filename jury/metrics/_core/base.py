@@ -17,8 +17,6 @@ Metrics base class. The part of this file is adapted from HuggingFace's
 datasets package implementation of Accuracy metric. See
 https://github.com/huggingface/datasets/blob/master/src/datasets/metric.py
 """
-import os
-import re
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
@@ -26,8 +24,6 @@ import datasets
 import numpy
 import numpy as np
 import pandas as pd
-import pyarrow as pa
-from datasets import temp_seed
 from datasets.utils.logging import get_logger
 
 from jury.collator import Collator
