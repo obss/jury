@@ -25,7 +25,7 @@ from jury.collator import Collator
 from jury.metrics import LanguageGenerationInstance, MetricForLanguageGeneration
 from jury.metrics._core.utils import PackagePlaceholder, requirement_message
 
-# `import jiwer` placeholder
+# `import sacrebleu as scb` placeholder
 scb = PackagePlaceholder(version="2.0.0")
 
 
