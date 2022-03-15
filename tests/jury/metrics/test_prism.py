@@ -12,12 +12,6 @@ def jury_prism():
     return Jury(metrics=metric)
 
 
-@pytest.fixture(scope="module")
-def jury_prism_normalized_and_segmented():
-    metric = AutoMetric.load("prism", compute_kwargs={"normalize": True, "segment_scores": True})
-    return Jury(metrics=metric)
-
-
 @pytest.fixture
 @get_expected_output(prefix="metrics")
 def output_basic():
@@ -59,10 +53,8 @@ def test_basic(predictions, references, jury_prism, output_basic):
     assert_almost_equal_dict(actual=scores, desired=output_basic)
 
 
-def test_basic_normalized_and_segmented(
-    predictions, references, jury_prism_normalized_and_segmented, output_basic_normalized_and_segmented
-):
-    scores = jury_prism_normalized_and_segmented(predictions=predictions, references=references)
+def test_basic_normalized_and_segmented(predictions, references, jury_prism, output_basic_normalized_and_segmented):
+    scores = jury_prism(predictions=predictions, references=references, normalize=True, segment_scores=True)
     assert_almost_equal_dict(actual=scores, desired=output_basic_normalized_and_segmented)
 
 
@@ -72,9 +64,9 @@ def test_multiple_ref(predictions, multiple_references, jury_prism, output_multi
 
 
 def test_multiple_ref_normalized_and_segmented(
-    predictions, references, jury_prism_normalized_and_segmented, output_multiple_ref_normalized_and_segmented
+    predictions, references, jury_prism, output_multiple_ref_normalized_and_segmented
 ):
-    scores = jury_prism_normalized_and_segmented(predictions=predictions, references=references)
+    scores = jury_prism(predictions=predictions, references=references, normalize=True, segment_scores=True)
     assert_almost_equal_dict(actual=scores, desired=output_multiple_ref_normalized_and_segmented)
 
 
@@ -88,8 +80,8 @@ def test_multiple_pred_multiple_ref(
 def test_multiple_pred_multiple_ref_normalized_and_segmented(
     predictions,
     references,
-    jury_prism_normalized_and_segmented,
+    jury_prism,
     output_multiple_pred_multiple_ref_normalized_and_segmented,
 ):
-    scores = jury_prism_normalized_and_segmented(predictions=predictions, references=references)
+    scores = jury_prism(predictions=predictions, references=references, normalize=True, segment_scores=True)
     assert_almost_equal_dict(actual=scores, desired=output_multiple_pred_multiple_ref_normalized_and_segmented)
