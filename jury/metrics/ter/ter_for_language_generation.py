@@ -82,7 +82,7 @@ Returns:
     'num_edits': The cumulative number of edits,
     'ref_length': The cumulative average reference length.
 Examples:
-    >>> predictions = [["hello there general kenobi", "foo bar foobar"]]
+    >>> predictions = [["hello there general kenobi"], ["foo bar foobar"]]
     >>> references = [["hello there general kenobi", "hello there !"], ["foo bar foobar", "foo bar foobar"]]
     >>> ter = jury.load_metric("ter")
     >>> results = ter.compute(predictions=predictions, references=references)
@@ -114,7 +114,7 @@ class TERForLanguageGeneration(MetricForLanguageGeneration):
             import sacrebleu as scb
             from sacrebleu import TER as TERScorer
         except ModuleNotFoundError:
-            raise ModuleNotFoundError(requirement_message(path="WER", package_name="jiwer"))
+            raise ModuleNotFoundError(requirement_message(path="TER", package_name="sacrebleu"))
         else:
             super(TERForLanguageGeneration, self)._download_and_prepare(dl_manager)
 
