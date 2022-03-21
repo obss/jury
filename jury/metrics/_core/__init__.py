@@ -4,6 +4,7 @@ from jury.metrics._core.base import (
     EvaluationInstance,
     LanguageGenerationInstance,
     Metric,
+    MetricForCrossLingualEvaluation,
     MetricForLanguageGeneration,
     MetricForSequenceClassification,
     MetricForSequenceLabeling,

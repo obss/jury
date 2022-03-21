@@ -1,0 +1,35 @@
+{
+  "basic": {
+    "total_items": 2,
+    "empty_items": 0,
+    "comet": {
+      "scores": [
+        -0.029062556102871895,
+        0.47664526104927063
+      ],
+      "samples": 0.22379135247319937
+    }
+  },
+  "multiple_ref": {
+    "total_items": 2,
+    "empty_items": 0,
+    "comet": {
+      "scores": [
+        0.05850040912628174,
+        0.49252423644065857
+      ],
+      "samples": 0.27551232278347015
+    }
+  },
+  "multiple_pred_multiple_ref": {
+    "total_items": 2,
+    "empty_items": 0,
+    "comet": {
+      "scores": [
+        0.3315272331237793,
+        1.4006391763687134
+      ],
+      "samples": 0.8660832047462463
+    }
+  }
+}

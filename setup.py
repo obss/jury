@@ -54,6 +54,7 @@ _METRIC_REQUIREMENTS = [
     "jiwer>=2.3.0",
     "seqeval==1.2.2",
     "sentencepiece==0.1.96",
+    "unbabel-comet @ git+https://github.com/Unbabel/COMET.git@c772b679e20725e6cc79b2107d50594f9ea7a4ae",
 ]
 _METRIC_REQUIREMENTS.extend(_PRISM_REQUIREMENTS)
 add_pywin(_METRIC_REQUIREMENTS)

@@ -19,6 +19,7 @@ from jury.metrics.bleu import Bleu
 from jury.metrics.bleurt import Bleurt
 from jury.metrics.cer import CER
 from jury.metrics.chrf import CHRF
+from jury.metrics.comet import Comet
 from jury.metrics.f1 import F1
 from jury.metrics.meteor import Meteor
 from jury.metrics.precision import Precision
