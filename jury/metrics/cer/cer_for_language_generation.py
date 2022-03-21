@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -62,12 +62,12 @@ Args:
 Returns:
     (float): the character error rate
 Examples:
-    >>> predictions = ["this is the prediction", "there is an other sample"]
-    >>> references = ["this is the reference", "there is another one"]
+    >>> predictions = [["this is the prediction"], ["there is an other sample"]]
+    >>> references = [["this is the reference"], ["there is another one"]]
     >>> cer = jury.load_metric("cer")
     >>> cer_score = cer.compute(predictions=predictions, references=references)
     >>> print(cer_score)
-    0.34146341463414637
+    {'score': 0.34146341463414637, 'overall': {'substitutions': 9, 'deletions': 0, 'insertions': 5, 'hits': 32}}
 """
 
 

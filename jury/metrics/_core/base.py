@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The HuggingFace Datasets Authors
+# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -196,7 +196,7 @@ class Metric(datasets.Metric, ABC):
         return self._task
 
 
-class MetricForTask(Metric):
+class MetricForTask(Metric, ABC):
     """
     Base metric class for any task. All metrics must extend this class as metric is required to adopt a task
     inherently. Default task will be language-generation for AutoMetric.

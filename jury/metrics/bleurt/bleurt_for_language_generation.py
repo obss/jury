@@ -61,8 +61,8 @@ Returns:
     'scores': List of scores.
 Examples:
 
-    >>> predictions = ["hello there", "general kenobi"]
-    >>> references = ["hello there", "general kenobi"]
+    >>> predictions = [["hello there"], ["general kenobi"]]
+    >>> references = [["hello there"], ["general kenobi"]]
     >>> bleurt = jury.load_metric("bleurt")
     >>> results = bleurt.compute(predictions=predictions, references=references)
     >>> print([round(v, 2) for v in results["scores"]])
@@ -188,3 +188,13 @@ class BleurtForLanguageGeneration(MetricForLanguageGeneration):
             scores.append(reduced_score)
 
         return {"score": sum(scores) / len(scores), "scores": scores, "checkpoint": self.config_name}
+
+
+if __name__ == "__main__":
+    import json
+
+    predictions = [["hello there", "general kenobi"]]
+    references = [["hello there", "general kenobi"]]
+    bleurt = BleurtForLanguageGeneration()
+    results = bleurt.compute(predictions=predictions, references=references)
+    print(json.dumps(results, indent=2))

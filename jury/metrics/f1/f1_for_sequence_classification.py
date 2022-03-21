@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The HuggingFace Datasets Authors and the current dataset script contributor.
+# Copyright 2021 The HuggingFace Datasets Authors and the current dataset script contributor.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -60,25 +60,25 @@ Returns:
     f1: F1 score.
 Examples:
 
-    >>> f1_metric = datasets.load_metric("f1")
-    >>> results = f1_metric.compute(predictions=[0, 1], references=[0, 1])
+    >>> f1_metric = jury.load_metric("f1")
+    >>> results = f1_metric.compute(predictions=[[0, 1]], references=[[0, 1]])
     >>> print(results)
     {'f1': 1.0}
 
-    >>> predictions = [0, 2, 1, 0, 0, 1]
-    >>> references = [0, 1, 2, 0, 1, 2]
+    >>> predictions = [[0], [2], [1], [0], [0], [1]]
+    >>> references = [[0], [1], [2], [0], [1], [2]]
     >>> results = f1_metric.compute(predictions=predictions, references=references, average="macro")
     >>> print(results)
-    {'f1': 0.26666666666666666}
+    {'score': 0.3333333333333333}
     >>> results = f1_metric.compute(predictions=predictions, references=references, average="micro")
     >>> print(results)
     {'f1': 0.3333333333333333}
     >>> results = f1_metric.compute(predictions=predictions, references=references, average="weighted")
     >>> print(results)
-    {'f1': 0.26666666666666666}
+    {'f1': 0.3333333333333333}
     >>> results = f1_metric.compute(predictions=predictions, references=references, average=None)
     >>> print(results)
-    {'f1': array([0.8, 0. , 0. ])}
+    {'f1': 0.3333333333333333}
 """
 
 _CITATION = """

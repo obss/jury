@@ -164,7 +164,7 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
         max_order: int = 4,
         smooth: bool = False,
     ):
-        # _compute_bleu_score expects a slighthly different reference structure
+        # _compute_bleu_score expects a slightly different reference structure
         #   than the one we currently have for single prediction single reference
         references = [[r] for r in references]
         return self._compute_bleu_score(

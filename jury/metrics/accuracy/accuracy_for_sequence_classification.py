@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The HuggingFace Datasets Authors and the current dataset script contributor.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,33 +25,37 @@ from sklearn.metrics import accuracy_score
 from jury.metrics._core import MetricForSequenceClassification, SequenceClassificationInstance
 
 _CITATION = """\
-@inproceedings{papineni2002bleu,
-  title={Bleu: a method for automatic evaluation of machine translation},
-  author={Papineni, Kishore and Roukos, Salim and Ward, Todd and Zhu, Wei-Jing},
-  booktitle={Proceedings of the 40th annual meeting of the Association for Computational Linguistics},
-  pages={311--318},
-  year={2002}
+@article{scikit-learn,
+  title={Scikit-learn: Machine Learning in {P}ython},
+  author={Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V.
+         and Thirion, B. and Grisel, O. and Blondel, M. and Prettenhofer, P.
+         and Weiss, R. and Dubourg, V. and Vanderplas, J. and Passos, A. and
+         Cournapeau, D. and Brucher, M. and Perrot, M. and Duchesnay, E.},
+  journal={Journal of Machine Learning Research},
+  volume={12},
+  pages={2825--2830},
+  year={2011}
 }
 """
 
 _DESCRIPTION = """
-This metric is derived from Modified Unigram Precision as an accuracy metric so that
-it will compute across maximum of reference or prediction. The computation is similar 
-to precision and recall, however, we call this accuracy since there is no measure 
-called "modified unigram accuracy".
-Accuracy is the fraction of the common unigrams between the prediction
-and the references among the max of prediction or reference tokens. It can be computed with:
-Accuracy = # of matching tokens / max(# of prediction tokens, # of reference tokens)
+Accuracy is the proportion of correct predictions among the total number of cases processed. It can be computed with:
+Accuracy = (TP + TN) / (TP + TN + FP + FN)
+TP: True positive
+TN: True negative
+FP: False positive
+FN: False negative
 """
 
 _KWARGS_DESCRIPTION = """
 Args:
-    predictions: list of predictions to score. Each predictions
-        should be a string with tokens separated by spaces.
-    references: list of reference for each prediction. Each
-        reference should be a string with tokens separated by spaces.
+    predictions: Predicted labels, as returned by a model.
+    references: Ground truth labels.
+    normalize: If False, return the number of correctly classified samples.
+        Otherwise, return the fraction of correctly classified samples.
+    sample_weight: Sample weights.
 Returns:
-    'score': Accuracy score.
+    accuracy: Accuracy score.
 Examples:
 
     >>> accuracy = jury.load_metric("accuracy")
