@@ -15,14 +15,15 @@
 <a href="https://doi.org/10.5281/zenodo.6109838"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.6109838.svg" alt="DOI"></a>
 </p>
 
-A comprehensive toolkit for evaluating NLP experiments offering various automated metrics. Jury offers a smooth and easy-to-use interface. It uses [datasets](https://github.com/huggingface/datasets/) for underlying metric computation, and hence adding custom metric is easy as extending proper class.
+A comprehensive toolkit for evaluating NLP experiments offering various automated metrics. Jury offers a smooth and easy-to-use interface. It uses a more advanced version of [datasets](https://github.com/huggingface/datasets/) design for underlying metric computation, so that adding custom metric is easy as extending proper class.
 
 Main advantages that Jury offers are:
 
-- Easy to use for any NLG system.
+- Easy to use for any NLP project.
+- Unified structure for computation input across all metrics.
 - Calculate many metrics at once.
-- Metrics calculations are handled concurrently to save processing time.
-- It supports evaluating multiple predictions seamlessly.
+- Metrics calculations can be handled concurrently to save processing time.
+- It seamlessly supports evaluation for multiple predictions/multiple references.
 
 To see more, check the [official Jury blog post](https://medium.com/codable/jury-evaluating-performance-of-nlg-models-730eb9c9999f).
 
