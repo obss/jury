@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -63,18 +63,23 @@ Args:
 Returns:
     (float): the word error rate
 Examples:
-    >>> predictions = ["this is the prediction", "there is an other sample"]
-    >>> references = ["this is the reference", "there is another one"]
+    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
+    >>> references = [
+        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["Today is a wonderful day", "The weather outside is wonderful."]
+    ]
     >>> wer = jury.load_metric("wer")
     >>> wer_score = wer.compute(predictions=predictions, references=references)
     >>> print(wer_score)
     {
-      "score": 0.5,
-      "overall": {
-        "substitutions": 3,
-        "deletions": 0,
-        "insertions": 1,
-        "hits": 5
+      "wer": {
+        "score": 1.0,
+        "overall": {
+          "substitutions": 2.8333333333333335,
+          "deletions": 0.5,
+          "insertions": 0.16666666666666666,
+          "hits": 2.6666666666666665
+        }
       }
     }
 """

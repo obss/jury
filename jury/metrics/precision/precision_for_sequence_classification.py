@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The HuggingFace Datasets Authors and the current dataset script contributor.
+# Copyright 2021 The HuggingFace Datasets Authors and the current dataset script contributor.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -61,24 +61,21 @@ Args:
 Returns:
     precision: Precision score.
 Examples:
-    >>> precision_metric = datasets.load_metric("precision")
-    >>> results = precision_metric.compute(references=[0, 1], predictions=[0, 1])
-    >>> print(results)
-    {'precision': 1.0}
-    >>> predictions = [0, 2, 1, 0, 0, 1]
-    >>> references = [0, 1, 2, 0, 1, 2]
+    >>> precision_metric = jury.load_metric("precision", task="sequence-classification")
+    >>> predictions = [[0], [2], [1], [0], [0], [1]]
+    >>> references = [[0], [1], [2], [0], [1], [2]]
     >>> results = precision_metric.compute(predictions=predictions, references=references, average='macro')
     >>> print(results)
-    {'precision': 0.2222222222222222}
+    {'precision': {'score': 0.2222222222222222}}
     >>> results = precision_metric.compute(predictions=predictions, references=references, average='micro')
     >>> print(results)
-    {'precision': 0.3333333333333333}
+    {'precision': {'score': 0.3333333333333333}}
     >>> results = precision_metric.compute(predictions=predictions, references=references, average='weighted')
     >>> print(results)
-    {'precision': 0.2222222222222222}
+    {'precision': {'score': 0.2222222222222222}}
     >>> results = precision_metric.compute(predictions=predictions, references=references, average=None)
     >>> print(results)
-    {'precision': array([0.66666667, 0.        , 0.        ])}
+    {'precision': {'score': [0.6666666666666666, 0.0, 0.0]}}
 """
 
 _CITATION = """\

@@ -12,7 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" ChrF(++) (Character n-gram F-score) metric. The part of this file is adapted from HuggingFace's
+"""
+ChrF(++) (Character n-gram F-score) metric. The part of this file is adapted from HuggingFace's
 datasets package implementation of CHRF metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/chrf/chrf.py
 """
@@ -96,12 +97,15 @@ Returns:
     'word_order': The word n-gram order. If equals to 2, the metric is referred to as chrF++,
     'beta': Determine the importance of recall w.r.t precision
 Examples:
-    >>> prediction = [["The relationship between Obama and Netanyahu is not exactly friendly."]]
-    >>> reference = [["The ties between Obama and Netanyahu are not particularly friendly."]]
+    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
+    >>> references = [
+        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["Today is a wonderful day", "The weather outside is wonderful."]
+    ]
     >>> chrf = jury.load_metric("chrf")
     >>> results = chrf.compute(predictions=prediction, references=reference)
     >>> print(results)
-    {'score': 61.576379378113785, 'char_order': 6, 'word_order': 0, 'beta': 2}
+    {'chrf': {'score': 0.29778203723986857, 'char_order': 6, 'word_order': 0, 'beta': 2}}
 """
 
 

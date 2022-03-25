@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -93,10 +93,38 @@ Examples:
     ]
     >>> results = sacrebleu.compute(predictions=predictions, references=references)
     >>> print(results)
-    {'sacrebleu': {'score': 0.32377227131456443, 'counts': [11, 6, 3, 0], 'totals': [13, 11, 9, 7],
-         'precisions': [0.8461538461538461, 0.5454545454545454, 0.33333333333333337, 0.07142857142857144], 
-         'bp': 1.0, 'sys_len': 11, 'ref_len': 12, 
-         'adjusted_precisions': [0.8461538461538461, 0.5454545454545454, 0.33333333333333337, 0.07142857142857144]}}
+    {
+      "sacrebleu": {
+        "score": 0.32377227131456443,
+        "counts": [
+          11,
+          6,
+          3,
+          0
+        ],
+        "totals": [
+          13,
+          11,
+          9,
+          7
+        ],
+        "precisions": [
+          0.8461538461538461,
+          0.5454545454545454,
+          0.33333333333333337,
+          0.07142857142857144
+        ],
+        "bp": 1.0,
+        "sys_len": 11,
+        "ref_len": 12,
+        "adjusted_precisions": [
+          0.8461538461538461,
+          0.5454545454545454,
+          0.33333333333333337,
+          0.07142857142857144
+        ]
+      }
+    }
 """
 
 

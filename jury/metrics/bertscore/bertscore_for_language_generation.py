@@ -12,10 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" BERTScore metric. The part of this file is adapted from BERTScore implementation
+"""
+BERTScore metric. The part of this file is adapted from BERTScore implementation
 of datasets package. See
-https://github.com/huggingface/datasets/blob/master/metrics/bertscore/bertscore.py """
-
+https://github.com/huggingface/datasets/blob/master/metrics/bertscore/bertscore.py
+"""
 import functools
 from contextlib import contextmanager
 from typing import Dict, List

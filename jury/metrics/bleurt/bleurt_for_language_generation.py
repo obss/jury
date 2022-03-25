@@ -12,9 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" BLEURT metric. The part of this file is adapted from BLEURT implementation
+"""
+BLEURT metric. The part of this file is adapted from BLEURT implementation
 of datasets package. See
-https://github.com/huggingface/datasets/blob/master/metrics/bleurt/bleurt.py """
+https://github.com/huggingface/datasets/blob/master/metrics/bleurt/bleurt.py
+"""
 
 import os
 from typing import Callable
@@ -61,12 +63,15 @@ Returns:
     'scores': List of scores.
 Examples:
 
-    >>> predictions = [["hello there"], ["general kenobi"]]
-    >>> references = [["hello there"], ["general kenobi"]]
-    >>> bleurt = jury.load_metric("bleurt")
+    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
+    >>> references = [
+        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["Today is a wonderful day", "The weather outside is wonderful."]
+    ]
+    >>> bleurt = jury.load_metric("bleurt", config_name="bleurt-tiny-128")
     >>> results = bleurt.compute(predictions=predictions, references=references)
-    >>> print([round(v, 2) for v in results["scores"]])
-    [1.03, 1.04]
+    >>> print(results)
+    {'bleurt': {'score': 0.25963682122528553, 'scores': [0.47344309091567993, 0.04583055153489113], 'checkpoint': 'bleurt-tiny-128'}}
 """
 
 _LICENSE = """Copyright 2021 Google.

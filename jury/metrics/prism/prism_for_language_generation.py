@@ -12,9 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" Prism metric. The part of this file is adapted from metric implementations
+"""
+Prism metric. The part of this file is adapted from metric implementations
 of datasets package. See
-https://github.com/huggingface/datasets/blob/master/metrics/ """
+https://github.com/huggingface/datasets/blob/master/metrics/
+"""
 import os
 from typing import Callable, Dict, List, Union
 
@@ -68,30 +70,29 @@ Returns:
 Examples:
 
     >>> prism = jury.load_metric("prism")
-    >>> predictions = [
-        ["the cat is on the mat", "There is cat playing on mat"],
-        ["Look! what a wonderful day, today.", "Today is a very wonderful day"],
-    ]
+    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
     >>> references = [
-        ["the cat is playing on the mat.", "The cat plays on the mat."],
-        ["Today is a wonderful day", "The weather outside is wonderful."],
+        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["Today is a wonderful day", "The weather outside is wonderful."]
     ]
     >>> results = prism.compute(predictions=predictions, references=references)
     >>> print(results)
     {
-      "score": -1.1489432752132416,
-      "identifier": {
+      "prism": {
+        "score": -2.3071975708007812,
+        "identifier": {
           "version": "0.1",
           "model": "m39v1",
           "seg_scores": "avg_log_prob",
           "sys_scores": "avg_log_prob",
           "log_base": 2,
           "temperature": 1.0
-      },
-      "model_path_or_url": "http://data.statmt.org/prism/m39v1.tar",
-      "lang": "en",
-      "segment_scores": false,
-      "normalized": false
+        },
+        "model_path_or_url": "default",
+        "lang": "en",
+        "segment_scores": false,
+        "normalized": false
+      }
     }
 """
 

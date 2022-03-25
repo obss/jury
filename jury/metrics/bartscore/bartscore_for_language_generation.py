@@ -12,9 +12,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" Bartscore metric. The part of this file is adapted from metric implementations
+"""
+BARTScore metric. The part of this file is adapted from metric implementations
 of datasets package. See
-https://github.com/huggingface/datasets/blob/master/metrics/ """
+https://github.com/huggingface/datasets/blob/master/metrics/
+"""
 from typing import Callable, Dict, List
 
 import datasets
@@ -65,23 +67,20 @@ Returns:
 Examples:
 
     >>> bartscore = jury.load_metric("bartscore")
-    >>> predictions = [
-        ["the cat is on the mat", "There is cat playing on mat"],
-        ["Look! what a wonderful day, today.", "Today is a very wonderful day"],
-    ]
+    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
     >>> references = [
-        ["the cat is playing on the mat.", "The cat plays on the mat."],
-        ["Today is a wonderful day", "The weather outside is wonderful."],
+        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["Today is a wonderful day", "The weather outside is wonderful."]
     ]
     >>> results = bartscore.compute(predictions=predictions, references=references)
     >>> print(results)
     {
-        'bartscore': {
-            'score': -1.8933048248291016,
-            'model_checkpoint': 'bartscore-large-cnn',
-            'model_weights': None,
-            'segment_scores': False
-        }
+      "bartscore": {
+        "score": -2.201135754585266,
+        "model_checkpoint": "bartscore-large-cnn",
+        "model_weights": null,
+        "segment_scores": false
+      }
     }
 """
 

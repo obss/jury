@@ -58,15 +58,12 @@ Returns:
     accuracy: Accuracy score.
 Examples:
 
-    >>> accuracy = jury.load_metric("accuracy")
-    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
-    >>> references = [
-        ["the cat is playing on the mat.", "The cat plays on the mat."], 
-        ["Today is a wonderful day", "The weather outside is wonderful."]
-    ]
+    >>> accuracy = jury.load_metric("accuracy", task="sequence-classification")
+    >>> predictions = [[0], [2], [1], [0], [0], [1]]
+    >>> references = [[0], [1], [2], [0], [1], [2]]
     >>> results = accuracy.compute(predictions=predictions, references=references)
     >>> print(results)
-    {'accuracy': {'score': 0.7285714285714285}}
+    {'accuracy': {'score': 0.3333333333333333}}
 """
 
 

@@ -62,12 +62,25 @@ Args:
 Returns:
     (float): the character error rate
 Examples:
-    >>> predictions = [["this is the prediction"], ["there is an other sample"]]
-    >>> references = [["this is the reference"], ["there is another one"]]
+    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
+    >>> references = [
+        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["Today is a wonderful day", "The weather outside is wonderful."]
+    ]
     >>> cer = jury.load_metric("cer")
     >>> cer_score = cer.compute(predictions=predictions, references=references)
     >>> print(cer_score)
-    {'score': 0.34146341463414637, 'overall': {'substitutions': 9, 'deletions': 0, 'insertions': 5, 'hits': 32}}
+    {
+      "cer": {
+        "score": 0.7272727272727273,
+        "overall": {
+          "substitutions": 3.1666666666666665,
+          "deletions": 5.5,
+          "insertions": 2.3333333333333335,
+          "hits": 19.166666666666668
+        }
+      }
+    }
 """
 
 

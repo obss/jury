@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -12,7 +12,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-""" Translation Edit Rate (TER) metric. The part of this file is adapted from HuggingFace's
+"""
+Translation Edit Rate (TER) metric. The part of this file is adapted from HuggingFace's
 datasets package implementation of TER metric. See
 https://github.com/huggingface/datasets/blob/master/metrics/ter/ter.py
 """
@@ -82,12 +83,15 @@ Returns:
     'num_edits': The cumulative number of edits,
     'ref_length': The cumulative average reference length.
 Examples:
-    >>> predictions = [["hello there general kenobi"], ["foo bar foobar"]]
-    >>> references = [["hello there general kenobi", "hello there !"], ["foo bar foobar", "foo bar foobar"]]
+    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
+    >>> references = [
+        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["Today is a wonderful day", "The weather outside is wonderful."]
+    ]
     >>> ter = jury.load_metric("ter")
     >>> results = ter.compute(predictions=predictions, references=references)
     >>> print(results)
-    {'score': 0.0, 'num_edits': 0, 'ref_length': 6.5}
+    {'ter': {'score': 0.5307692307692308, 'avg_num_edits': 2.75, 'avg_ref_length': 5.75}}
 """
 
 

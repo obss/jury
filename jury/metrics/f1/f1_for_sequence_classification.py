@@ -60,7 +60,7 @@ Returns:
     f1: F1 score.
 Examples:
 
-    >>> f1_metric = jury.load_metric("f1")
+    >>> f1_metric = jury.load_metric("f1", task="sequence-classification")
     >>> results = f1_metric.compute(predictions=[[0, 1]], references=[[0, 1]])
     >>> print(results)
     {'f1': 1.0}
@@ -69,16 +69,16 @@ Examples:
     >>> references = [[0], [1], [2], [0], [1], [2]]
     >>> results = f1_metric.compute(predictions=predictions, references=references, average="macro")
     >>> print(results)
-    {'score': 0.3333333333333333}
+    {'f1': {'score': 0.26666666666666666}}
     >>> results = f1_metric.compute(predictions=predictions, references=references, average="micro")
     >>> print(results)
-    {'f1': 0.3333333333333333}
+    {'f1': {'score': 0.3333333333333333}}
     >>> results = f1_metric.compute(predictions=predictions, references=references, average="weighted")
     >>> print(results)
-    {'f1': 0.3333333333333333}
+    {'f1': {'score': 0.26666666666666666}}
     >>> results = f1_metric.compute(predictions=predictions, references=references, average=None)
     >>> print(results)
-    {'f1': 0.3333333333333333}
+    {'f1': {'score': [0.8, 0.0, 0.0]}}
 """
 
 _CITATION = """
