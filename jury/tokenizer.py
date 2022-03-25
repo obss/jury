@@ -24,8 +24,11 @@ class TokenizerWrapper:
     def tokenize(self, predictions: Collator, references: Collator) -> Tuple[Collator, Collator]:
         _predictions = []
         _references = []
-        for preds in predictions:
+        i = 0
+        while i < len(predictions):
+            preds = predictions[i]
+            refs = references[i]
             _predictions.append([self.tokenizer.tokenize(pred) for pred in preds])
-        for refs in references:
             _references.append([self.tokenizer.tokenize(ref) for ref in refs])
+            i += 1
         return Collator(_predictions, keep=True), Collator(_references, keep=True)

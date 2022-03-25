@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -83,8 +83,14 @@ Examples:
     ]
     >>> results = rouge.compute(predictions=predictions, references=references)
     >>> print(results)
-    {'rouge': {'rouge1': 0.7783882783882783, 'rouge2': 0.5925324675324675, 
-        'rougeL': 0.7426739926739926, 'rougeLsum': 0.7426739926739926}}
+    {
+      "rouge": {
+        "rouge1": 0.7783882783882783,
+        "rouge2": 0.5925324675324675,
+        "rougeL": 0.7426739926739926,
+        "rougeLsum": 0.7426739926739926
+      }
+    }
 """
 
 

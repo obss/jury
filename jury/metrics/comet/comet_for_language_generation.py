@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -77,13 +77,16 @@ Returns:
     `samples`: List of dictionaries with `src`, `mt`, `ref` and `score`.
     `scores`: List of scores.
 Examples:
-    >>> comet_metric = jury.load_metric('comet')
-    >>> source = ["Dem Feuer konnte Einhalt geboten werden", "Schulen und Kindergärten wurden eröffnet."]
-    >>> hypothesis = ["The fire could be stopped", "Schools and kindergartens were open"]
-    >>> reference = ["They were able to control the fire.", "Schools and kindergartens opened"]
-    >>> results = comet_metric.compute(predictions=hypothesis, references=reference, sources=source)
+    >>> comet_metric = jury.load_metric('comet', config_name="wmt21-cometinho-da")
+    >>> source = ["Die Katze spielt auf der Matte.", "Heute ist ein wunderbarer Tag."]
+    >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
+    >>> references = [
+        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["Today is a wonderful day", "The weather outside is wonderful."]
+    ]
+    >>> results = comet_metric.compute(sources=source, predictions=hypothesis, references=reference)
     >>> print(results)
-    {'scores': [0.19016975164413452, 0.9156621694564819], 'samples': 0.5529159605503082}
+    {'comet': {'scores': [0.6338749527931213, 0.4925243854522705], 'samples': 0.5631996691226959}}
 """
 
 

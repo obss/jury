@@ -12,12 +12,6 @@ def jury_bartscore():
     return Jury(metrics=metric)
 
 
-@pytest.fixture(scope="module")
-def jury_bartscore_segment():
-    metric = AutoMetric.load("bartscore", device="cpu", compute_kwargs={"segment_scores": True})
-    return Jury(metrics=metric)
-
-
 @pytest.fixture
 @get_expected_output(prefix="metrics")
 def output_basic():
@@ -47,8 +41,8 @@ def test_basic(predictions, references, jury_bartscore, output_basic):
     assert_almost_equal_dict(actual=scores, desired=output_basic)
 
 
-def test_basic_segment(predictions, references, jury_bartscore_segment, output_basic_segment):
-    scores = jury_bartscore_segment(predictions=predictions, references=references)
+def test_basic_segment(predictions, references, jury_bartscore, output_basic_segment):
+    scores = jury_bartscore(predictions=predictions, references=references, segment_scores=True)
     assert_almost_equal_dict(actual=scores, desired=output_basic_segment)
 
 

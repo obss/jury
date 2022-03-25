@@ -29,23 +29,28 @@ from jury.metrics._core import MetricForLanguageGeneration
 from jury.utils.nlp import normalize_text
 
 _CITATION = """\
-@inproceedings{papineni2002bleu,
-  title={Bleu: a method for automatic evaluation of machine translation},
-  author={Papineni, Kishore and Roukos, Salim and Ward, Todd and Zhu, Wei-Jing},
-  booktitle={Proceedings of the 40th annual meeting of the Association for Computational Linguistics},
-  pages={311--318},
-  year={2002}
+@article{scikit-learn,
+  title={Scikit-learn: Machine Learning in {P}ython},
+  author={Pedregosa, F. and Varoquaux, G. and Gramfort, A. and Michel, V.
+         and Thirion, B. and Grisel, O. and Blondel, M. and Prettenhofer, P.
+         and Weiss, R. and Dubourg, V. and Vanderplas, J. and Passos, A. and
+         Cournapeau, D. and Brucher, M. and Perrot, M. and Duchesnay, E.},
+  journal={Journal of Machine Learning Research},
+  volume={12},
+  pages={2825--2830},
+  year={2011}
 }
 """
 
 _DESCRIPTION = """
-This metric is derived from Modified Unigram Precision as an accuracy metric so that
-it will compute across maximum of reference or prediction. The computation is similar 
-to precision and recall, however, we call this accuracy since there is no measure 
-called "modified unigram accuracy".
-Accuracy is the fraction of the common unigrams between the prediction
-and the references among the max of prediction or reference tokens. It can be computed with:
-Accuracy = # of matching tokens / max(# of prediction tokens, # of reference tokens)
+Accuracy is the proportion of correct predictions among the total number of cases processed. It can be computed with:
+Accuracy = (TP + TN) / (TP + TN + FP + FN)
+TP: True positive
+TN: True negative
+FP: False positive
+FN: False negative
+
+Accuracy for language generation computes token based accuracy.
 """
 
 _KWARGS_DESCRIPTION = """

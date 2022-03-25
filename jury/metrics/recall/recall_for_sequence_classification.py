@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 The HuggingFace Datasets Authors and the current dataset script contributor.
+# Copyright 2021 The HuggingFace Datasets Authors and the current dataset script contributor.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -25,10 +25,12 @@ from sklearn.metrics import recall_score
 from jury.metrics._core import MetricForSequenceClassification, SequenceClassificationInstance
 
 _DESCRIPTION = """
-Precision is the fraction of the true examples among the predicted examples. It can be computed with:
-Precision = TP / (TP + FP)
-TP: True positive
-FP: False positive
+This metric is derived from Modified Unigram Precision as a recall metric so that
+it will compute across references and not across predictions unlike precision. The computation is similar, however,
+we call this recall since there is no measure called "modified unigram recall".
+Recall is the fraction of the common unigrams between the prediction
+and the references among the reference tokens. It can be computed with:
+Recall = # of matching tokens / # of reference tokens
 """
 
 _KWARGS_DESCRIPTION = """
@@ -61,24 +63,12 @@ Args:
 Returns:
     precision: Precision score.
 Examples:
-    >>> precision_metric = datasets.load_metric("precision")
-    >>> results = precision_metric.compute(references=[0, 1], predictions=[0, 1])
+    >>> precision_metric = jury.load_metric("recall", taks="sequence-classificaiton")
+    >>> predictions = [[0], [2], [1], [0], [0], [1]]
+    >>> references = [[0], [1], [2], [0], [1], [2]]
+    >>> results = precision_metric.compute(predictions=predictions, references=references)
     >>> print(results)
-    {'precision': 1.0}
-    >>> predictions = [0, 2, 1, 0, 0, 1]
-    >>> references = [0, 1, 2, 0, 1, 2]
-    >>> results = precision_metric.compute(predictions=predictions, references=references, average='macro')
-    >>> print(results)
-    {'precision': 0.2222222222222222}
-    >>> results = precision_metric.compute(predictions=predictions, references=references, average='micro')
-    >>> print(results)
-    {'precision': 0.3333333333333333}
-    >>> results = precision_metric.compute(predictions=predictions, references=references, average='weighted')
-    >>> print(results)
-    {'precision': 0.2222222222222222}
-    >>> results = precision_metric.compute(predictions=predictions, references=references, average=None)
-    >>> print(results)
-    {'precision': array([0.66666667, 0.        , 0.        ])}
+    {'recall': {'score': 0.3333333333333333}}
 """
 
 _CITATION = """\

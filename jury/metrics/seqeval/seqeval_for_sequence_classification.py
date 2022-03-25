@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2020 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -95,14 +95,31 @@ Examples:
 
     >>> predictions = [['O', 'O', 'B-MISC', 'I-MISC', 'I-MISC', 'I-MISC', 'O'], ['B-PER', 'I-PER', 'O']]
     >>> references = [['O', 'O', 'O', 'B-MISC', 'I-MISC', 'I-MISC', 'O'], ['B-PER', 'I-PER', 'O']]
-    >>> seqeval = datasets.load_metric("seqeval")
+    >>> seqeval = jury.load_metric("seqeval")
     >>> results = seqeval.compute(predictions=predictions, references=references)
     >>> print(list(results.keys()))
     ['MISC', 'PER', 'overall_precision', 'overall_recall', 'overall_f1', 'overall_accuracy']
-    >>> print(results["overall_f1"])
-    0.5
-    >>> print(results["PER"]["f1"])
-    1.0
+    >>> print(results)
+    {
+      "seqeval": {
+        "MISC": {
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "number": 1
+        },
+        "PER": {
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "number": 1
+        },
+        "overall_precision": 0.5,
+        "overall_recall": 0.5,
+        "overall_f1": 0.5,
+        "overall_accuracy": 0.8
+      }
+    }
 """
 
 

@@ -12,12 +12,6 @@ def jury_wer():
     return Jury(metrics=metric)
 
 
-@pytest.fixture(scope="module")
-def jury_wer_concat():
-    metric = AutoMetric.load("wer", compute_kwargs={"concatenate_texts": True})
-    return Jury(metrics=metric)
-
-
 @pytest.fixture
 @get_expected_output(prefix="metrics")
 def output_basic():
@@ -47,8 +41,8 @@ def test_basic(predictions, references, jury_wer, output_basic):
     assert_almost_equal_dict(actual=scores, desired=output_basic)
 
 
-def test_basic_concat(predictions, references, jury_wer_concat, output_basic_concat):
-    scores = jury_wer_concat(predictions=predictions, references=references)
+def test_basic_concat(predictions, references, jury_wer, output_basic_concat):
+    scores = jury_wer(predictions=predictions, references=references, concatenate_texts=True)
     assert_almost_equal_dict(actual=scores, desired=output_basic_concat)
 
 

@@ -94,9 +94,21 @@ Examples:
     ]
     >>> results = bleu.compute(predictions=predictions, references=references)
     >>> print(results)
-    {'bleu': {'score': 0.42370250917168295, 
-        'precisions': [0.8823529411764706, 0.6428571428571429, 0.45454545454545453, 0.125], 
-        'brevity_penalty': 1.0, 'length_ratio': 1.0, 'translation_length': 11, 'reference_length': 11}}
+    {
+      "bleu": {
+        "score": 0.42370250917168295,
+        "precisions": [
+          0.8823529411764706,
+          0.6428571428571429,
+          0.45454545454545453,
+          0.125
+        ],
+        "brevity_penalty": 1.0,
+        "length_ratio": 1.0,
+        "translation_length": 11,
+        "reference_length": 11
+      }
+    }
 """
 
 
@@ -164,7 +176,7 @@ class BleuForLanguageGeneration(MetricForLanguageGeneration):
         max_order: int = 4,
         smooth: bool = False,
     ):
-        # _compute_bleu_score expects a slighthly different reference structure
+        # _compute_bleu_score expects a slightly different reference structure
         #   than the one we currently have for single prediction single reference
         references = [[r] for r in references]
         return self._compute_bleu_score(
