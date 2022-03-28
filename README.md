@@ -63,13 +63,13 @@ table.
 
 **Notes**
 
-* In the table :white_check_mark: means that this metric is supported (for Jury through the `datasets`), so that it 
-can be used just like the `datasets` metric although unfortunately full Jury support for those metrics are not yet 
-available.
+* The entry :heavy_check_mark: represents that full Jury support is available meaning that all combinations of input 
+types (single prediction & single reference, single prediction & multiple references, multiple predictions & multiple 
+references) are supported
 
-* For metrics marked as :white_check_mark: are available in Jury, and they can (and should) be used as instructed 
-in `datasets` implementation, and there may not be a unified interface that applies for all of these partially 
-supported metrics.
+* The entry :white_check_mark: means that this metric is supported (for Jury through the `datasets`), so that it 
+can (and should) be used just like the `datasets` metric as instructed in `datasets` implementation although 
+unfortunately full Jury support for those metrics are not yet available.
 
 ## Request for a New Metric
 
