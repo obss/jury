@@ -37,7 +37,7 @@ def download(source: str, destination: str, overwrite: bool = False, warn: bool 
     if os.path.exists(destination) and not overwrite:
         if warn:
             warnings.warn(
-                f"Path {destination} already exists, not overwriting. To overwrite, speficy " f"'overwrite' parameter."
+                f"Path {destination} already exists, not overwriting. To overwrite, speficy 'overwrite' parameter."
             )
         return
     r = requests.get(source, allow_redirects=True)
