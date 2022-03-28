@@ -25,10 +25,11 @@ class TaskNotAvailable(KeyError):
         super(TaskNotAvailable, self).__init__(message)
 
 
-def requirement_message(path: str, package_name: str) -> str:
+def requirement_message(path: str, package_name: str, package_source: str = None) -> str:
+    package_source = package_source or package_name
     return (
         f"In order to use metric '{path}', '{package_name}' is required. "
-        f"You can install the package by `pip install {package_name}`."
+        f"You can install the package by `pip install {package_source}`."
     )
 
 
@@ -36,7 +37,7 @@ def download(source: str, destination: str, overwrite: bool = False, warn: bool 
     if os.path.exists(destination) and not overwrite:
         if warn:
             warnings.warn(
-                f"Path {destination} already exists, not overwriting. To overwrite, speficy " f"'overwrite' parameter."
+                f"Path {destination} already exists, not overwriting. To overwrite, speficy 'overwrite' parameter."
             )
         return
     r = requests.get(source, allow_redirects=True)
