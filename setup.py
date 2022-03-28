@@ -28,7 +28,7 @@ def get_version():
 def add_pywin(reqs: List[str]) -> None:
     if platform.system() == "Windows":
         # Latest PyWin32 build (301) fails, required for sacrebleu
-        ext_package = ["pywin32==228"]
+        ext_package = ["pywin32==302"]
     else:
         ext_package = []
     reqs.extend(ext_package)
@@ -42,7 +42,6 @@ _DEV_REQUIREMENTS = [
     "pytest>=7.0.1",
     "pytest-cov>=3.0.0",
     "pytest-timeout>=2.1.0",
-    "math_equivalence @ git+https://github.com/hendrycks/math.git",  # for datasets test metric
 ]
 
 _PRISM_REQUIREMENTS = ["fairseq==0.9.0", "validators"]
@@ -50,12 +49,11 @@ _PRISM_REQUIREMENTS = ["fairseq==0.9.0", "validators"]
 _METRIC_REQUIREMENTS = [
     "sacrebleu>=2.0.0",
     "bert_score==0.3.11",
-    "bleurt @ git+https://github.com/google-research/bleurt.git",
     "jiwer>=2.3.0",
     "seqeval==1.2.2",
     "sentencepiece==0.1.96",
-    "unbabel-comet @ git+https://github.com/Unbabel/COMET.git@c772b679e20725e6cc79b2107d50594f9ea7a4ae",
 ]
+
 _METRIC_REQUIREMENTS.extend(_PRISM_REQUIREMENTS)
 add_pywin(_METRIC_REQUIREMENTS)
 

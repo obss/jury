@@ -88,6 +88,11 @@ or build from source,
     cd jury
     python setup.py install
 
+**NOTE:** There may be malfunctions of some metrics depending on `sacrebleu` package on Windows machines which is 
+mainly due to the package `pywin32`. For this, we fixed pywin32 version on our setup config for Windows platforms. 
+However, if pywin32 causes trouble in your environment we strongly recommend using `conda` manager install the package 
+as `conda install pywin32`.
+
 ## <div align="center"> Usage </div>
 
 ### API Usage
@@ -226,6 +231,14 @@ PRs are welcomed as always :)
     git clone https://github.com/obss/jury.git
     cd jury
     pip install -e .[dev]
+
+Also, you need to install the packages which are available through a git source separately with the following command. 
+For the folks who are curious about "why?"; a short explaination is that PYPI does not allow indexing a package which 
+are directly dependent on non-pypi packages due to security reasons. The file `requirements-dev.txt` includes packages 
+which are currently only available through a git source, or they are PYPI packages with no recent release or 
+incompatible with Jury, so that they are added as git sources or pointing to specific commits.
+
+    pip install -r requirements-dev.txt
 
 ### Tests
 
