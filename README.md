@@ -152,7 +152,7 @@ import jury
 bleu = jury.load_metric("bleu")
 bleu_1 = jury.load_metric("bleu", resulting_name="bleu_1", compute_kwargs={"max_order": 1})
 # metrics not available in `jury` but in `datasets`
-wer = jury.load_metric("wer") # It falls back to `datasets` package with a warning
+wer = jury.load_metric("competition_math") # It falls back to `datasets` package with a warning
 ```
 
 ### CLI Usage
