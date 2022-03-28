@@ -25,10 +25,11 @@ class TaskNotAvailable(KeyError):
         super(TaskNotAvailable, self).__init__(message)
 
 
-def requirement_message(path: str, package_name: str) -> str:
+def requirement_message(path: str, package_name: str, package_source: str = None) -> str:
+    package_source = package_source or package_name
     return (
         f"In order to use metric '{path}', '{package_name}' is required. "
-        f"You can install the package by `pip install {package_name}`."
+        f"You can install the package by `pip install {package_source}`."
     )
 
 

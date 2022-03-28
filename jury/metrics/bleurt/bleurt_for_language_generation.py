@@ -24,7 +24,7 @@ from typing import Callable
 import datasets
 
 from jury.metrics import LanguageGenerationInstance, MetricForLanguageGeneration
-from jury.metrics._core.utils import PackagePlaceholder
+from jury.metrics._core.utils import PackagePlaceholder, requirement_message
 
 # `import bleurt` placeholder
 bleurt = PackagePlaceholder(version="1.2.2")
@@ -122,8 +122,11 @@ class BleurtForLanguageGeneration(MetricForLanguageGeneration):
             from bleurt import score
         except ModuleNotFoundError:
             raise ModuleNotFoundError(
-                f"In order to use metric BLEURT, 'bleurt' is required. "
-                f"You can install the package by `bleurt @ pip install git+https://github.com/google-research/bleurt.git`."
+                requirement_message(
+                    path="bleurt",
+                    package_name="bleurt",
+                    package_source="git+https://github.com/devrimcavusoglu/bleurt.git",
+                )
             )
 
         # check that config name specifies a valid BLEURT model
