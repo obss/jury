@@ -134,7 +134,7 @@ class BleurtForLanguageGeneration(MetricForLanguageGeneration):
             logger.warning(
                 "Using default BLEURT-Base checkpoint for sequence maximum length 128. "
                 "You can use a bigger model for better results with e.g: "
-                "Jury(metric={path: 'bleurt', 'checkpoint': 'bleurt-large-512'})."
+                "Jury(metrics=[{'path': 'bleurt', 'config_name': 'bleurt-large-512'}])."
             )
             self.config_name = "bleurt-base-128"
 
