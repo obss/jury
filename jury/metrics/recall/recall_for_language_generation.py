@@ -91,13 +91,11 @@ class RecallForLanguageGeneration(MetricForLanguageGeneration):
         scores = []
         predictions, references = self._tokenize(predictions, references)
         for pred, ref in zip(predictions, references):
-            score = 0
-            pred_counts = Counter(pred)
-            ref_counts = Counter(ref)
-            for token, pred_count in pred_counts.items():
-                if token in ref_counts:
-                    score += min(pred_count, ref_counts[token])  # Intersection count
-            scores.append(score / len(ref))
+            if len(ref) == 0:
+                scores.append(0)
+                continue
+            common = Counter(pred) & Counter(ref)  # Intersection count
+            scores.append(sum(common.values()) / len(ref))
         avg_score = sum(scores) / len(scores)
         return {"score": avg_score}
 
