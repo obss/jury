@@ -31,10 +31,10 @@
     "cer": {
       "score": 0.7272727272727273,
       "overall": {
-        "substitutions": 6.25,
-        "deletions": 5.5,
-        "insertions": 1.5,
-        "hits": 16.25
+        "substitutions": 4.75,
+        "deletions": 6.25,
+        "insertions": 2.25,
+        "hits": 17.0
       }
     }
   },
@@ -44,10 +44,10 @@
     "cer": {
       "score": 0.8484848484848485,
       "overall": {
-        "substitutions": 6.625,
-        "deletions": 3.875,
-        "insertions": 3.625,
-        "hits": 17.5
+        "substitutions": 5.125,
+        "deletions": 4.625,
+        "insertions": 4.375,
+        "hits": 18.25
       }
     }
   }
