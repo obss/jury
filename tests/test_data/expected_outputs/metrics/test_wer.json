@@ -31,10 +31,10 @@
     "wer": {
       "score": 1.0,
       "overall": {
-        "substitutions": 3.25,
-        "deletions": 0.5,
-        "insertions": 0.25,
-        "hits": 2.0
+        "substitutions": 2.75,
+        "deletions": 0.75,
+        "insertions": 0.5,
+        "hits": 2.25
       }
     }
   },
@@ -44,10 +44,10 @@
     "wer": {
       "score": 1.2,
       "overall": {
-        "substitutions": 3.0,
-        "deletions": 0.375,
-        "insertions": 0.625,
-        "hits": 2.375
+        "substitutions": 2.75,
+        "deletions": 0.5,
+        "insertions": 0.75,
+        "hits": 2.5
       }
     }
   }

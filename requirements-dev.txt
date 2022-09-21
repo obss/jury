@@ -1,7 +1,6 @@
 # Jury metrics
 # Falling back to fork for Windows related issue: https://github.com/google-research/bleurt/issues/49
 bleurt @ git+https://github.com/devrimcavusoglu/bleurt.git
-unbabel-comet @ git+https://github.com/Unbabel/COMET.git@c772b679e20725e6cc79b2107d50594f9ea7a4ae
 
 # for datasets metric test
 math_equivalence @ git+https://github.com/hendrycks/math.git
