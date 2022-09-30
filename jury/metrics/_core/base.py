@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors
+# Copyright 2021 Open Business Software Solutions, The HuggingFace evaluate Authors
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,17 +14,18 @@
 # limitations under the License.
 """
 Metrics base class. The part of this file is adapted from HuggingFace's
-datasets package implementation of Accuracy metric. See
-https://github.com/huggingface/datasets/blob/master/src/datasets/metric.py
+evaluate package implementation of Accuracy metric. See
+https://github.com/huggingface/evaluate/blob/master/src/evaluate/metric.py
 """
 from abc import ABC, abstractmethod
 from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import datasets
+import evaluate
 import numpy
 import numpy as np
 import pandas as pd
-from datasets.utils.logging import get_logger
+from evaluate.utils.logging import get_logger
 
 from jury.collator import Collator
 from jury.metrics._core.utils import import_module, is_reduce_fn
@@ -38,7 +39,7 @@ MetricOutput = Dict[str, Union[str, int, float]]
 logger = get_logger(__name__)
 
 
-class Metric(datasets.Metric, ABC):
+class Metric(evaluate.Metric, ABC):
     """
     Base metric class and common API for all metrics.
 
@@ -59,7 +60,7 @@ class Metric(datasets.Metric, ABC):
         process_id (``int``): specify the id of the current process in a distributed setup (between 0 and num_process-1)
             This is useful to compute metrics in distributed setups (in particular non-additive metrics like F1).
         seed (Optional ``int``): If specified, this will temporarily set numpy's random seed when
-        :func:`datasets.Metric.compute` is run.
+        :func:`evaluate.Metric.compute` is run.
         experiment_id (Optional ``str``): A specific experiment id. This is used if several distributed evaluations
             share the same file system. This is useful to compute metrics in distributed setups (in particular
             non-additive metrics like F1).
@@ -204,7 +205,7 @@ class MetricForTask(Metric, ABC):
     All metrics extending :py:class:`jury.metrics._core.base.MetricForTask` must implement the following:
 
         - _task (``[str]``): Task name for the base task metric.
-        - _default_features() (``datasets.Features``): Task input as a :py:class:`datasets.Features`.
+        - _default_features() (``datasets.Features``): Task input as a :py:class:`evaluate.Features`.
 
      Args:
         resulting_name (Optional ``[str]``): Optional resulting name for :py:class:`jury.Jury` to use. By default, it

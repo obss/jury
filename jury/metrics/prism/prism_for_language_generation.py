@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace evaluate Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
 # limitations under the License.
 """
 Prism metric. The part of this file is adapted from metric implementations
-of datasets package. See
-https://github.com/huggingface/datasets/blob/master/metrics/
+of evaluate package. See
+https://github.com/huggingface/evaluate/blob/master/metrics/
 """
 import os
 from typing import Callable, Dict, List, Union
 
-import datasets
+import evaluate
 import validators
 
 from jury.metrics import LanguageGenerationInstance
@@ -130,7 +130,7 @@ CHECKPOINT_URLS = {
 }
 
 
-@datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
+@evaluate.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class PrismForLanguageGeneration(MetricForLanguageGeneration):
     def __init__(
         self,
@@ -188,7 +188,7 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
         )
 
     def _info(self):
-        return datasets.MetricInfo(
+        return evaluate.MetricInfo(
             description=_DESCRIPTION,
             citation=_CITATION,
             homepage="https://github.com/thompsonb/prism",

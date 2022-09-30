@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace evaluate Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,11 +13,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """ SQuAD metric. The part of this file is adapted from SacreBLEU implementation
-of datasets package. See
-https://github.com/huggingface/datasets/blob/master/metrics/squad/squad.py"""
+of evaluate package. See
+https://github.com/huggingface/evaluate/blob/master/metrics/squad/squad.py"""
 from typing import Callable, Dict, List
 
-import datasets
+import evaluate
 import numpy as np
 import pandas as pd
 
@@ -77,19 +77,19 @@ Examples:
 """
 
 
-@datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
+@evaluate.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class SquadForLanguageGeneration(MetricForLanguageGeneration):
     def _download_and_prepare(self, dl_manager) -> None:
         """
         Downloads and import the computation of squad score from the implementation
-        of Squad computation from huggingface/datasets. See
-        https://github.com/huggingface/datasets/blob/master/metrics/squad/evaluate.py
+        of Squad computation from huggingface/evaluate. See
+        https://github.com/huggingface/evaluate/blob/master/metrics/squad/evaluate.py
         """
-        squad_source = "https://raw.githubusercontent.com/huggingface/datasets/master/metrics/squad/evaluate.py"
+        squad_source = f"https://raw.githubusercontent.com/huggingface/evaluate/v{evaluate.__version__}/metrics/squad/compute_score.py"
         self.external_module_path = dl_manager.download(squad_source)
 
     def _info(self):
-        return datasets.MetricInfo(
+        return evaluate.MetricInfo(
             description=_DESCRIPTION,
             citation=_CITATION,
             inputs_description=_KWARGS_DESCRIPTION,
@@ -130,7 +130,7 @@ class SquadForLanguageGeneration(MetricForLanguageGeneration):
                 ]
             }
         ]
-        evaluation_fn = self._get_external_resource("squad_evaluate", attr="evaluate")
+        evaluation_fn = self._get_external_resource("squad_compute_score", attr="compute_score")
         score = evaluation_fn(dataset=dataset, predictions=pred_dict)
         for metric_, score_ in score.items():
             score[metric_] = score_ / 100

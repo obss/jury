@@ -15,7 +15,7 @@
 <a href="https://doi.org/10.5281/zenodo.6109838"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.6109838.svg" alt="DOI"></a>
 </p>
 
-A comprehensive toolkit for evaluating NLP experiments offering various automated metrics. Jury offers a smooth and easy-to-use interface. It uses a more advanced version of [datasets](https://github.com/huggingface/datasets/) design for underlying metric computation, so that adding custom metric is easy as extending proper class.
+A comprehensive toolkit for evaluating NLP experiments offering various automated metrics. Jury offers a smooth and easy-to-use interface. It uses a more advanced version of [evaluate](https://github.com/huggingface/evaluate/) design for underlying metric computation, so that adding custom metric is easy as extending proper class.
 
 Main advantages that Jury offers are:
 
@@ -31,7 +31,7 @@ To see more, check the [official Jury blog post](https://medium.com/codable/jury
 
 The table below shows the current support status for available metrics.
 
-| Metric                                                                        | Jury Support       | HF/datasets Support |
+| Metric                                                                        | Jury Support       | HF/evaluate Support |
 |-------------------------------------------------------------------------------|--------------------|---------------------|
 | Accuracy-Numeric                                                              | :heavy_check_mark: | :white_check_mark:  |
 | Accuracy-Text                                                                 | :heavy_check_mark: | :x:                 |
@@ -56,9 +56,9 @@ The table below shows the current support status for available metrics.
 | Squad                                                                         | :heavy_check_mark: | :white_check_mark:  |
 | TER                                                                           | :heavy_check_mark: | :white_check_mark:  |
 | WER                                                                           | :heavy_check_mark: | :white_check_mark:  |
-| [Other metrics](https://github.com/huggingface/datasets/tree/master/metrics)* | :white_check_mark: | :white_check_mark:  |
+| [Other metrics](https://github.com/huggingface/evaluate/tree/master/metrics)* | :white_check_mark: | :white_check_mark:  |
 
-_*_ Placeholder for the rest of the metrics available in `datasets` package apart from those which are present in the 
+_*_ Placeholder for the rest of the metrics available in `evaluate` package apart from those which are present in the 
 table. 
 
 **Notes**
@@ -67,8 +67,8 @@ table.
 types (single prediction & single reference, single prediction & multiple references, multiple predictions & multiple 
 references) are supported
 
-* The entry :white_check_mark: means that this metric is supported (for Jury through the `datasets`), so that it 
-can (and should) be used just like the `datasets` metric as instructed in `datasets` implementation although 
+* The entry :white_check_mark: means that this metric is supported (for Jury through the `evaluate`), so that it 
+can (and should) be used just like the `evaluate` metric as instructed in `evaluate` implementation although 
 unfortunately full Jury support for those metrics are not yet available.
 
 ## Request for a New Metric
@@ -149,15 +149,15 @@ bleu = Bleu.construct(compute_kwargs={"max_order": 1})
 score = bleu.compute(predictions=predictions, references=references)
 ```
 
-Note that you can seemlessly access both `jury` and `datasets` metrics through `jury.load_metric`. 
+Note that you can seemlessly access both `jury` and `evaluate` metrics through `jury.load_metric`. 
 
 ```python
 import jury
 
 bleu = jury.load_metric("bleu")
 bleu_1 = jury.load_metric("bleu", resulting_name="bleu_1", compute_kwargs={"max_order": 1})
-# metrics not available in `jury` but in `datasets`
-wer = jury.load_metric("competition_math") # It falls back to `datasets` package with a warning
+# metrics not available in `jury` but in `evaluate`
+wer = jury.load_metric("competition_math") # It falls back to `evaluate` package with a warning
 ```
 
 ### CLI Usage
@@ -190,9 +190,9 @@ Then, you can call jury eval with `config` argument.
 
 ### Custom Metrics
 
-You can use custom metrics with inheriting `jury.metrics.Metric`, you can see current metrics implemented on Jury from [jury/metrics](https://github.com/obss/jury/tree/master/jury/metrics). Jury falls back to `datasets` implementation of metrics for the ones that are currently not supported by Jury, you can see the metrics available for `datasets` on [datasets/metrics](https://github.com/huggingface/datasets/tree/master/metrics). 
+You can use custom metrics with inheriting `jury.metrics.Metric`, you can see current metrics implemented on Jury from [jury/metrics](https://github.com/obss/jury/tree/master/jury/metrics). Jury falls back to `evaluate` implementation of metrics for the ones that are currently not supported by Jury, you can see the metrics available for `evaluate` on [evaluate/metrics](https://github.com/huggingface/evaluate/tree/master/metrics). 
 
-Jury itself uses `datasets.Metric` as a base class to drive its own base class as `jury.metrics.Metric`. The interface is similar; however, Jury makes the metrics to take a unified input type by handling the inputs for each metrics, and allows supporting several input types as;
+Jury itself uses `evaluate.Metric` as a base class to drive its own base class as `jury.metrics.Metric`. The interface is similar; however, Jury makes the metrics to take a unified input type by handling the inputs for each metrics, and allows supporting several input types as;
 
 - single prediction & single reference
 - single prediction & multiple reference

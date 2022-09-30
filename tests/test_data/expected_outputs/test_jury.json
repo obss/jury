@@ -354,7 +354,7 @@
       "f1": 0.6857142857142858
     }
   },
-  "evaluate_datasets_metric": {
+  "evaluate_hf_metric": {
     "total_items": 2,
     "empty_items": 0,
     "accuracy": 0.0

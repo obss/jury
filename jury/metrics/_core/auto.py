@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors and the TensorFlow Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace evaluate Authors and the TensorFlow evaluate Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ import os
 import warnings
 from typing import Any, Dict, NamedTuple, Optional
 
-import datasets
+import evaluate
 
 from jury.metrics._core.base import Metric
 from jury.metrics._core.utils import import_module, list_metrics
@@ -40,17 +40,17 @@ def load_metric(
             path to the metric processing script with the metric builder. Can be either:
                 - a local absolute or relative path to processing script or the directory containing the script,
                     e.g. ``'./metrics/rogue/rouge.py'``
-                - a metric identifier on the HuggingFace datasets repo (list all available metrics with
+                - a metric identifier on the HuggingFace evaluate repo (list all available metrics with
                     ``jury.list_metrics()``) e.g. ``'rouge'`` or ``'bleu'``
         resulting_name (Optional ``str``): Resulting name of the computed score returned.
         task (Optional ``str``): Task name for the metric. "language-generation" by default.
         compute_kwargs (Optional ``Dict[str, Any]``): Arguments to be passed to `compute()` method of metric at
             computation.
         use_jury_only (``bool``): Whether to use jury metrics only or not. False by default.
-        kwargs (Optional): Additional keyword arguments to be passed to :py:func:`datasets.load_metric`.
+        kwargs (Optional): Additional keyword arguments to be passed to :py:func:`evaluate.load_metric`.
 
     Returns:
-        `datasets.Metric`
+        `evaluate.Metric`
     """
     return AutoMetric.load(
         path=path,
@@ -101,14 +101,14 @@ class AutoMetric:
             if use_jury_only:
                 raise ValueError(
                     f"Metric {resolved_path.path} is not available on jury, set use_jury_only=False to use"
-                    f"additional metrics (e.g datasets metrics)."
+                    f"additional metrics (e.g evaluate metrics)."
                 )
             warnings.warn(
-                f"Metric {resolved_path.path} is not available on jury, falling back to datasets metric. "
+                f"Metric {resolved_path.path} is not available on jury, falling back to evaluate metric. "
                 f"You may not fully utilize this metric for different input types, e.g multiple predictions "
                 f"or multiple references."
             )
-            metric = datasets.load_metric(resolved_path.path, **kwargs)
+            metric = evaluate.load(resolved_path.path, **kwargs)
         else:
             # get the class, will raise AttributeError if class cannot be found
             factory_class = module.__main_class__
@@ -140,4 +140,4 @@ class AutoMetric:
                 raise FileNotFoundError(f"File {path} does not exists.")
             return ResolvedName(path=path, resolution="external-module")
         else:
-            return ResolvedName(path=path, resolution="datasets")
+            return ResolvedName(path=path, resolution="evaluate")

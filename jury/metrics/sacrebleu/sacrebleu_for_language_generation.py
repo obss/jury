@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace evaluate Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
 # limitations under the License.
 """
 SacreBLEU metric. The part of this file is adapted from SacreBLEU implementation
-of datasets package. See
-https://github.com/huggingface/datasets/blob/master/metrics/sacrebleu/sacrebleu.py
+of evaluate package. See
+https://github.com/huggingface/evaluate/blob/master/metrics/sacrebleu/sacrebleu.py
 """
 
 import math
 from typing import Callable, Dict, Sequence
 
-import datasets
+import evaluate
 from packaging import version
 
 from jury.collator import Collator
@@ -128,7 +128,7 @@ Examples:
 """
 
 
-@datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
+@evaluate.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class SacrebleuForLanguageGeneration(MetricForLanguageGeneration):
     def _download_and_prepare(self, dl_manager):
         global scb
@@ -145,7 +145,7 @@ class SacrebleuForLanguageGeneration(MetricForLanguageGeneration):
                 "To use `sacrebleu`, the module `sacrebleu>=1.4.12` is required, and the current version of `sacrebleu` doesn't match this condition.\n"
                 'You can install it with `pip install "sacrebleu>=1.4.12"`.'
             )
-        return datasets.MetricInfo(
+        return evaluate.MetricInfo(
             description=_DESCRIPTION,
             citation=_CITATION,
             homepage="https://github.com/mjpost/sacreBLEU",

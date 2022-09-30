@@ -1,9 +1,7 @@
 click==8.0.4
-datasets>=2.0.0
+evaluate>=0.2.2,<0.3
 fire>=0.4.0
 nltk>=3.6.6,<3.7.1
-numpy>=1.21.0
-pandas>=1.1.5
 rouge-score==0.0.4
 sklearn
 tqdm

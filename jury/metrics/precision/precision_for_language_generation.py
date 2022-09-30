@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2021 The HuggingFace Datasets Authors and the current dataset script contributor.
+# Copyright 2021 The HuggingFace evaluate Authors and the current dataset script contributor.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
 # limitations under the License.
 """
 Modified Unigram Precision metric. The part of this file is adapted from HuggingFace's
-datasets package implementation of Precision metric. See
-https://github.com/huggingface/datasets/blob/master/metrics/precision/precision.py
+evaluate package implementation of Precision metric. See
+https://github.com/huggingface/evaluate/blob/master/metrics/precision/precision.py
 """
 from collections import Counter
 from typing import Callable
 
-import datasets
+import evaluate
 import numpy as np
 
 from jury.collator import Collator
@@ -65,10 +65,10 @@ Args:
 """
 
 
-@datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
+@evaluate.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class PrecisionForLanguageGeneration(MetricForLanguageGeneration):
     def _info(self):
-        return datasets.MetricInfo(
+        return evaluate.MetricInfo(
             description=_DESCRIPTION,
             citation=_CITATION,
             inputs_description=_KWARGS_DESCRIPTION,
