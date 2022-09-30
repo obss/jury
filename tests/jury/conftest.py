@@ -64,7 +64,7 @@ _LIST_MIXED_TEST_METRICS = [
     {"path": "squad"},
 ]
 
-_DATASETS_METRICS = "competition_math"
+_HF_METRICS = "competition_math"
 
 _TEST_METRICS_SEQUENCE_CLASSIFICATION = [
     {"path": "accuracy", "task": "sequence-classification"},
@@ -177,8 +177,8 @@ def jury_list_mixed():
 
 
 @pytest.fixture(scope="function")
-def jury_datasets():
-    return Jury(metrics=_DATASETS_METRICS)
+def jury_hf():
+    return Jury(metrics=_HF_METRICS)
 
 
 @pytest.fixture(scope="function")

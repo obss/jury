@@ -1,4 +1,3 @@
-import datasets
 import evaluate
 import numpy as np
 import pytest
@@ -45,8 +44,8 @@ def output_evaluate_list_mixed_input():
 
 @pytest.fixture
 @get_expected_output(prefix=None)
-def output_evaluate_datasets_metric():
-    return output_evaluate_datasets_metric.output
+def output_evaluate_hf_metric():
+    return output_evaluate_hf_metric.output
 
 
 @pytest.fixture
@@ -122,9 +121,9 @@ def test_evaluate_list_mixed_input(predictions, references, jury_list_mixed, out
     assert_almost_equal_dict(actual=scores, desired=output_evaluate_list_mixed_input)
 
 
-def test_evaluate_datasets_metric(predictions, references, jury_datasets, output_evaluate_datasets_metric):
-    scores = jury_datasets(predictions=predictions, references=references)
-    assert_almost_equal_dict(actual=scores, desired=output_evaluate_datasets_metric)
+def test_evaluate_hf_metric(predictions, references, jury_hf, output_evaluate_hf_metric):
+    scores = jury_hf(predictions=predictions, references=references)
+    assert_almost_equal_dict(actual=scores, desired=output_evaluate_hf_metric)
 
 
 def test_evaluate_corpus(single_prediction_array, multiple_references, jury_base, output_evaluate_corpus):
