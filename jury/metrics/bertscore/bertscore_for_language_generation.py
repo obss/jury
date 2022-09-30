@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace evaluate Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
 # limitations under the License.
 """
 BERTScore metric. The part of this file is adapted from BERTScore implementation
-of datasets package. See
-https://github.com/huggingface/datasets/blob/master/metrics/bertscore/bertscore.py
+of evaluate package. See
+https://github.com/huggingface/evaluate/blob/master/metrics/bertscore/bertscore.py
 """
 import functools
 from contextlib import contextmanager
 from typing import Dict, List
 
-import datasets
+import evaluate
 import numpy as np
 import pandas as pd
 from packaging import version
@@ -39,7 +39,7 @@ def filter_logging_context():
     def filter_log(record):
         return False if "This IS expected if you are initializing" in record.msg else True
 
-    logger = datasets.utils.logging.get_logger("transformers.modeling_utils")
+    logger = evaluate.utils.logging.get_logger("transformers.modeling_utils")
     logger.addFilter(filter_log)
     try:
         yield
@@ -115,7 +115,7 @@ Examples:
 """
 
 
-@datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
+@evaluate.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class BertscoreForLanguageGeneration(MetricForLanguageGeneration):
     def _download_and_prepare(self, dl_manager):
         global bert_score
@@ -128,7 +128,7 @@ class BertscoreForLanguageGeneration(MetricForLanguageGeneration):
             super(BertscoreForLanguageGeneration, self)._download_and_prepare(dl_manager)
 
     def _info(self):
-        return datasets.MetricInfo(
+        return evaluate.MetricInfo(
             description=_DESCRIPTION,
             citation=_CITATION,
             homepage="https://github.com/Tiiiger/bert_score",

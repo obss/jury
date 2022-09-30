@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace evaluate Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,14 +14,14 @@
 # limitations under the License.
 """
 BLEURT metric. The part of this file is adapted from BLEURT implementation
-of datasets package. See
-https://github.com/huggingface/datasets/blob/master/metrics/bleurt/bleurt.py
+of evaluate package. See
+https://github.com/huggingface/evaluate/blob/master/metrics/bleurt/bleurt.py
 """
 
 import os
 from typing import Callable
 
-import datasets
+import evaluate
 
 from jury.metrics import LanguageGenerationInstance, MetricForLanguageGeneration
 from jury.metrics._core.utils import PackagePlaceholder, requirement_message
@@ -29,7 +29,7 @@ from jury.metrics._core.utils import PackagePlaceholder, requirement_message
 # `import bleurt` placeholder
 bleurt = PackagePlaceholder(version="1.2.2")
 
-logger = datasets.logging.get_logger(__name__)
+logger = evaluate.logging.get_logger(__name__)
 
 
 _CITATION = """\
@@ -102,10 +102,10 @@ CHECKPOINT_URLS = {
 }
 
 
-@datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
+@evaluate.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class BleurtForLanguageGeneration(MetricForLanguageGeneration):
     def _info(self):
-        return datasets.MetricInfo(
+        return evaluate.MetricInfo(
             description=_DESCRIPTION,
             citation=_CITATION,
             homepage="https://github.com/google-research/bleurt",

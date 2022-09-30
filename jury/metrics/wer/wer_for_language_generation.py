@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace evaluate Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,13 +13,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """ Word Error Ratio (WER) metric. The part of this file is adapted from HuggingFace's
-datasets package implementation of CER metric. See
-https://github.com/huggingface/datasets/blob/master/metrics/wer/wer.py
+evaluate package implementation of CER metric. See
+https://github.com/huggingface/evaluate/blob/master/metrics/wer/wer.py
 """
 import warnings
 from typing import Callable, List, Tuple, Union
 
-import datasets
+import evaluate
 
 from jury.metrics import LanguageGenerationInstance, MetricForLanguageGeneration
 from jury.metrics._core.utils import PackagePlaceholder, requirement_message
@@ -85,10 +85,10 @@ Examples:
 """
 
 
-@datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
+@evaluate.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class WERForLanguageGeneration(MetricForLanguageGeneration):
     def _info(self):
-        return datasets.MetricInfo(
+        return evaluate.MetricInfo(
             description=_DESCRIPTION,
             citation=_CITATION,
             inputs_description=_KWARGS_DESCRIPTION,

@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2021 The HuggingFace Datasets Authors and the current dataset script contributor.
+# Copyright 2021 The HuggingFace evaluate Authors and the current dataset script contributor.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
 # limitations under the License.
 """
 F1 metric. The part of this file is adapted from HuggingFace's
-datasets package implementation of F1 metric. See
-https://github.com/huggingface/datasets/blob/master/metrics/f1/f1.py
+evaluate package implementation of F1 metric. See
+https://github.com/huggingface/evaluate/blob/master/metrics/f1/f1.py
 """
 from typing import List, Union
 
-import datasets
+import evaluate
 from sklearn.metrics import f1_score
 
 from jury.metrics._core import MetricForSequenceClassification, SequenceClassificationInstance, load_metric
@@ -96,13 +96,13 @@ _CITATION = """
 """
 
 
-@datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
+@evaluate.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class F1ForSequenceClassification(MetricForSequenceClassification):
     _precision = load_metric("precision", task="sequence-classification")
     _recall = load_metric("recall", task="sequence-classification")
 
     def _info(self):
-        return datasets.MetricInfo(
+        return evaluate.MetricInfo(
             description=_DESCRIPTION,
             citation=_CITATION,
             inputs_description=_KWARGS_DESCRIPTION,

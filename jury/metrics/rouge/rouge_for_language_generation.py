@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace evaluate Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,13 +14,13 @@
 # limitations under the License.
 """
 ROUGE metric. The part of this file is adapted from HuggingFace's
-datasets package implementation of ROUGE metric. See
-https://github.com/huggingface/datasets/blob/master/metrics/rouge/rouge.py
+evaluate package implementation of ROUGE metric. See
+https://github.com/huggingface/evaluate/blob/master/metrics/rouge/rouge.py
 """
 
 from typing import Callable, Dict, List, Optional, Union
 
-import datasets
+import evaluate
 import pandas as pd
 from rouge_score import rouge_scorer, scoring
 
@@ -65,7 +65,7 @@ Args:
         `"rouge{n}"` (e.g. `"rouge1"`, `"rouge2"`) where: {n} is the n-gram based scoring,
         `"rougeL"`: Longest common subsequence based scoring.
         `"rougeLSum"`: rougeLsum splits text using `"\n"`.
-        See details in https://github.com/huggingface/datasets/issues/617
+        See details in https://github.com/huggingface/evaluate/issues/617
     use_stemmer: Bool indicating whether Porter stemmer should be used to strip word suffixes.
     use_agregator: Return aggregates if this is set to True
 Returns:
@@ -94,10 +94,10 @@ Examples:
 """
 
 
-@datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
+@evaluate.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class RougeForLanguageGeneration(MetricForLanguageGeneration):
     def _info(self):
-        return datasets.MetricInfo(
+        return evaluate.MetricInfo(
             description=_DESCRIPTION,
             citation=_CITATION,
             inputs_description=_KWARGS_DESCRIPTION,

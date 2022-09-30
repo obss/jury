@@ -1,5 +1,5 @@
 # coding=utf-8
-# Copyright 2021 Open Business Software Solutions, The HuggingFace Datasets Authors.
+# Copyright 2021 Open Business Software Solutions, The HuggingFace evaluate Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,12 +14,12 @@
 # limitations under the License.
 """
 Accuracy metric. The part of this file is adapted from HuggingFace's
-datasets package implementation of Accuracy metric. See
-https://github.com/huggingface/datasets/blob/master/metrics/accuracy/accuracy.py
+evaluate package implementation of Accuracy metric. See
+https://github.com/huggingface/evaluate/blob/master/metrics/accuracy/accuracy.py
 """
 from typing import Callable
 
-import datasets
+import evaluate
 from sklearn.metrics import accuracy_score
 
 from jury.metrics._core import MetricForSequenceClassification, SequenceClassificationInstance
@@ -67,10 +67,10 @@ Examples:
 """
 
 
-@datasets.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
+@evaluate.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
 class AccuracyForSequenceClassification(MetricForSequenceClassification):
     def _info(self):
-        return datasets.MetricInfo(
+        return evaluate.MetricInfo(
             description=_DESCRIPTION,
             citation=_CITATION,
             inputs_description=_KWARGS_DESCRIPTION,
