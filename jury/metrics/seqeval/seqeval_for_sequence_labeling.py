@@ -124,7 +124,7 @@ Examples:
 
 
 @evaluate.utils.file_utils.add_start_docstrings(_DESCRIPTION, _KWARGS_DESCRIPTION)
-class SeqevalForLanguageGeneration(MetricForSequenceLabeling):
+class SeqevalForSequnceLabeling(MetricForSequenceLabeling):
     def _download_and_prepare(self, dl_manager):
         global seqeval
         try:
@@ -132,7 +132,7 @@ class SeqevalForLanguageGeneration(MetricForSequenceLabeling):
         except ModuleNotFoundError:
             raise ModuleNotFoundError(requirement_message(path="Seqeval", package_name="seqeval"))
         else:
-            super(SeqevalForLanguageGeneration, self)._download_and_prepare(dl_manager)
+            super(SeqevalForSequnceLabeling, self)._download_and_prepare(dl_manager)
 
     def _info(self):
         return evaluate.MetricInfo(
