@@ -38,7 +38,7 @@ _DEV_REQUIREMENTS = [
     "black==21.7b0",
     "deepdiff==5.5.0",
     "flake8==3.9.2",
-    'importlib-metadata>=1.1.0,<4.3;python_version<"3.8"'
+    'importlib-metadata>=1.1.0,<4.3;python_version<"3.8"',
     "isort==5.9.2",
     "pytest>=7.0.1",
     "pytest-cov>=3.0.0",
