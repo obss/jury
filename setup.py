@@ -45,7 +45,10 @@ _DEV_REQUIREMENTS = [
     "pytest-timeout>=2.1.0",
 ]
 
-_PRISM_REQUIREMENTS = ["fairseq==0.9.0", "validators"]
+_PRISM_REQUIREMENTS = [
+    "fairseq==0.9.0",
+    "numpy>=1.23,<1.24"
+]
 
 _METRIC_REQUIREMENTS = [
     "sacrebleu>=2.0.0",
