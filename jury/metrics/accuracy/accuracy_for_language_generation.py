@@ -24,9 +24,13 @@ from typing import Callable
 import evaluate
 import numpy as np
 
+from evaluate.utils.logging import get_logger
+
 from jury.collator import Collator
 from jury.metrics._core import MetricForLanguageGeneration
 from jury.utils.nlp import normalize_text
+
+logger = get_logger(__name__)
 
 _CITATION = """\
 @article{scikit-learn,
@@ -66,7 +70,7 @@ Examples:
     >>> accuracy = jury.load_metric("accuracy")
     >>> predictions = [["the cat is on the mat", "There is cat playing on the mat"], ["Look! a wonderful day."]]
     >>> references = [
-        ["the cat is playing on the mat.", "The cat plays on the mat."], 
+        ["the cat is playing on the mat.", "The cat plays on the mat."],
         ["Today is a wonderful day", "The weather outside is wonderful."]
     ]
     >>> results = accuracy.compute(predictions=predictions, references=references)
@@ -104,7 +108,11 @@ class AccuracyForLanguageGeneration(MetricForLanguageGeneration):
             for token, pred_count in pred_counts.items():
                 if token in ref_counts:
                     score += min(pred_count, ref_counts[token])  # Intersection count
-            scores.append(score / max(len(pred), len(ref)))
+            try:
+                scores.append(score / max(len(pred), len(ref)))
+            except ZeroDivisionError:
+                logger.warning("Empty pred/ref. Ignoring!")
+
         avg_score = sum(scores) / len(scores)
         return {"score": avg_score}
 
