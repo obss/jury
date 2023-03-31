@@ -102,12 +102,8 @@ class AccuracyForLanguageGeneration(MetricForLanguageGeneration):
         scores = []
         predictions, references = self._tokenize(predictions, references)
         for pred, ref in zip(predictions, references):
-            score = 0
-            pred_counts = Counter(pred)
-            ref_counts = Counter(ref)
-            for token, pred_count in pred_counts.items():
-                if token in ref_counts:
-                    score += min(pred_count, ref_counts[token])  # Intersection count
+            common = Counter(pred) & Counter(ref)  # Intersection count
+            score = sum(common.values())
             try:
                 scores.append(score / max(len(pred), len(ref)))
             except ZeroDivisionError:
