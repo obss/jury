@@ -111,7 +111,7 @@ class AccuracyForLanguageGeneration(MetricForLanguageGeneration):
             try:
                 scores.append(score / max(len(pred), len(ref)))
             except ZeroDivisionError:
-                logger.warning("Empty pred/ref. Ignoring!")
+                logger.warning("Empty pred & ref after preprocess (`normalize_text`) step. Ignoring!")
 
         avg_score = sum(scores) / len(scores)
         return {"score": avg_score}
