@@ -23,7 +23,6 @@ from typing import Callable
 
 import evaluate
 import numpy as np
-
 from evaluate.utils.logging import get_logger
 
 from jury.collator import Collator
