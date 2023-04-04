@@ -223,8 +223,8 @@ class PrismForLanguageGeneration(MetricForLanguageGeneration):
     @staticmethod
     def _normalize_score(score: Union[float, List[float]], exponent: float):
         if isinstance(score, float):
-            return exponent**score
-        return [exponent**s for s in score]
+            return exponent ** score
+        return [exponent ** s for s in score]
 
     def _compute_single_pred_single_ref(
         self,
