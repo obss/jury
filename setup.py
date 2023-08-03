@@ -59,6 +59,7 @@ _METRIC_REQUIREMENTS = [
     "sentencepiece==0.1.96",
     'unbabel-comet>=1.1.2,<2;python_version<"3.8"',
     'unbabel-comet>=2.0,<2.1;python_version>="3.8"',
+    "protobuf<3.20.1",
 ]
 
 _METRIC_REQUIREMENTS.extend(_PRISM_REQUIREMENTS)
