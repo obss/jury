@@ -125,7 +125,7 @@ class CometForCrossLingualEvaluation(MetricForCrossLingualEvaluation):
             model_url = COMET_MODELS.get(self.config_name)
             if model_url is not None:
                 model_dir = dl_manager.download_and_extract(model_url)
-                checkpoint_path = Path(model_dir) / f"{self.config_name}/checkpoints/model.ckpt"
+                checkpoint_path = (Path(model_dir) / f"{self.config_name}/checkpoints/model.ckpt").as_posix()
             else:
                 checkpoint_path = comet.download_model(self.config_name)
         self.scorer = comet.load_from_checkpoint(checkpoint_path)
