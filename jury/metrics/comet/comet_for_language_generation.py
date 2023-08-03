@@ -17,10 +17,11 @@ Comet cross-lingual MT evaluation metric. The part of this file is adapted from
 Comet implementation of evaluate package. See
 https://github.com/huggingface/evaluate/blob/master/metrics/comet/comet.py
 """
-
-from typing import Callable, Union
+from pathlib import Path
+from typing import Any, Callable, Dict, Union
 
 import evaluate
+from packaging.version import Version
 
 from jury.metrics import LanguageGenerationInstance
 from jury.metrics._core import MetricForCrossLingualEvaluation
@@ -28,6 +29,20 @@ from jury.metrics._core.utils import PackagePlaceholder, requirement_message
 
 # `import comet` placeholder
 comet = PackagePlaceholder(version="1.0.1")
+
+# Comet checkpoints, taken from https://github.com/Unbabel/COMET/blob/master/MODELS.md
+COMET_MODELS = {
+    "emnlp20-comet-rank": "https://unbabel-experimental-models.s3.amazonaws.com/comet/wmt20/emnlp20-comet-rank.tar.gz",
+    "wmt20-comet-qe-da": "https://unbabel-experimental-models.s3.amazonaws.com/comet/wmt20/wmt20-comet-qe-da.tar.gz",
+    "wmt21-comet-da": "https://unbabel-experimental-models.s3.amazonaws.com/comet/wmt21/wmt21-comet-da.tar.gz",
+    "wmt21-comet-mqm": "https://unbabel-experimental-models.s3.amazonaws.com/comet/wmt21/wmt21-comet-mqm.tar.gz",
+    "wmt21-comet-qe-da": "https://unbabel-experimental-models.s3.amazonaws.com/comet/wmt21/wmt21-comet-qe-da.tar.gz",
+    "wmt21-comet-qe-mqm": "https://unbabel-experimental-models.s3.amazonaws.com/comet/wmt21/wmt21-comet-qe-mqm.tar.gz",
+    "wmt21-cometinho-mqm": "https://unbabel-experimental-models.s3.amazonaws.com/comet/wmt21/wmt21-cometinho-mqm.tar.gz",
+    "wmt21-cometinho-da": "https://unbabel-experimental-models.s3.amazonaws.com/comet/wmt21/wmt21-cometinho-da.tar.gz",
+    "eamt22-prune-comet-da": "https://unbabel-experimental-models.s3.amazonaws.com/comet/eamt22/eamt22-prune-comet-da.tar.gz",
+    "eamt22-cometinho-da": "https://unbabel-experimental-models.s3.amazonaws.com/comet/eamt22/eamt22-cometinho-da.tar.gz",
+}
 
 _CITATION = """\
 @inproceedings{rei-EtAl:2020:WMT,
@@ -102,9 +117,17 @@ class CometForCrossLingualEvaluation(MetricForCrossLingualEvaluation):
             super(CometForCrossLingualEvaluation, self)._download_and_prepare(dl_manager)
 
         if self.config_name == "default":
-            checkpoint_path = comet.download_model("wmt20-comet-da")
+            if Version(comet.__version__) >= Version("2.0.0"):
+                checkpoint_path = comet.download_model("Unbabel/wmt22-comet-da")
+            else:
+                checkpoint_path = comet.download_model("wmt20-comet-da")
         else:
-            checkpoint_path = comet.download_model(self.config_name)
+            model_url = COMET_MODELS.get(self.config_name)
+            if model_url is not None:
+                model_dir = dl_manager.download_and_extract(model_url)
+                checkpoint_path = (Path(model_dir) / f"{self.config_name}/checkpoints/model.ckpt").as_posix()
+            else:
+                checkpoint_path = comet.download_model(self.config_name)
         self.scorer = comet.load_from_checkpoint(checkpoint_path)
 
     def _info(self):
@@ -122,6 +145,14 @@ class CometForCrossLingualEvaluation(MetricForCrossLingualEvaluation):
             ],
         )
 
+    def _handle_comet_outputs(self, outputs) -> Dict[str, Any]:
+        if Version(comet.__version__) >= Version("2.0.0"):
+            scores = outputs.get("scores")
+            system_score = outputs.get("system_score")
+        else:
+            scores, system_score = outputs
+        return {"scores": scores, "system_score": system_score}
+
     def _compute_single_pred_single_ref(
         self,
         sources: LanguageGenerationInstance,
@@ -138,7 +169,7 @@ class CometForCrossLingualEvaluation(MetricForCrossLingualEvaluation):
     ):
         data = {"src": sources, "mt": predictions, "ref": references}
         data = [dict(zip(data, t)) for t in zip(*data.values())]
-        scores, samples = self.scorer.predict(
+        comet_scores = self.scorer.predict(
             data,
             batch_size=batch_size,
             gpus=gpus,
@@ -148,7 +179,7 @@ class CometForCrossLingualEvaluation(MetricForCrossLingualEvaluation):
             num_workers=num_workers,
             length_batching=length_batching,
         )
-        return {"scores": scores, "samples": samples}
+        return self._handle_comet_outputs(comet_scores)
 
     def _compute_single_pred_multi_ref(
         self,
@@ -168,7 +199,7 @@ class CometForCrossLingualEvaluation(MetricForCrossLingualEvaluation):
         for src, pred, refs in zip(sources, predictions, references):
             data = {"src": [src] * len(refs), "mt": [pred] * len(refs), "ref": refs}
             data = [dict(zip(data, t)) for t in zip(*data.values())]
-            pred_scores, _ = self.scorer.predict(
+            comet_scores = self.scorer.predict(
                 data,
                 batch_size=batch_size,
                 gpus=gpus,
@@ -178,9 +209,10 @@ class CometForCrossLingualEvaluation(MetricForCrossLingualEvaluation):
                 num_workers=num_workers,
                 length_batching=length_batching,
             )
-            scores.append(float(reduce_fn(pred_scores)))
+            pred_scores = self._handle_comet_outputs(comet_scores)
+            scores.append(float(reduce_fn(pred_scores["scores"])))
 
-        return {"scores": scores, "samples": sum(scores) / len(scores)}
+        return {"scores": scores, "system_score": sum(scores) / len(scores)}
 
     def _compute_multi_pred_multi_ref(
         self,
@@ -202,7 +234,7 @@ class CometForCrossLingualEvaluation(MetricForCrossLingualEvaluation):
             for pred in preds:
                 data = {"src": [src] * len(refs), "mt": [pred] * len(refs), "ref": refs}
                 data = [dict(zip(data, t)) for t in zip(*data.values())]
-                pred_scores, _ = self.scorer.predict(
+                comet_scores = self.scorer.predict(
                     data,
                     batch_size=batch_size,
                     gpus=gpus,
@@ -212,7 +244,8 @@ class CometForCrossLingualEvaluation(MetricForCrossLingualEvaluation):
                     num_workers=num_workers,
                     length_batching=length_batching,
                 )
-                all_pred_scores.append(float(reduce_fn(pred_scores)))
+                pred_scores = self._handle_comet_outputs(comet_scores)
+                all_pred_scores.append(float(reduce_fn(pred_scores["scores"])))
             scores.append(float(reduce_fn(all_pred_scores)))
 
-        return {"scores": scores, "samples": sum(scores) / len(scores)}
+        return {"scores": scores, "system_score": sum(scores) / len(scores)}
