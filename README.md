@@ -27,7 +27,7 @@ Main advantages that Jury offers are:
 
 To see more, check the [official Jury blog post](https://medium.com/codable/jury-evaluating-performance-of-nlg-models-730eb9c9999f).
 
-**Public notice:** You can reach our official [Public Notice](https://docs.google.com/document/d/1mFFT0cR8BUHKJki8mAg6b36QhmsRxvKR3pwOlcxbnss/edit?usp=sharing) document that poses a claim about plagiarisim of the work, *jury*, presented in this codebase.
+**Public notice:** You can reach our official [Public Notice](https://docs.google.com/document/d/1mFFT0cR8BUHKJki8mAg6b36QhmsRxvKR3pwOlcxbnss/edit?usp=sharing) document that poses a claim about plagiarism of the work, *jury*, presented in this codebase.
 
 # Available Metrics
 
