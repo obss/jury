@@ -38,7 +38,6 @@ _DEV_REQUIREMENTS = [
     "black==21.7b0",
     "deepdiff==5.5.0",
     "flake8==3.9.2",
-    'importlib-metadata>=1.1.0,<4.3;python_version<"3.8"',
     "isort==5.9.2",
     "pytest>=7.0.1",
     "pytest-cov>=3.0.0",
@@ -47,8 +46,7 @@ _DEV_REQUIREMENTS = [
 
 _PRISM_REQUIREMENTS = [
     "fairseq==0.9.0",
-    'numpy>=1.23,<1.24;python_version>="3.8"',
-    'numpy==1.21.6;python_version<"3.8"',
+    'numpy',
 ]
 
 _METRIC_REQUIREMENTS = [
@@ -56,14 +54,13 @@ _METRIC_REQUIREMENTS = [
     "bert_score==0.3.11",
     "jiwer>=2.3.0",
     "seqeval==1.2.2",
-    "sentencepiece==0.1.96",
-    'unbabel-comet>=1.1.2,<2;python_version<"3.8"',
-    'unbabel-comet>=2.0,<2.1;python_version>="3.8"',
+    "sentencepiece>=0.1.99,<0.2",
+    'unbabel-comet==2.0.1',
     "protobuf<3.20.1",
 ]
 
 _METRIC_REQUIREMENTS.extend(_PRISM_REQUIREMENTS)
-add_pywin(_METRIC_REQUIREMENTS)
+# add_pywin(_METRIC_REQUIREMENTS)
 
 extras = {
     "prism": _PRISM_REQUIREMENTS,
@@ -82,7 +79,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/obss/jury",
     packages=setuptools.find_packages(exclude=["tests"]),
-    python_requires=">=3.7",
+    python_requires=">=3.8",
     install_requires=get_requirements(),
     extras_require=extras,
     include_package_data=True,
@@ -97,9 +94,10 @@ setuptools.setup(
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
         "Programming Language :: Python :: 3",
-        "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
         "Topic :: Software Development :: Libraries",
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Education",
