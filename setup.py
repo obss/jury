@@ -44,10 +44,7 @@ _DEV_REQUIREMENTS = [
     "pytest-timeout>=2.1.0",
 ]
 
-_PRISM_REQUIREMENTS = [
-    "fairseq==0.9.0",
-    "numpy",
-]
+_PRISM_REQUIREMENTS = ["fairseq==0.9.0", "numpy>=1.23,<1.24"]
 
 _METRIC_REQUIREMENTS = [
     "sacrebleu>=2.0.0",
@@ -56,6 +53,7 @@ _METRIC_REQUIREMENTS = [
     "seqeval==1.2.2",
     "sentencepiece>=0.1.99,<0.2",
     "unbabel-comet==2.0.1",
+    "protobuf>=3.20.3,<3.21",
 ]
 
 _METRIC_REQUIREMENTS.extend(_PRISM_REQUIREMENTS)
