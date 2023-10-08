@@ -56,7 +56,6 @@ _METRIC_REQUIREMENTS = [
     "seqeval==1.2.2",
     "sentencepiece>=0.1.99,<0.2",
     'unbabel-comet==2.0.1',
-    "protobuf<3.20.1",
 ]
 
 _METRIC_REQUIREMENTS.extend(_PRISM_REQUIREMENTS)
