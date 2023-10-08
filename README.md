@@ -12,7 +12,7 @@
 <a href="https://github.com/psf/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 <a href="https://github.com/obss/jury/blob/main/LICENSE"><img alt="License: MIT" src="https://img.shields.io/pypi/l/jury"></a>
 <br>
-<a href="https://doi.org/10.5281/zenodo.6109838"><img src="https://zenodo.org/badge/DOI/10.5281/zenodo.6109838.svg" alt="DOI"></a>
+<a href="https://doi.org/10.48550/arXiv.2310.02040"><img src="https://img.shields.io/badge/DOI-10.48550%2FarXiv.2310.02040-blue" alt="DOI"></a>
 </p>
 
 A comprehensive toolkit for evaluating NLP experiments offering various automated metrics. Jury offers a smooth and easy-to-use interface. It uses a more advanced version of [evaluate](https://github.com/huggingface/evaluate/) design for underlying metric computation, so that adding custom metric is easy as extending proper class.
@@ -27,9 +27,12 @@ Main advantages that Jury offers are:
 
 To see more, check the [official Jury blog post](https://medium.com/codable/jury-evaluating-performance-of-nlg-models-730eb9c9999f).
 
-**Public notice:** You can reach our official [Public Notice](https://docs.google.com/document/d/1mFFT0cR8BUHKJki8mAg6b36QhmsRxvKR3pwOlcxbnss/edit?usp=sharing) document that poses a claim about plagiarism of the work, *jury*, presented in this codebase.
+## 🔥 News
 
-# Available Metrics
+* (2023.10.03) Jury paper is out currently is on [arxiv](https://arxiv.org/abs/2310.02040). Please cite this paper if your work use Jury, and if your publication material will be submitted to the venues after this date.  
+* (2023.07.30) **Public notice:** You can reach our official [Public Notice](https://docs.google.com/document/d/1mFFT0cR8BUHKJki8mAg6b36QhmsRxvKR3pwOlcxbnss/edit?usp=sharing) document that poses a claim about plagiarism of the work, *jury*, presented in this codebase.
+
+## Available Metrics
 
 The table below shows the current support status for available metrics.
 
@@ -263,14 +266,14 @@ To format codebase,
 
 If you use this package in your work, please cite it as:
 
-    @software{obss2021jury,
-      author       = {Cavusoglu, Devrim and Akyon, Fatih Cagatay and Sert, Ulas and Cengiz, Cemil},
-      title        = {{Jury: Comprehensive NLP Evaluation toolkit}},
-      month        = {feb},
-      year         = {2022},
-      publisher    = {Zenodo},
-      doi          = {10.5281/zenodo.6108229},
-      url          = {https://doi.org/10.5281/zenodo.6108229}
+    @misc{cavusoglu2023jury,
+      title={Jury: A Comprehensive Evaluation Toolkit}, 
+      author={Devrim Cavusoglu and Ulas Sert and Secil Sen and Sinan Altinuc},
+      year={2023},
+      eprint={2310.02040},
+      archivePrefix={arXiv},
+      primaryClass={cs.CL},
+      doi={10.48550/arXiv.2310.02040}
     }
 
 ## <div align="center"> License </div>
