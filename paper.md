@@ -16,7 +16,7 @@ authors:
     affiliation: "1, 3"
   - name: Ulas Sert
     affiliation: 1
-  - name: Ulas Sert
+  - name: Sinan Altinuc
     affiliation: "1, 2"
 affiliations:
  - name: OBSS AI
