@@ -276,6 +276,16 @@ If you use this package in your work, please cite it as:
       doi={10.48550/arXiv.2310.02040}
     }
 
+## Community Interaction
+
+We use the GitHub Issue Tracker to track issues in general. Issues can be bug reports, feature requests or implementation of a new metric type. Please refer to the related issue template for opening new issues.
+
+|                                | Location                                                                                           |
+|--------------------------------|----------------------------------------------------------------------------------------------------|
+| Bug Report                     | [Bug Report Template](https://github.com/obss/jury/issues/new?assignees=&labels=&projects=&template=bug_report.md&title=) |
+| New Metric Request             | [Request Metric Implementation](https://github.com/obss/jury/issues/new?assignees=&labels=&projects=&template=new-metric.md&title=) |
+| All other issues and questions | [General Issues](https://github.com/obss/jury/issues/new)                                                            |
+
 ## <div align="center"> License </div>
 
 Licensed under the [MIT](LICENSE) License.
