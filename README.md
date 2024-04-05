@@ -235,7 +235,7 @@ PRs are welcomed as always :)
 
     git clone https://github.com/obss/jury.git
     cd jury
-    pip install -e .[dev]
+    pip install -e ".[dev]"
 
 Also, you need to install the packages which are available through a git source separately with the following command. 
 For the folks who are curious about "why?"; a short explaination is that PYPI does not allow indexing a package which 
