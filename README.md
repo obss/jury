@@ -29,6 +29,7 @@ To see more, check the [official Jury blog post](https://medium.com/codable/jury
 
 ## 🔥 News
 
+* (2024.05.29) [Retraction Watch Post](https://retractionwatch.com/2024/05/29/caught-by-a-reviewer-a-plagiarizing-deep-learning-paper-lingers/) regarding retraction of a paper has been posted. [The plagiarised paper](https://aclanthology.org/2022.coling-1.306.pdf) has been retracted.
 * (2023.10.03) Jury paper is out currently is on [arxiv](https://arxiv.org/abs/2310.02040). Please cite this paper if your work use Jury, and if your publication material will be submitted to the venues after this date.  
 * (2023.07.30) **Public notice:** You can reach our official [Public Notice](https://docs.google.com/document/d/1mFFT0cR8BUHKJki8mAg6b36QhmsRxvKR3pwOlcxbnss/edit?usp=sharing) document that poses a claim about plagiarism of the work, *jury*, presented in this codebase.
 
